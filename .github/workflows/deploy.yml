@@ -73,7 +73,7 @@ jobs:
 
   # --- 1. OPSERA BACKEND SERVICE ---
   service-backend:
-    name: Backend: Build & Deploy
+    name: "Backend: Build & Deploy"
     needs: [backend-tests]
     runs-on: ubuntu-latest
     steps:
@@ -125,7 +125,7 @@ jobs:
 
   # --- 2. OPSERA AGENTIC WORKER SERVICE ---
   service-agentic:
-    name: Agentic Worker: Build & Deploy
+    name: "Agentic Worker: Build & Deploy"
     needs: [backend-tests]
     runs-on: ubuntu-latest
     steps:
@@ -177,7 +177,7 @@ jobs:
 
   # --- 3. OPSERA FRONTEND SERVICE ---
   service-frontend:
-    name: Frontend: Build & Deploy
+    name: "Frontend: Build & Deploy"
     needs: [frontend-check]
     runs-on: ubuntu-latest
     steps:
