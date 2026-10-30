@@ -16,7 +16,15 @@ RUN pip install --no-cache-dir .
 
 COPY backend/ ./backend/
 COPY agentic/ ./agentic/
+COPY data/ ./data/
+RUN mkdir -p /app/data/storage
+
+# Default SQLite database configuration for self-contained Cloud Run demo
+ENV DATABASE_URL=sqlite:////app/data/ops_agent.db \
+    STORAGE_BACKEND=local \
+    LOCAL_STORAGE_DIR=/app/data/storage \
+    PORT=8000
 
 EXPOSE 8000
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

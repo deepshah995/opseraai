@@ -13,11 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY agentic/pyproject.toml ./
 RUN pip install --no-cache-dir .
 
+COPY backend/ ./backend/
 COPY agentic/ ./agentic/
-COPY backend/app/core ./backend/app/core
-COPY backend/app/db/models ./backend/app/db/models
-COPY backend/app/db/base.py ./backend/app/db/base.py
 
 EXPOSE 8080
 
-CMD ["uvicorn", "agentic.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["sh", "-c", "uvicorn agentic.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

@@ -53,6 +53,18 @@ async def lifespan(app: FastAPI):
             db.add(demo_user)
             db.commit()
             logger.info("Default tenant and operations manager initialized.")
+
+        # Ensure demo records and exceptions are seeded if table is empty
+        from backend.app.db.models.record import OperationalRecord
+        if db.query(OperationalRecord).count() == 0:
+            logger.info("Auto-seeding initial demo records and running exception detection...")
+            from backend.app.api.routes.records import seed_demo_data
+            admin_user = db.query(User).first()
+            if admin_user:
+                seed_demo_data(current_user=admin_user, db=db)
+                logger.info("Demo records and exceptions initialized.")
+    except Exception as e:
+        logger.warning(f"Startup initialization notice: {e}")
     finally:
         db.close()
 
