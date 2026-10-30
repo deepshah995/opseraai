@@ -1,4 +1,4 @@
-name: CI/CD - Test, Build & Deploy
+name: CI/CD - Parallel Build & Deploy
 
 on:
   push:
@@ -12,10 +12,10 @@ env:
 
 jobs:
   # ==========================================
-  # STAGE 1: Automated Quality & Test Suite
+  # STAGE 1: Fast Quality & Test Checks
   # ==========================================
   backend-tests:
-    name: Backend & Agentic Tests
+    name: Backend Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,7 +45,7 @@ jobs:
           pytest -v backend/tests/
 
   frontend-check:
-    name: Frontend Build & Typecheck
+    name: Frontend Typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -67,27 +67,17 @@ jobs:
         run: npm run build
 
   # ==========================================
-  # STAGE 2: Parallel Docker Image Builds
+  # STAGE 2: PARALLEL SERVICE BUILDS & DEPLOYS
+  # Each service builds & deploys concurrently
   # ==========================================
-  build-images:
-    name: Build & Push ${{ matrix.service.name }}
-    needs: [backend-tests, frontend-check]
+
+  # --- 1. OPSERA BACKEND SERVICE ---
+  service-backend:
+    name: Backend: Build & Deploy
+    needs: [backend-tests]
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        service:
-          - name: opsera-backend
-            context: .
-            dockerfile: ./backend/Dockerfile
-          - name: opsera-agentic
-            context: .
-            dockerfile: ./agentic/Dockerfile
-          - name: opsera-frontend
-            context: ./frontend
-            dockerfile: ./frontend/Dockerfile
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
@@ -99,25 +89,17 @@ jobs:
           username: ${{ env.DOCKER_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Container Image
+      - name: Build & Push Backend Container
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.service.context }}
-          file: ${{ matrix.service.dockerfile }}
+          context: .
+          file: ./backend/Dockerfile
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ env.DOCKER_USER }}/${{ matrix.service.name }}:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/${{ matrix.service.name }}:latest
+            ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/opsera-backend:latest
 
-  # ==========================================
-  # STAGE 3: Cloud Run Deployment
-  # ==========================================
-  deploy-cloudrun:
-    name: Deploy Services to Cloud Run
-    needs: [build-images]
-    runs-on: ubuntu-latest
-    steps:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -126,7 +108,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy Backend to Cloud Run
+      - name: Deploy opsera-backend to Cloud Run
         run: |
           gcloud run deploy opsera-backend \
             --project ${{ env.PROJECT_ID }} \
@@ -141,13 +123,44 @@ jobs:
             --min-instances 0 \
             --max-instances 2
 
-      - name: Retrieve Backend URL
-        run: |
-          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
-          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
-          echo "Discovered Backend URL: $BACKEND_URL"
+  # --- 2. OPSERA AGENTIC WORKER SERVICE ---
+  service-agentic:
+    name: Agentic Worker: Build & Deploy
+    needs: [backend-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Deploy Agentic Worker to Cloud Run
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_PASSWORD }}
+
+      - name: Build & Push Agentic Worker Container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./agentic/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/opsera-agentic:latest
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY || secrets.GOOGLE_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy opsera-agentic to Cloud Run
         run: |
           gcloud run deploy opsera-agentic \
             --project ${{ env.PROJECT_ID }} \
@@ -162,14 +175,57 @@ jobs:
             --min-instances 0 \
             --max-instances 2
 
-      - name: Retrieve Agentic Worker URL
-        run: |
-          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
-          echo "AGENTIC_URL=$AGENTIC_URL" >> $GITHUB_ENV
-          echo "Discovered Agentic URL: $AGENTIC_URL"
+  # --- 3. OPSERA FRONTEND SERVICE ---
+  service-frontend:
+    name: Frontend: Build & Deploy
+    needs: [frontend-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Deploy Frontend to Cloud Run
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_PASSWORD }}
+
+      - name: Build & Push Frontend Container
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/opsera-frontend:latest
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY || secrets.GOOGLE_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Discover Backend URL & Deploy opsera-frontend
         run: |
+          # Retrieve backend URL (polling briefly if first deployment is in progress)
+          BACKEND_URL=""
+          for i in {1..20}; do
+            BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
+            if [ -n "$BACKEND_URL" ]; then
+              echo "Discovered Backend URL: $BACKEND_URL"
+              break
+            fi
+            echo "Waiting for opsera-backend endpoint to resolve... ($i/20)"
+            sleep 5
+          done
+
           gcloud run deploy opsera-frontend \
             --project ${{ env.PROJECT_ID }} \
             --image docker.io/${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }} \
@@ -177,24 +233,39 @@ jobs:
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --port 8080 \
-            --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${{ env.BACKEND_URL }}" \
+            --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL}" \
             --memory 512Mi \
             --cpu 1 \
             --min-instances 0 \
             --max-instances 2
 
-      - name: Retrieve Frontend URL
-        run: |
-          FRONTEND_URL=$(gcloud run services describe opsera-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
-          echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
-          echo "Discovered Frontend URL: $FRONTEND_URL"
+  # ==========================================
+  # STAGE 3: Final Deployment Summary
+  # ==========================================
+  deployment-summary:
+    name: Deployment Summary
+    needs: [service-backend, service-agentic, service-frontend]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY || secrets.GOOGLE_SA_KEY }}
 
-      - name: Deployment Summary
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Publish Summary Table
         run: |
-          echo "### 🚀 Cloud Run Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          FRONTEND_URL=$(gcloud run services describe opsera-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "Pending")
+          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "Pending")
+          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "Pending")
+
+          echo "### 🚀 Cloud Run Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Service | Cloud Run Endpoint | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Cloud Run Endpoint | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Frontend** | [${{ env.FRONTEND_URL }}](${{ env.FRONTEND_URL }}) | Next.js 14 Web Interface |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Backend** | [${{ env.BACKEND_URL }}](${{ env.BACKEND_URL }}) | FastAPI Core + SQLite Database |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Agentic Worker** | [${{ env.AGENTIC_URL }}](${{ env.AGENTIC_URL }}) | LangGraph Investigation Worker |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Frontend UI** | [$FRONTEND_URL]($FRONTEND_URL) | Active |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Backend API** | [$BACKEND_URL]($BACKEND_URL) | Active |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Agentic Worker** | [$AGENTIC_URL]($AGENTIC_URL) | Active |" >> $GITHUB_STEP_SUMMARY
