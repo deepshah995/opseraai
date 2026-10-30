@@ -213,14 +213,14 @@ def generate_minion_chat_response(agent_id: str, message: str, context: dict[str
 
     if any(k in msg_lower for k in ["team", "other agents", "friends", "together", "colleagues"]):
         team_talk = (
-            f"*signals with pride to fellow operations agents* We are an unstoppable autonomous operations squad!\n\n"
-            f"• 🔍 **TicketHawk (TH-01)** verifies landfill scale slips vs driver estimates.\n"
-            f"• 🚚 **DispatchPulse (DP-02)** tracks fleet GPS & route swaps.\n"
-            f"• 💰 **BillSentry (BS-03)** stops unbilled hauls & catches wrong rates.\n"
-            f"• 🔮 **ReportBeacon (RB-04)** synthesizes big-picture leadership KPIs.\n"
-            f"• 🛡️ **DisputeShield (DS-05)** brings certified proof to keep customers smiling!\n"
-            f"• ⚡ **ResolveX (RX-06)** executes instant auto-settlements (<$500) & stages 1-click approvals for leadership.\n\n"
-            f"When we pass data packets to each other, nothing slips through the cracks!"
+            "*signals with pride to fellow operations agents* We are an unstoppable autonomous operations squad!\n\n"
+            "• 🔍 **TicketHawk (TH-01)** verifies landfill scale slips vs driver estimates.\n"
+            "• 🚚 **DispatchPulse (DP-02)** tracks fleet GPS & route swaps.\n"
+            "• 💰 **BillSentry (BS-03)** stops unbilled hauls & catches wrong rates.\n"
+            "• 🔮 **ReportBeacon (RB-04)** synthesizes big-picture leadership KPIs.\n"
+            "• 🛡️ **DisputeShield (DS-05)** brings certified proof to keep customers smiling!\n"
+            "• ⚡ **ResolveX (RX-06)** executes instant auto-settlements (<$500) & stages 1-click approvals for leadership.\n\n"
+            "When we pass data packets to each other, nothing slips through the cracks!"
         )
         return {
             "agent_id": clean_id,

@@ -6,6 +6,7 @@ Defines agent identities, cool names, personas, capabilities, and interactive tu
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass
 class AgentTutorialStep:
     step_number: int

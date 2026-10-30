@@ -1,5 +1,5 @@
-from datetime import UTC, datetime
 import logging
+from datetime import UTC, datetime
 from typing import Any
 
 from agentic.app.agents.dispatcher import OperationsAgentDispatcher
@@ -83,7 +83,7 @@ def list_agents(
 def get_tutorials(current_user: User = Depends(get_current_user)):
     """Return full interactive tutorial modules and learning steps for each agent."""
     tutorials = []
-    for agent_id, agent in AGENTS_REGISTRY.items():
+    for agent in AGENTS_REGISTRY.values():
         tutorials.append({
             "agent_id": agent.id,
             "agent_name": agent.name,

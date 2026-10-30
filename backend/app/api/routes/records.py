@@ -16,11 +16,15 @@ from backend.app.schemas.record import (
     OperationalRecordCreate,
     OperationalRecordResponse,
 )
-from backend.app.services.ingestion import IngestionService, infer_column_mapping, parse_date, parse_float
+from backend.app.services.ingestion import (
+    IngestionService,
+    infer_column_mapping,
+    parse_date,
+    parse_float,
+)
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy import delete, or_, select
 from sqlalchemy.orm import Session
-
 
 router = APIRouter(prefix="/records", tags=["Operational Records"])
 
