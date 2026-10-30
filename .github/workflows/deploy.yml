@@ -11,9 +11,22 @@ env:
   DOCKER_USER: ${{ secrets.DOCKER_USER || secrets.DOCKERHUB_USERNAME || 'deepshah995' }}
 
 jobs:
-  build-and-deploy:
-    name: Build Docker Images & Deploy Cloud Run
+  build-images:
+    name: Build & Push ${{ matrix.service.name }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: opsera-backend
+            context: .
+            dockerfile: ./backend/Dockerfile
+          - name: opsera-agentic
+            context: .
+            dockerfile: ./agentic/Dockerfile
+          - name: opsera-frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,39 +40,22 @@ jobs:
           username: ${{ env.DOCKER_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Backend Image
+      - name: Build & Push Container Image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./backend/Dockerfile
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/opsera-backend:latest
+            ${{ env.DOCKER_USER }}/${{ matrix.service.name }}:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/${{ matrix.service.name }}:latest
 
-      - name: Build & Push Agentic Worker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./agentic/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/opsera-agentic:latest
-
-      - name: Build & Push Frontend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/opsera-frontend:latest
-
+  deploy-cloudrun:
+    name: Deploy Services to Cloud Run
+    needs: [build-images]
+    runs-on: ubuntu-latest
+    steps:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
