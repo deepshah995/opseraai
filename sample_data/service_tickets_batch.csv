@@ -1,0 +1,4 @@
+ticket_number,customer_name,service_date,quantity,unit,rate,amount,status,driver
+TKT-8801,Titan Industrial Metals,2026-10-25,12.5,tons,75.00,937.50,completed,Marcus Vance
+TKT-8802,Metro Recycle Corp,2026-10-25,8.0,tons,85.00,680.00,completed,David Chen
+TKT-8803,Apex Construction LLC,2026-10-26,15.2,tons,70.00,1064.00,completed,Elena Rostova

@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ops_agent_db
+    environment:
+      POSTGRES_DB: ops_agent
+      POSTGRES_USER: ops_user
+      POSTGRES_PASSWORD: ops_password_local
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ops_user -d ops_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ops_agent_backend
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+psycopg2://ops_user:ops_password_local@postgres:5432/ops_agent
+      STORAGE_BACKEND: local
+      LOCAL_STORAGE_DIR: /app/data/storage
+      JWT_SECRET_KEY: local-dev-secret-key-32-chars-long!!
+      USE_MOCK_LLM_IN_DEV: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+  agentic:
+    build:
+      context: .
+      dockerfile: agentic/Dockerfile
+    container_name: ops_agent_agentic
+    environment:
+      ENVIRONMENT: development
+      USE_MOCK_LLM_IN_DEV: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ops_agent_frontend
+    environment:
+      BACKEND_API_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

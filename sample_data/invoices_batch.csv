@@ -1,0 +1,4 @@
+invoice_number,customer_name,service_date,quantity,unit,rate,amount,status
+INV-8801,Titan Industrial Metals,2026-10-26,12.5,tons,75.00,937.50,issued
+INV-8802,Metro Recycle Corp,2026-10-26,8.0,tons,95.00,760.00,issued
+INV-8803,Apex Construction LLC,2026-10-27,15.2,tons,70.00,1064.00,issued
