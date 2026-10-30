@@ -245,6 +245,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
         {/* Tab Switcher */}
         <div className="flex items-center rounded-lg border border-slate-200 bg-slate-100 p-1 dark:border-slate-800 dark:bg-slate-800">
           <button
+            id="tab-csv-import"
             onClick={() => setActiveTab("csv")}
             className={`flex items-center space-x-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
               activeTab === "csv"
@@ -256,6 +257,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
             <span>Excel / CSV Importer</span>
           </button>
           <button
+            id="tab-db-connect"
             onClick={() => setActiveTab("database")}
             className={`flex items-center space-x-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
               activeTab === "database"

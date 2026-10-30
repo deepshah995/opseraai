@@ -224,6 +224,7 @@ export function ReportingAgentView({
 
             {/* Primary Report Agent Action: Generate Live Operations Report */}
             <button
+              id="btn-generate-report"
               onClick={handleGenerateBriefing}
               disabled={generatingReport}
               className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-purple-950/30 transition transform active:scale-95 disabled:opacity-50 cursor-pointer"
@@ -234,6 +235,7 @@ export function ReportingAgentView({
 
             {/* Secondary Audit Action: Run Fleet Auto-Reconcile */}
             <button
+              id="btn-auto-reconcile"
               onClick={handleRunAgentSweep}
               disabled={runningSweep}
               title="Instructs ReportBeacon to audit open discrepancies across the fleet and auto-settle verified variances (<$500)"

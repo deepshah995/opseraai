@@ -21,6 +21,9 @@ import {
   ChevronDown,
   ChevronUp,
   Play,
+  BarChart3,
+  Layers,
+  Zap,
 } from "lucide-react";
 import { WalkthroughSpotlightPointer, SpotlightTarget } from "./WalkthroughSpotlightPointer";
 import { NavTab } from "../layout/Sidebar";
@@ -88,8 +91,8 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
       id: "seed-data",
       badge: "01",
       title: "Load Demo Data",
-      headline: "Load sample tickets & customer bills",
-      description: "Click 'Load Demo Data' in the top bar to add realistic examples of waste haul tickets, disposal scale receipts, customer invoices, and driver logs.",
+      headline: "Populate realistic scale tickets & customer bills",
+      description: "Click 'Load Demo Data' in the top bar to add realistic examples of waste haul tickets, certified landfill scale slips, customer invoices, and driver logs.",
       icon: Database,
       targetElementId: "btn-seed-data",
       pointerLabel: "Step 1: Click 'Load Demo Data'",
@@ -106,7 +109,7 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
       badge: "02",
       title: "Check for Errors",
       headline: "Find billing mistakes automatically",
-      description: "Click 'Check for Errors'. The system compares your tickets, invoices, and disposal receipts to instantly spot wrong prices, double charges, and missing bills.",
+      description: "Click 'Check for Errors'. The system compares tickets, invoices, and disposal receipts to instantly spot wrong prices, double charges, and missing bills.",
       icon: RefreshCw,
       targetElementId: "btn-run-detection",
       pointerLabel: "Step 2: Click 'Check for Errors'",
@@ -120,14 +123,13 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
     },
     {
       id: "dashboard-overview",
-
       badge: "03",
-      title: "See Money at Risk",
-      headline: "Track how much money is affected",
-      description: "Look at the 'Money at Risk' card. It shows the total dollar amount lost to billing errors, and organizes the problems into clear, simple categories.",
+      title: "Track Money at Risk",
+      headline: "Live visibility into affected revenue",
+      description: "The 'Money at Risk' card tracks the total dollar volume lost to billing discrepancies across your operations, broken down by issue category.",
       icon: LayoutDashboard,
       targetElementId: "kpi-at-risk",
-      pointerLabel: "Total Dollars Lost to Errors",
+      pointerLabel: "Total Dollars at Risk",
       pointerPosition: "bottom",
       requiredTab: "dashboard",
       actionButtonText: "Check Overview Cards",
@@ -137,14 +139,65 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
       },
     },
     {
-      id: "exception-queue",
+      id: "agents-fleet",
       badge: "04",
-      title: "Review Issues List",
-      headline: "Browse and sort problems found",
-      description: "Go to the 'Issues List'. You can filter by priority (Critical or High), filter by problem type (like 'Billed Twice'), or search for a specific customer.",
+      title: "AI Agents Fleet & Live Studio",
+      headline: "5 autonomous agents with character avatars & telemetry",
+      description: "Meet the specialized Opsera AI Fleet: TicketHawk (scale variance), DispatchPulse (GPS routes), BillSentry (unbilled hauls), OpsBeacon (analytics), and DisputeShield (customer claims). In the Live Studio, chat with each agent and view their live enterprise data connections!",
+      icon: Bot,
+      targetElementId: "tab-agents",
+      pointerLabel: "Step 4: AI Agents Fleet & Live Studio",
+      pointerPosition: "auto",
+      requiredTab: "agents",
+      actionButtonText: "Explore AI Agents Fleet",
+      onExecuteAction: () => {
+        setActiveTab("agents");
+        triggerSpotlight("tab-agents", "AI Agents Fleet & Character Studio", "auto");
+      },
+    },
+    {
+      id: "agent-workbench",
+      badge: "05",
+      title: "Agent Console & Simulation",
+      headline: "Run live agent simulations & auto-resolutions",
+      description: "Switch to the Agent Console to test real-world scenarios. Run DisputeShield to produce certified customer dispute resolution letters or ResolveX to execute instant auto-settlements (<$500).",
+      icon: Sparkles,
+      targetElementId: "btn-agent-workbench",
+      pointerLabel: "Step 5: Agent Console & Scenarios",
+      pointerPosition: "auto",
+      requiredTab: "agents",
+      actionButtonText: "Highlight Agent Console",
+      onExecuteAction: () => {
+        setActiveTab("agents");
+        triggerSpotlight("btn-agent-workbench", "Launch Agent Console", "auto");
+      },
+    },
+    {
+      id: "report-console",
+      badge: "06",
+      title: "Report Console (OpsBeacon)",
+      headline: "Executive KPI briefings & margin analytics",
+      description: "OpsBeacon (RB-04) continuously analyzes cross-fleet operational performance. Generate real-time executive briefings, facility benchmarks, cycle-time velocity, and downloadable summaries.",
+      icon: BarChart3,
+      targetElementId: "tab-reports",
+      pointerLabel: "Step 6: Operations Report Console",
+      pointerPosition: "auto",
+      requiredTab: "reports",
+      actionButtonText: "Open Report Console",
+      onExecuteAction: () => {
+        setActiveTab("reports");
+        triggerSpotlight("tab-reports", "Operations Report Console", "auto");
+      },
+    },
+    {
+      id: "exception-queue",
+      badge: "07",
+      title: "Review Issues Queue",
+      headline: "Triage detected billing discrepancies",
+      description: "Browse detected discrepancies sorted by financial severity. Filter by priority (Critical or High), problem type (e.g., 'Unbilled Haul' or 'Tonnage Leak'), or search by customer name.",
       icon: AlertTriangle,
       targetElementId: "tab-exceptions",
-      pointerLabel: "Step 4: Go to Issues List",
+      pointerLabel: "Step 7: Go to Issues List",
       pointerPosition: "auto",
       requiredTab: "exceptions",
       actionButtonText: "Open Issues List",
@@ -155,13 +208,13 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
     },
     {
       id: "investigate-action",
-      badge: "05",
-      title: "Ask AI to Investigate",
-      headline: "Let the AI find out what went wrong",
-      description: "Click the blue 'Investigate' button next to any issue. The AI helper will do the math, compare documents, and find the root cause.",
+      badge: "08",
+      title: "Trigger AI Investigation",
+      headline: "Stateful LangGraph root-cause analysis",
+      description: "Click 'Investigate' next to any issue. The agent fetches linked scale slips, cross-checks customer contract rates, executes mathematical reconciliation, and formulates the exact root cause.",
       icon: Bot,
       targetElementId: "btn-investigate-first",
-      pointerLabel: "Step 5: Click 'Investigate'",
+      pointerLabel: "Step 8: Click 'Investigate'",
       pointerPosition: "auto",
       requiredTab: "exceptions",
       actionButtonText: "Highlight Investigate Button",
@@ -175,16 +228,16 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
     },
     {
       id: "evidence-grounding",
-      badge: "06",
-      title: "See the Proof Side-by-Side",
-      headline: "Real documents, zero guesswork",
-      description: "Compare the customer bill and signed driver ticket side-by-side. The AI explains the exact difference and quotes the actual document numbers.",
+      badge: "09",
+      title: "Side-by-Side Document Proof",
+      headline: "Zero hallucination, grounded mathematical proof",
+      description: "Compare the invoice line items, driver work order, and scale weight slip side-by-side. The agent displays certified weights, formulaic rate math, and contractual clauses with zero guesswork.",
       icon: ShieldCheck,
       targetElementId: "agent-findings-card",
-      pointerLabel: "AI Explanation & Document Proof",
+      pointerLabel: "Step 9: Document Proof & Math",
       pointerPosition: "auto",
       requiredTab: "exceptions",
-      actionButtonText: "View Document Proof",
+      actionButtonText: "View Evidence & Proof",
       onExecuteAction: () => {
         setActiveTab("exceptions");
         if (exceptions.length > 0 && onSelectException) {
@@ -195,13 +248,13 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
     },
     {
       id: "hitl-approval",
-      badge: "07",
-      title: "Approve or Reject the Fix",
-      headline: "You have the final say",
-      description: "The AI suggests how to fix it (like giving a $220.00 refund). You type your notes and click 'Approve Fix'. The AI never changes money on its own.",
+      badge: "10",
+      title: "Manager 1-Click Approval",
+      headline: "Human-in-the-loop enterprise governance",
+      description: "The agent stages proposed resolutions (e.g., issuing a $220.00 credit memo or rebilling an unbilled haul) for human review. Managers enter notes and click 'Approve Fix' or 'Reject' with full governance.",
       icon: CheckSquare,
       targetElementId: "hitl-approval-card",
-      pointerLabel: "Step 7: Manager Approval Box",
+      pointerLabel: "Step 10: Manager Decision Box",
       pointerPosition: "auto",
       requiredTab: "exceptions",
       actionButtonText: "Highlight Approval Box",
@@ -215,30 +268,30 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
     },
     {
       id: "data-ingestion",
-      badge: "08",
-      title: "Upload Your Own Files",
-      headline: "Import spreadsheets or PDF tickets",
-      description: "Go to 'Upload Files' to import your own CSV spreadsheets or PDF receipts. The system matches columns automatically so you don't have to enter them by hand.",
+      badge: "11",
+      title: "Spreadsheets & Database Ingestion",
+      headline: "Import CSVs or connect live SQL databases",
+      description: "Upload your team's existing CSV spreadsheets with automatic column mapping, or connect directly to enterprise databases (AMCS, PostgreSQL, MySQL) to pull live operations data.",
       icon: FileUp,
       targetElementId: "tab-ingestion",
-      pointerLabel: "Step 8: Upload Files",
+      pointerLabel: "Step 11: Ingestion & ERP Connect",
       pointerPosition: "auto",
       requiredTab: "ingestion",
-      actionButtonText: "Open Upload Screen",
+      actionButtonText: "Open Ingestion Screen",
       onExecuteAction: () => {
         setActiveTab("ingestion");
-        triggerSpotlight("tab-ingestion", "Upload Files", "auto");
+        triggerSpotlight("tab-ingestion", "Upload Files & Connect DB", "auto");
       },
     },
     {
       id: "audit-trail",
-      badge: "09",
-      title: "Activity History",
-      headline: "Complete, honest record of all actions",
-      description: "Every check, AI explanation, and manager approval is saved in this log so your team always knows who approved what and when.",
+      badge: "12",
+      title: "Complete Activity History",
+      headline: "Honest, immutable audit ledger",
+      description: "Every check, AI root cause analysis, and manager approval is logged with precise timestamps, before/after values, and user identity for enterprise compliance.",
       icon: History,
       targetElementId: "tab-audit",
-      pointerLabel: "Step 9: Activity Log",
+      pointerLabel: "Step 12: Activity Log",
       pointerPosition: "auto",
       requiredTab: "audit",
       actionButtonText: "View Activity Log",
@@ -255,7 +308,11 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
     if (isOpen && !isMinimized && currentStep) {
       setActiveTab(currentStep.requiredTab);
 
-      if ((currentStep.id === "evidence-grounding" || currentStep.id === "hitl-approval") && exceptions.length > 0 && onSelectException) {
+      if (
+        (currentStep.id === "evidence-grounding" || currentStep.id === "hitl-approval" || currentStep.id === "investigate-action") &&
+        exceptions.length > 0 &&
+        onSelectException
+      ) {
         onSelectException(exceptions[0].id);
       }
 
@@ -338,8 +395,8 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-xs tracking-wide text-white">App Walkthrough</h3>
-              <p className="text-[10px] text-slate-400">Step-by-Step Guide</p>
+              <h3 className="font-bold text-xs tracking-wide text-white">Opsera AI Guided Tour</h3>
+              <p className="text-[10px] text-slate-400">Interactive Walkthrough</p>
             </div>
           </div>
 
@@ -366,7 +423,7 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
           <div className="flex items-center gap-2 mb-2">
             <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500 ease-out"
+                className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
               />
             </div>
@@ -378,47 +435,44 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
           {/* Dropdown Toggle to Jump to Any Step */}
           <button
             onClick={() => setShowStepList(!showStepList)}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between text-left py-1 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer group"
           >
-            <div className="flex items-center gap-2 truncate">
-              <span className="w-4 h-4 rounded bg-blue-500 text-white font-mono font-bold text-[9px] flex items-center justify-center shrink-0">
-                {currentStep.badge}
-              </span>
-              <span className="truncate text-[11px] font-medium">{currentStep.title}</span>
+            <span className="font-semibold truncate">
+              Step {currentStep.badge}: {currentStep.title}
+            </span>
+            <div className="flex items-center gap-1 text-[10px] text-blue-400 font-mono">
+              <span>All Steps</span>
+              {showStepList ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
             </div>
-            {showStepList ? (
-              <ChevronUp className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            ) : (
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            )}
           </button>
 
-          {/* Step List Drawer */}
+          {/* Expandable Step List */}
           {showStepList && (
-            <div className="mt-2 space-y-1 max-h-48 overflow-y-auto border-t border-white/10 pt-2 animate-fade-in">
-              {steps.map((s, idx) => {
-                const isActive = idx === currentStepIndex;
+            <div className="mt-2.5 py-1 max-h-48 overflow-y-auto space-y-1 pr-1 border-t border-white/10">
+              {steps.map((st, idx) => {
+                const isCur = idx === currentStepIndex;
                 const isDone = completedSteps[idx];
-                const ItemIcon = s.icon;
                 return (
                   <button
-                    key={s.id}
+                    key={st.id}
                     onClick={() => handleSelectStep(idx)}
-                    className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-colors cursor-pointer ${
-                      isActive
-                        ? "bg-blue-600/30 text-white border border-blue-500/40"
-                        : "hover:bg-white/5 text-slate-300"
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-xs transition cursor-pointer ${
+                      isCur
+                        ? "bg-blue-600 text-white font-bold"
+                        : "hover:bg-white/10 text-slate-300 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
-                      <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 ${
-                        isActive ? "bg-blue-500 text-white" : "bg-white/10 text-slate-400"
-                      }`}>
-                        <ItemIcon className="w-3 h-3" />
-                      </div>
-                      <span className="truncate text-[11px] font-medium">{s.title}</span>
+                      <span className="text-[10px] font-mono opacity-70">{st.badge}</span>
+                      <span className="truncate">{st.title}</span>
                     </div>
-                    {isDone && <span className="text-[10px] text-emerald-400 font-bold">✓</span>}
+                    {isDone && !isCur && (
+                      <span className="text-[10px] text-emerald-400 font-mono font-bold">✓</span>
+                    )}
                   </button>
                 );
               })}
@@ -426,103 +480,58 @@ export const OperationsTour: React.FC<OperationsTourProps> = ({
           )}
         </div>
 
-        {/* Step Details & Prompt */}
-        <div className="p-4 space-y-3">
+        {/* Step Content */}
+        <div className="p-4 space-y-3.5 max-h-[380px] overflow-y-auto">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30">
-              <StepIcon className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center shrink-0 text-blue-400 mt-0.5">
+              <StepIcon className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white leading-tight">
+              <div className="text-[10px] font-mono uppercase text-blue-400 font-bold tracking-wider">
                 {currentStep.headline}
-              </h4>
-              <p className="mt-1 text-xs text-slate-300 leading-relaxed">
-                {currentStep.description}
-              </p>
+              </div>
+              <h4 className="text-sm font-bold text-white mt-0.5">{currentStep.title}</h4>
             </div>
           </div>
 
-          {/* Action Trigger Button & Feedback */}
-          {currentStep.onExecuteAction && (
-            <div className="space-y-2">
-              <button
-                disabled={actionLoading}
-                onClick={async () => {
-                  if (!currentStep.onExecuteAction) return;
-                  try {
-                    setActionLoading(true);
-                    setStepFeedback(null);
-                    await currentStep.onExecuteAction();
-                    setCompletedSteps((prev) => ({ ...prev, [currentStepIndex]: true }));
-                    if (currentStepIndex === 0) {
-                      setStepFeedback("✅ 11 Sample records loaded & ready! Click 'Next' to check for errors.");
-                    } else if (currentStepIndex === 1) {
-                      setStepFeedback("✅ Scan complete! Billing discrepancies detected.");
-                    }
-                  } catch (e: any) {
-                    setStepFeedback(`⚠️ Error: ${e.message}`);
-                  } finally {
-                    setActionLoading(false);
-                  }
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md transition-all cursor-pointer disabled:opacity-50"
-              >
-                {actionLoading ? (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Loading...</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-3 h-3 fill-current" />
-                    <span>{currentStep.actionButtonText || "Try This"}</span>
-                  </>
-                )}
-              </button>
+          <p className="text-xs text-slate-300 leading-relaxed">{currentStep.description}</p>
 
-              {stepFeedback && (
-                <div className="rounded-lg bg-emerald-950/80 border border-emerald-500/40 p-2 text-[11px] text-emerald-300 flex items-center gap-2 animate-fade-in">
-                  <span>{stepFeedback}</span>
-                </div>
-              )}
-
-              {currentStepIndex === 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("ingestion");
-                    setStepFeedback("Switched to File & DB Import tab!");
-                  }}
-                  className="w-full text-center text-[11px] text-blue-300 hover:text-blue-200 underline pt-1 cursor-pointer"
-                >
-                  Want your own data? Download Excel template or connect DB &rarr;
-                </button>
-              )}
-            </div>
+          {/* Action Trigger Button */}
+          {currentStep.actionButtonText && currentStep.onExecuteAction && (
+            <button
+              onClick={async () => {
+                setActionLoading(true);
+                try {
+                  if (currentStep.onExecuteAction) await currentStep.onExecuteAction();
+                } finally {
+                  setActionLoading(false);
+                }
+              }}
+              disabled={actionLoading}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50"
+            >
+              <Play className={`w-3.5 h-3.5 text-blue-400 ${actionLoading ? "animate-spin" : ""}`} />
+              <span>{actionLoading ? "Working..." : currentStep.actionButtonText}</span>
+            </button>
           )}
         </div>
 
-
-        {/* Footer Navigation Controls */}
+        {/* Navigation Footer */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-white/10 bg-slate-950/60">
           <button
             onClick={handlePrev}
             disabled={currentStepIndex === 0}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+            className="flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-white disabled:opacity-30 disabled:hover:text-slate-400 transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Back</span>
+            <span>Previous</span>
           </button>
-
-          <span className="text-[10px] text-slate-500 font-mono">
-            {currentStepIndex + 1} of {steps.length}
-          </span>
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-600/30 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-600/30 transition-all hover:scale-[1.02] cursor-pointer"
           >
-            <span>{currentStepIndex === steps.length - 1 ? "Finish" : "Next"}</span>
+            <span>{currentStepIndex === steps.length - 1 ? "Finish Tour" : "Next Step"}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

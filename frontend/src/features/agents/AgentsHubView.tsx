@@ -181,6 +181,7 @@ export function AgentsHubView({
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-lg border border-slate-200 bg-slate-100/80 p-0.5 dark:border-slate-800 dark:bg-slate-800/80 text-xs font-medium">
             <button
+              id="btn-fleet-overview"
               onClick={() => setActiveTab("fleet")}
               className={`flex items-center space-x-1.5 rounded-md px-3 py-1.5 transition ${
                 activeTab === "fleet"
@@ -192,6 +193,7 @@ export function AgentsHubView({
               <span>Fleet Overview</span>
             </button>
             <button
+              id="btn-agent-studio"
               onClick={() => setActiveTab("studio")}
               className={`flex items-center space-x-1.5 rounded-md px-3 py-1.5 transition ${
                 activeTab === "studio"
@@ -203,6 +205,7 @@ export function AgentsHubView({
               <span>Agent Live Studio</span>
             </button>
             <button
+              id="btn-agent-workbench"
               onClick={() => setActiveTab("workbench")}
               className={`flex items-center space-x-1.5 rounded-md px-3 py-1.5 transition ${
                 activeTab === "workbench"
@@ -216,6 +219,7 @@ export function AgentsHubView({
           </div>
 
           <button
+            id="btn-agent-tutorials"
             onClick={() => {
               if (agents.length > 0) handleOpenTutorial(selectedAgent || agents[0]);
             }}

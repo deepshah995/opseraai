@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   RefreshCw,
   Database,
+  BarChart3,
+  Layers,
 } from "lucide-react";
 
 interface TourWelcomeModalProps {
@@ -32,7 +34,7 @@ export const TourWelcomeModal: React.FC<TourWelcomeModalProps> = ({
       <div className="relative w-full max-w-xl bg-slate-900 border border-blue-500/30 rounded-3xl shadow-2xl p-6 sm:p-8 text-white overflow-hidden">
         {/* Glow ambient background accents */}
         <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-blue-600/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-purple-600/20 blur-3xl pointer-events-none" />
 
         {/* Close Button */}
         <button
@@ -46,16 +48,16 @@ export const TourWelcomeModal: React.FC<TourWelcomeModalProps> = ({
         {/* Header */}
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-mono font-bold tracking-wider uppercase">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-            <span>Quick 1-Minute Tour</span>
+            <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
+            <span>Interactive Opsera AI Tour</span>
           </div>
 
           <h2 className="text-2xl font-bold text-white tracking-tight">
-            See How the App Catches Billing & Job Mistakes
+            Autonomous Reconciliation & AI Agent Operations
           </h2>
 
           <p className="text-xs text-slate-300 leading-relaxed">
-            Take a fast, interactive tour to see how this tool finds billing errors, shows you clear proof, and helps you fix issues with one click.
+            Take a 1-minute guided tour to explore how Opsera AI audits scale slips, coordinates 5 specialized AI agents, generates executive briefings, and delivers 1-click human-approved resolutions.
           </p>
         </div>
 
@@ -66,38 +68,46 @@ export const TourWelcomeModal: React.FC<TourWelcomeModalProps> = ({
               <Database className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-bold text-white">1. Load Real Examples</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">Add sample tickets, disposal receipts, and customer bills with one click.</div>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
-              <Scale className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white">2. Find Mistakes Fast</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">Instantly spots wrong prices, jobs you forgot to bill, or double charges.</div>
+              <div className="text-xs font-bold text-white">1. Real Scale & ERP Data</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                Pre-loaded with landfill scale slips, customer billing invoices, and signed driver handheld tickets.
+              </div>
             </div>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
             <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
-              <Bot className="w-4 h-4" />
+              <Bot className="w-4 h-4 text-purple-400" />
             </div>
             <div>
-              <div className="text-xs font-bold text-white">3. Smart AI Explanation</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">The AI helper explains what went wrong in plain English and shows the exact proof.</div>
+              <div className="text-xs font-bold text-white">2. Live AI Agents Fleet</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                Meet TicketHawk, BillSentry, OpsBeacon, and DisputeShield with animated character avatars & live chat.
+              </div>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+              <BarChart3 className="w-4 h-4 text-indigo-400" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white">3. Report Console & KPIs</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                OpsBeacon synthesizes margin leakage across facilities into automated executive KPI briefings.
+              </div>
             </div>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-              <ShieldCheck className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
-              <div className="text-xs font-bold text-white">4. You Have the Final Say</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">The AI never moves money on its own. You review and approve every fix.</div>
+              <div className="text-xs font-bold text-white">4. 1-Click Human Governance</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                AI proposes mathematically proven fixes. Managers review evidence side-by-side and approve with 1 click.
+              </div>
             </div>
           </div>
         </div>
@@ -115,7 +125,7 @@ export const TourWelcomeModal: React.FC<TourWelcomeModalProps> = ({
             onClick={onStartTour}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition-all hover:scale-[1.02] cursor-pointer"
           >
-            <span>Start Quick Tour</span>
+            <span>Start Guided Tour</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
