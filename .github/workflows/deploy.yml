@@ -1,4 +1,4 @@
-name: CD - Build & Deploy to Google Cloud Run
+name: CI/CD - Test, Build & Deploy
 
 on:
   push:
@@ -11,8 +11,67 @@ env:
   DOCKER_USER: ${{ secrets.DOCKER_USER || secrets.DOCKERHUB_USERNAME || 'deepshah995' }}
 
 jobs:
+  # ==========================================
+  # STAGE 1: Automated Quality & Test Suite
+  # ==========================================
+  backend-tests:
+    name: Backend & Agentic Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./backend
+          pip install -e ./agentic
+          pip install pytest pytest-asyncio ruff
+
+      - name: Run Ruff Linting
+        run: |
+          ruff check backend/ agentic/
+
+      - name: Run Pytest Test Suite
+        env:
+          PYTHONPATH: .
+        run: |
+          pytest -v backend/tests/
+
+  frontend-check:
+    name: Frontend Build & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Next.js
+        working-directory: ./frontend
+        run: npm run build
+
+  # ==========================================
+  # STAGE 2: Parallel Docker Image Builds
+  # ==========================================
   build-images:
     name: Build & Push ${{ matrix.service.name }}
+    needs: [backend-tests, frontend-check]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -51,6 +110,9 @@ jobs:
             ${{ env.DOCKER_USER }}/${{ matrix.service.name }}:${{ github.sha }}
             ${{ env.DOCKER_USER }}/${{ matrix.service.name }}:latest
 
+  # ==========================================
+  # STAGE 3: Cloud Run Deployment
+  # ==========================================
   deploy-cloudrun:
     name: Deploy Services to Cloud Run
     needs: [build-images]
