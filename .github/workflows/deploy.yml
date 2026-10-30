@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
 
 env:
-  REGION: us-central1
+  REGION: ${{ secrets.GCP_REGION || 'us-central1' }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID || 'business-agents-508202' }}
+  DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME || 'deepts' }}
 
 jobs:
   build-and-deploy:
@@ -22,7 +24,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ env.DOCKER_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & Push Backend Image
@@ -33,8 +35,8 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/opsera-backend:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/opsera-backend:latest
+            ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/opsera-backend:latest
 
       - name: Build & Push Agentic Worker Image
         uses: docker/build-push-action@v5
@@ -44,8 +46,8 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/opsera-agentic:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/opsera-agentic:latest
+            ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/opsera-agentic:latest
 
       - name: Build & Push Frontend Image
         uses: docker/build-push-action@v5
@@ -55,13 +57,13 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/opsera-frontend:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/opsera-frontend:latest
+            ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/opsera-frontend:latest
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GOOGLE_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY || secrets.GOOGLE_SA_KEY }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -69,7 +71,8 @@ jobs:
       - name: Deploy Backend to Cloud Run
         run: |
           gcloud run deploy opsera-backend \
-            --image docker.io/${{ secrets.DOCKERHUB_USERNAME }}/opsera-backend:${{ github.sha }} \
+            --project ${{ env.PROJECT_ID }} \
+            --image docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }} \
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
@@ -82,14 +85,15 @@ jobs:
 
       - name: Retrieve Backend URL
         run: |
-          BACKEND_URL=$(gcloud run services describe opsera-backend --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
+          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
           echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
           echo "Discovered Backend URL: $BACKEND_URL"
 
       - name: Deploy Agentic Worker to Cloud Run
         run: |
           gcloud run deploy opsera-agentic \
-            --image docker.io/${{ secrets.DOCKERHUB_USERNAME }}/opsera-agentic:${{ github.sha }} \
+            --project ${{ env.PROJECT_ID }} \
+            --image docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }} \
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
@@ -102,14 +106,15 @@ jobs:
 
       - name: Retrieve Agentic Worker URL
         run: |
-          AGENTIC_URL=$(gcloud run services describe opsera-agentic --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
+          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
           echo "AGENTIC_URL=$AGENTIC_URL" >> $GITHUB_ENV
           echo "Discovered Agentic URL: $AGENTIC_URL"
 
       - name: Deploy Frontend to Cloud Run
         run: |
           gcloud run deploy opsera-frontend \
-            --image docker.io/${{ secrets.DOCKERHUB_USERNAME }}/opsera-frontend:${{ github.sha }} \
+            --project ${{ env.PROJECT_ID }} \
+            --image docker.io/${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }} \
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
@@ -122,7 +127,7 @@ jobs:
 
       - name: Retrieve Frontend URL
         run: |
-          FRONTEND_URL=$(gcloud run services describe opsera-frontend --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
+          FRONTEND_URL=$(gcloud run services describe opsera-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)')
           echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
           echo "Discovered Frontend URL: $FRONTEND_URL"
 
