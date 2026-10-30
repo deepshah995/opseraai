@@ -8,7 +8,7 @@ on:
 env:
   REGION: ${{ secrets.GCP_REGION || 'us-central1' }}
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID || 'business-agents-508202' }}
-  DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME || 'deepts' }}
+  DOCKER_USER: ${{ secrets.DOCKER_USER || secrets.DOCKERHUB_USERNAME || 'deepshah995' }}
 
 jobs:
   build-and-deploy:
@@ -25,7 +25,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKER_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_PASSWORD }}
 
       - name: Build & Push Backend Image
         uses: docker/build-push-action@v5
