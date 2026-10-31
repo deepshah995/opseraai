@@ -119,7 +119,7 @@ jobs:
               --platform managed \
               --region ${{ env.REGION }} \
               --allow-unauthenticated \
-              --port 8000 \
+              --port 8080 \
               --set-env-vars "ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=true,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage" \
               --memory 1Gi \
               --cpu 1 \

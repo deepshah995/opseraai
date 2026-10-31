@@ -2,7 +2,8 @@ FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=off
+    PIP_NO_CACHE_DIR=off \
+    PYTHONPATH=/app
 
 WORKDIR /app
 
@@ -11,8 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY backend/pyproject.toml ./
-RUN pip install --no-cache-dir .
+COPY backend/pyproject.toml ./backend/
+COPY agentic/pyproject.toml ./agentic/
+RUN pip install --no-cache-dir ./backend ./agentic
 
 COPY backend/ ./backend/
 COPY agentic/ ./agentic/
@@ -23,8 +25,8 @@ RUN mkdir -p /app/data/storage
 ENV DATABASE_URL=sqlite:////app/data/ops_agent.db \
     STORAGE_BACKEND=local \
     LOCAL_STORAGE_DIR=/app/data/storage \
-    PORT=8000
+    PORT=8080
 
-EXPOSE 8000
+EXPOSE 8080
 
-CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
