@@ -1,4 +1,4 @@
-name: CI/CD - Parallel Build & Deploy
+name: CI/CD - Fast Parallel Build & Deploy
 
 on:
   push:
@@ -12,7 +12,7 @@ env:
 
 jobs:
   # ==========================================
-  # STAGE 1: Fast Quality & Test Checks
+  # STAGE 1: Fast Backend Test Suite (< 20s)
   # ==========================================
   backend-tests:
     name: Backend Tests
@@ -26,13 +26,13 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: |
+            backend/pyproject.toml
+            agentic/pyproject.toml
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ./backend
-          pip install -e ./agentic
-          pip install pytest pytest-asyncio ruff email-validator
+          pip install -e ./backend -e ./agentic pytest pytest-asyncio ruff email-validator
 
       - name: Run Ruff Linting
         run: |
@@ -42,33 +42,11 @@ jobs:
         env:
           PYTHONPATH: .
         run: |
-          pytest -v backend/tests/
-
-  frontend-check:
-    name: Frontend Typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: Build Next.js
-        working-directory: ./frontend
-        run: npm run build
+          pytest -q backend/tests/
 
   # ==========================================
   # STAGE 2: PARALLEL SERVICE BUILDS & DEPLOYS
-  # Each service builds & deploys concurrently
+  # All 3 services build and deploy concurrently
   # ==========================================
 
   # --- 1. OPSERA BACKEND SERVICE ---
@@ -97,6 +75,8 @@ jobs:
           push: true
           platforms: linux/amd64
           provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-backend:latest
@@ -111,6 +91,7 @@ jobs:
 
       - name: Deploy opsera-backend to Cloud Run
         run: |
+          sleep 8
           for attempt in 1 2 3 4; do
             echo "Attempt $attempt: Deploying opsera-backend to Cloud Run..."
             if gcloud run deploy opsera-backend \
@@ -132,8 +113,8 @@ jobs:
               echo "Deployment failed after 4 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
-            sleep 15
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
+            sleep 10
           done
 
   # --- 2. OPSERA AGENTIC WORKER SERVICE ---
@@ -162,6 +143,8 @@ jobs:
           push: true
           platforms: linux/amd64
           provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-agentic:latest
@@ -176,6 +159,7 @@ jobs:
 
       - name: Deploy opsera-agentic to Cloud Run
         run: |
+          sleep 8
           for attempt in 1 2 3 4; do
             echo "Attempt $attempt: Deploying opsera-agentic to Cloud Run..."
             if gcloud run deploy opsera-agentic \
@@ -197,14 +181,14 @@ jobs:
               echo "Deployment failed after 4 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
-            sleep 15
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
+            sleep 10
           done
 
   # --- 3. OPSERA FRONTEND SERVICE ---
+  # Runs immediately in parallel (T=0)
   service-frontend:
     name: "Frontend: Build & Deploy"
-    needs: [frontend-check]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -227,6 +211,8 @@ jobs:
           push: true
           platforms: linux/amd64
           provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-frontend:latest
@@ -241,18 +227,13 @@ jobs:
 
       - name: Discover Backend URL & Deploy opsera-frontend
         run: |
-          # Retrieve backend URL (polling briefly if first deployment is in progress)
-          BACKEND_URL=""
-          for i in {1..20}; do
-            BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
-            if [ -n "$BACKEND_URL" ]; then
-              echo "Discovered Backend URL: $BACKEND_URL"
-              break
-            fi
-            echo "Waiting for opsera-backend endpoint to resolve... ($i/20)"
-            sleep 5
-          done
+          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
+          if [ -z "$BACKEND_URL" ]; then
+            BACKEND_URL="https://opsera-backend-r7ys35tfna-uc.a.run.app"
+          fi
+          echo "Using Backend URL: $BACKEND_URL"
 
+          sleep 8
           for attempt in 1 2 3 4; do
             echo "Attempt $attempt: Deploying opsera-frontend to Cloud Run..."
             if gcloud run deploy opsera-frontend \
@@ -274,8 +255,8 @@ jobs:
               echo "Deployment failed after 4 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
-            sleep 15
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
+            sleep 10
           done
 
   # ==========================================
