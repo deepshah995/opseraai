@@ -96,6 +96,7 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           platforms: linux/amd64
+          provenance: false
           tags: |
             ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-backend:latest
@@ -110,18 +111,30 @@ jobs:
 
       - name: Deploy opsera-backend to Cloud Run
         run: |
-          gcloud run deploy opsera-backend \
-            --project ${{ env.PROJECT_ID }} \
-            --image docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }} \
-            --platform managed \
-            --region ${{ env.REGION }} \
-            --allow-unauthenticated \
-            --port 8000 \
-            --set-env-vars "ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=true,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage" \
-            --memory 1Gi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 2
+          for attempt in 1 2 3 4; do
+            echo "Attempt $attempt: Deploying opsera-backend to Cloud Run..."
+            if gcloud run deploy opsera-backend \
+              --project ${{ env.PROJECT_ID }} \
+              --image docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }} \
+              --platform managed \
+              --region ${{ env.REGION }} \
+              --allow-unauthenticated \
+              --port 8000 \
+              --set-env-vars "ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=true,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage" \
+              --memory 1Gi \
+              --cpu 1 \
+              --min-instances 0 \
+              --max-instances 2; then
+              echo "opsera-backend deployment succeeded!"
+              break
+            fi
+            if [ $attempt -eq 4 ]; then
+              echo "Deployment failed after 4 attempts."
+              exit 1
+            fi
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
+            sleep 15
+          done
 
   # --- 2. OPSERA AGENTIC WORKER SERVICE ---
   service-agentic:
@@ -148,6 +161,7 @@ jobs:
           file: ./agentic/Dockerfile
           push: true
           platforms: linux/amd64
+          provenance: false
           tags: |
             ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-agentic:latest
@@ -162,18 +176,30 @@ jobs:
 
       - name: Deploy opsera-agentic to Cloud Run
         run: |
-          gcloud run deploy opsera-agentic \
-            --project ${{ env.PROJECT_ID }} \
-            --image docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }} \
-            --platform managed \
-            --region ${{ env.REGION }} \
-            --allow-unauthenticated \
-            --port 8080 \
-            --set-env-vars "ENVIRONMENT=production,USE_MOCK_LLM_IN_DEV=true" \
-            --memory 1Gi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 2
+          for attempt in 1 2 3 4; do
+            echo "Attempt $attempt: Deploying opsera-agentic to Cloud Run..."
+            if gcloud run deploy opsera-agentic \
+              --project ${{ env.PROJECT_ID }} \
+              --image docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }} \
+              --platform managed \
+              --region ${{ env.REGION }} \
+              --allow-unauthenticated \
+              --port 8080 \
+              --set-env-vars "ENVIRONMENT=production,USE_MOCK_LLM_IN_DEV=true" \
+              --memory 1Gi \
+              --cpu 1 \
+              --min-instances 0 \
+              --max-instances 2; then
+              echo "opsera-agentic deployment succeeded!"
+              break
+            fi
+            if [ $attempt -eq 4 ]; then
+              echo "Deployment failed after 4 attempts."
+              exit 1
+            fi
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
+            sleep 15
+          done
 
   # --- 3. OPSERA FRONTEND SERVICE ---
   service-frontend:
@@ -200,6 +226,7 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           platforms: linux/amd64
+          provenance: false
           tags: |
             ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-frontend:latest
@@ -226,18 +253,30 @@ jobs:
             sleep 5
           done
 
-          gcloud run deploy opsera-frontend \
-            --project ${{ env.PROJECT_ID }} \
-            --image docker.io/${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }} \
-            --platform managed \
-            --region ${{ env.REGION }} \
-            --allow-unauthenticated \
-            --port 8080 \
-            --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL}" \
-            --memory 512Mi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 2
+          for attempt in 1 2 3 4; do
+            echo "Attempt $attempt: Deploying opsera-frontend to Cloud Run..."
+            if gcloud run deploy opsera-frontend \
+              --project ${{ env.PROJECT_ID }} \
+              --image docker.io/${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }} \
+              --platform managed \
+              --region ${{ env.REGION }} \
+              --allow-unauthenticated \
+              --port 8080 \
+              --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL}" \
+              --memory 512Mi \
+              --cpu 1 \
+              --min-instances 0 \
+              --max-instances 2; then
+              echo "opsera-frontend deployment succeeded!"
+              break
+            fi
+            if [ $attempt -eq 4 ]; then
+              echo "Deployment failed after 4 attempts."
+              exit 1
+            fi
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
+            sleep 15
+          done
 
   # ==========================================
   # STAGE 3: Final Deployment Summary
