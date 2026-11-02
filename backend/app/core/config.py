@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     AGENTIC_WORKER_URL: str = Field(default="https://opsera-agentic-1030854563974.us-central1.run.app")
     
     # CORS
-    CORS_ORIGINS: list[str] = Field(
+    CORS_ORIGINS: list[str] | str = Field(
         default=[
             "http://localhost:3000",
             "http://127.0.0.1:3000",
@@ -65,7 +65,7 @@ class Settings(BaseSettings):
         ]
     )
 
-    @field_validator("CORS_ORIGINS", mode="before")
+    @field_validator("CORS_ORIGINS")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> list[str]:
         if isinstance(v, str):
@@ -76,7 +76,7 @@ class Settings(BaseSettings):
                     if isinstance(parsed, list):
                         return [str(item) for item in parsed]
                 except json.JSONDecodeError:
-                    logger.debug("CORS_ORIGINS is not valid JSON, parsing as comma-separated string.")
+                    pass
             return [i.strip() for i in v.split(",") if i.strip()]
         elif isinstance(v, list):
             return [str(item) for item in v]

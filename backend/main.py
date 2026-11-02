@@ -79,9 +79,14 @@ app = FastAPI(
 )
 
 # CORS Middleware
+origins = (
+    settings.CORS_ORIGINS
+    if isinstance(settings.CORS_ORIGINS, list)
+    else [s.strip() for s in settings.CORS_ORIGINS.split(",") if s.strip()]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=origins,
     allow_origin_regex=r"^https:\/\/.*\.run\.app$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -122,6 +127,7 @@ app.include_router(analytics_router, prefix=api_v1_prefix)
 app.include_router(agents_router, prefix=api_v1_prefix)
 
 @app.get("/healthz", tags=["Health"])
+@app.get("/api/healthz", tags=["Health"])
 def health_check():
     return {
         "status": "healthy",
