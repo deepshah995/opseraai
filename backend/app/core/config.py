@@ -1,8 +1,9 @@
 import logging
 import os
 import secrets
+from typing import Any
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
@@ -51,17 +52,39 @@ class Settings(BaseSettings):
     VERTEX_AI_LOCATION: str = Field(default="us-central1")
     GEMINI_MODEL: str = Field(default="gemini-1.5-pro")
     USE_MOCK_LLM_IN_DEV: bool = Field(default=True)
+    AGENTIC_WORKER_URL: str = Field(default="https://opsera-agentic-1030854563974.us-central1.run.app")
     
     # CORS
-    CORS_ORIGINS: list[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ]
+    CORS_ORIGINS: list[str] = Field(
+        default=[
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+            "https://opsera-frontend-1030854563974.us-central1.run.app",
+        ]
+    )
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Any) -> list[str]:
+        if isinstance(v, str):
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, list):
+                        return [str(item) for item in parsed]
+                except json.JSONDecodeError:
+                    logger.debug("CORS_ORIGINS is not valid JSON, parsing as comma-separated string.")
+            return [i.strip() for i in v.split(",") if i.strip()]
+        elif isinstance(v, list):
+            return [str(item) for item in v]
+        return [str(v)]
 
     class Config:
         env_file = ".env"
         extra = "ignore"
 
 settings = Settings()
+

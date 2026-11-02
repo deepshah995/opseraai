@@ -3,11 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 const getBackendUrl = () => {
-  return (
-    process.env.BACKEND_API_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    "http://127.0.0.1:8000"
-  ).replace(/\/$/, "");
+  if (process.env.BACKEND_API_URL) {
+    return process.env.BACKEND_API_URL.replace(/\/$/, "");
+  }
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  if (process.env.NODE_ENV === "production") {
+    return "https://opsera-backend-1030854563974.us-central1.run.app";
+  }
+  return "http://127.0.0.1:8000";
 };
 
 async function handleProxy(

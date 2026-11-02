@@ -101,7 +101,7 @@ jobs:
               --region ${{ env.REGION }} \
               --allow-unauthenticated \
               --port 8080 \
-              --set-env-vars "ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=true,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage" \
+              --set-env-vars "ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=true,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage,AGENTIC_WORKER_URL=https://opsera-agentic-1030854563974.us-central1.run.app,CORS_ORIGINS=https://opsera-frontend-1030854563974.us-central1.run.app" \
               --memory 1Gi \
               --cpu 1 \
               --min-instances 0 \
@@ -116,6 +116,13 @@ jobs:
             echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
             sleep 10
           done
+
+          echo "Applying IAM invoker policy binding for public access..."
+          gcloud run services add-iam-policy-binding opsera-backend \
+            --project ${{ env.PROJECT_ID }} \
+            --region ${{ env.REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker" || true
 
   # --- 2. OPSERA AGENTIC WORKER SERVICE ---
   service-agentic:
@@ -185,6 +192,13 @@ jobs:
             sleep 10
           done
 
+          echo "Applying IAM invoker policy binding for public access..."
+          gcloud run services add-iam-policy-binding opsera-agentic \
+            --project ${{ env.PROJECT_ID }} \
+            --region ${{ env.REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker" || true
+
   # --- 3. OPSERA FRONTEND SERVICE ---
   # Runs immediately in parallel (T=0)
   service-frontend:
@@ -229,7 +243,7 @@ jobs:
         run: |
           BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
           if [ -z "$BACKEND_URL" ]; then
-            BACKEND_URL="https://opsera-backend-r7ys35tfna-uc.a.run.app"
+            BACKEND_URL="https://opsera-backend-1030854563974.us-central1.run.app"
           fi
           echo "Using Backend URL: $BACKEND_URL"
 
@@ -243,7 +257,7 @@ jobs:
               --region ${{ env.REGION }} \
               --allow-unauthenticated \
               --port 8080 \
-              --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL}" \
+              --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL},NEXT_PUBLIC_API_URL=/api,AGENTIC_API_URL=https://opsera-agentic-1030854563974.us-central1.run.app" \
               --memory 512Mi \
               --cpu 1 \
               --min-instances 0 \
@@ -258,6 +272,13 @@ jobs:
             echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
             sleep 10
           done
+
+          echo "Applying IAM invoker policy binding for public access..."
+          gcloud run services add-iam-policy-binding opsera-frontend \
+            --project ${{ env.PROJECT_ID }} \
+            --region ${{ env.REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker" || true
 
   # ==========================================
   # STAGE 3: Final Deployment Summary
@@ -278,14 +299,23 @@ jobs:
 
       - name: Publish Summary Table
         run: |
-          FRONTEND_URL=$(gcloud run services describe opsera-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "Pending")
-          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "Pending")
-          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "Pending")
+          FRONTEND_URL=$(gcloud run services describe opsera-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-frontend-1030854563974.us-central1.run.app")
+          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-backend-1030854563974.us-central1.run.app")
+          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-agentic-1030854563974.us-central1.run.app")
+
+          FRONT_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" || echo "N/A")
+          BACK_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/api/healthz" || echo "N/A")
+          AGENT_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$AGENTIC_URL/healthz" || echo "N/A")
 
           echo "### 🚀 Cloud Run Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Service | Cloud Run Endpoint | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Cloud Run Endpoint | HTTP Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Frontend UI** | [$FRONTEND_URL]($FRONTEND_URL) | Active |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Backend API** | [$BACKEND_URL]($BACKEND_URL) | Active |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Agentic Worker** | [$AGENTIC_URL]($AGENTIC_URL) | Active |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Frontend UI** | [$FRONTEND_URL]($FRONTEND_URL) | HTTP $FRONT_CODE |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Backend API** | [$BACKEND_URL]($BACKEND_URL) | HTTP $BACK_CODE |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Agentic Worker** | [$AGENTIC_URL]($AGENTIC_URL) | HTTP $AGENT_CODE |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$FRONT_CODE" = "403" ]; then
+            echo "> [!WARNING]" >> $GITHUB_STEP_SUMMARY
+            echo "> **Public Access Note:** If HTTP 403 Forbidden is returned, GCP Organization Policy \`constraints/iam.allowedPolicyMemberDomains\` (Domain Restricted Sharing) is preventing unauthenticated access. Grant \`roles/run.invoker\` to \`allUsers\` in Google Cloud Console or allow public access in the Organization Policy." >> $GITHUB_STEP_SUMMARY
+          fi

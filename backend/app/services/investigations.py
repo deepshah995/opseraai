@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 
 from agentic.app.graph.state import InvestigationState
 from agentic.app.graph.workflow import investigation_graph
+from backend.app.core.config import settings
 from backend.app.db.models.agent_run import AgentRun
 from backend.app.db.models.approval import Approval
 from backend.app.db.models.audit import AuditEvent
@@ -132,8 +133,39 @@ class InvestigationService:
         }
 
         try:
-            thread_config = {"configurable": {"thread_id": f"inv_{inv.id}"}}
-            final_state = investigation_graph.invoke(initial_state, config=thread_config)
+            final_state = None
+            if settings.AGENTIC_WORKER_URL:
+                try:
+                    import httpx
+                    worker_endpoint = f"{settings.AGENTIC_WORKER_URL.rstrip('/')}/investigate"
+                    logger.info(f"Delegating investigation to agentic worker at {worker_endpoint}")
+                    resp = httpx.post(
+                        worker_endpoint,
+                        json={
+                            "organization_id": organization_id,
+                            "exception_id": exception_id,
+                            "exception_data": initial_state["exception_data"],
+                            "records": records_payload,
+                            "documents": [],
+                            "user_notes": user_notes,
+                        },
+                        timeout=90.0,
+                    )
+                    if resp.status_code == 200:
+                        resp_data = resp.json()
+                        final_state = resp_data.get("final_state")
+                    else:
+                        logger.warning(
+                            f"Agentic worker returned HTTP {resp.status_code}. Falling back to in-process graph."
+                        )
+                except Exception as worker_err:
+                    logger.warning(
+                        f"Failed to connect to agentic worker at {settings.AGENTIC_WORKER_URL}: {worker_err}. Falling back to in-process graph."
+                    )
+
+            if not final_state:
+                thread_config = {"configurable": {"thread_id": f"inv_{inv.id}"}}
+                final_state = investigation_graph.invoke(initial_state, config=thread_config)
 
             # 5. Persist Investigation Results & Grounded Evidence
             inv.status = "awaiting_review"
