@@ -91,8 +91,8 @@ jobs:
 
       - name: Deploy opsera-backend to Cloud Run
         run: |
-          sleep 8
-          for attempt in 1 2 3 4; do
+          sleep 10
+          for attempt in 1 2 3 4 5 6; do
             echo "Attempt $attempt: Deploying opsera-backend to Cloud Run..."
             if gcloud run deploy opsera-backend \
               --project ${{ env.PROJECT_ID }} \
@@ -109,12 +109,12 @@ jobs:
               echo "opsera-backend deployment succeeded!"
               break
             fi
-            if [ $attempt -eq 4 ]; then
-              echo "Deployment failed after 4 attempts."
+            if [ $attempt -eq 6 ]; then
+              echo "Deployment failed after 6 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
-            sleep 10
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 12 seconds..."
+            sleep 12
           done
 
           echo "Applying IAM invoker policy binding for public access..."
@@ -166,8 +166,8 @@ jobs:
 
       - name: Deploy opsera-agentic to Cloud Run
         run: |
-          sleep 8
-          for attempt in 1 2 3 4; do
+          sleep 10
+          for attempt in 1 2 3 4 5 6; do
             echo "Attempt $attempt: Deploying opsera-agentic to Cloud Run..."
             if gcloud run deploy opsera-agentic \
               --project ${{ env.PROJECT_ID }} \
@@ -184,12 +184,12 @@ jobs:
               echo "opsera-agentic deployment succeeded!"
               break
             fi
-            if [ $attempt -eq 4 ]; then
-              echo "Deployment failed after 4 attempts."
+            if [ $attempt -eq 6 ]; then
+              echo "Deployment failed after 6 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
-            sleep 10
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 12 seconds..."
+            sleep 12
           done
 
           echo "Applying IAM invoker policy binding for public access..."
@@ -247,8 +247,8 @@ jobs:
           fi
           echo "Using Backend URL: $BACKEND_URL"
 
-          sleep 8
-          for attempt in 1 2 3 4; do
+          sleep 10
+          for attempt in 1 2 3 4 5 6; do
             echo "Attempt $attempt: Deploying opsera-frontend to Cloud Run..."
             if gcloud run deploy opsera-frontend \
               --project ${{ env.PROJECT_ID }} \
@@ -265,12 +265,12 @@ jobs:
               echo "opsera-frontend deployment succeeded!"
               break
             fi
-            if [ $attempt -eq 4 ]; then
-              echo "Deployment failed after 4 attempts."
+            if [ $attempt -eq 6 ]; then
+              echo "Deployment failed after 6 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 10 seconds..."
-            sleep 10
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 12 seconds..."
+            sleep 12
           done
 
           echo "Applying IAM invoker policy binding for public access..."
