@@ -355,6 +355,18 @@ def resolve_batch_exceptions(
     }
 
 
+@router.get("/llm-status", summary="Get Live Agent Studio LLM provider status")
+def get_live_agent_llm_status(
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Returns active LLM provider metadata (Gemini / OpenAI / Rule Engine)
+    for Live Agent Studio badges.
+    """
+    from agentic.app.agents.minion_chat import get_llm_status
+    return get_llm_status()
+
+
 @router.get("/{agent_id}", summary="Get detailed definition of an agent")
 def get_agent_detail(
     agent_id: str,
@@ -732,4 +744,5 @@ def chat_with_agent(
     context = {"organization_id": current_user.organization_id}
     res = generate_minion_chat_response(agent_id, req.message, context)
     return res
+
 

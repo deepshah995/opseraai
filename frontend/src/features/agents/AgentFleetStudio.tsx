@@ -15,9 +15,13 @@ import {
   Activity, 
   Radio, 
   ChevronRight,
-  BarChart3
+  BarChart3,
+  X,
+  ChevronDown,
+  Database,
+  CheckCircle2
 } from "lucide-react";
-import { AgentDefinition, AgentChatResponse } from "@/types";
+import { AgentDefinition, AgentChatResponse, OperationalRecord } from "@/types";
 import { api } from "@/lib/api/client";
 
 interface AgentFleetStudioProps {
@@ -35,6 +39,7 @@ const DATA_SYSTEMS = [
     shortName: "Scale Houses",
     icon: Scale,
     color: "emerald",
+    recordType: "load_record",
     description: "Hardware truck weighbridges printing certified gross, tare & net weight slips.",
     activeRecord: "Slip #SC-110 (4.00 net tons)",
     primaryAgentId: "ticket_hawk",
@@ -45,6 +50,7 @@ const DATA_SYSTEMS = [
     shortName: "Fleet GPS",
     icon: Satellite,
     color: "blue",
+    recordType: "dispatch_record",
     description: "Samsara / Geotab real-time vehicle GPS pings, engine telemetry & geofence events.",
     activeRecord: "Truck #402 (Sector 4 Route)",
     primaryAgentId: "dispatch_pulse",
@@ -55,6 +61,7 @@ const DATA_SYSTEMS = [
     shortName: "ERP & Invoices",
     icon: Building2,
     color: "amber",
+    recordType: "invoice",
     description: "Core financial ledger, customer contracts, standard rates & billing cycles.",
     activeRecord: "INV-9020 (Apex Mfg $1,115.00)",
     primaryAgentId: "bill_sentry",
@@ -65,6 +72,7 @@ const DATA_SYSTEMS = [
     shortName: "Driver Tickets",
     icon: FileCheck2,
     color: "purple",
+    recordType: "service_ticket",
     description: "Electronic handheld signatures, customer sign-offs & driver field notes.",
     activeRecord: "Ticket #TKT-4410 (Signed 10:42 AM)",
     primaryAgentId: "ticket_hawk",
@@ -75,6 +83,7 @@ const DATA_SYSTEMS = [
     shortName: "Customer Portal",
     icon: Users2,
     color: "rose",
+    recordType: "customer_account",
     description: "Client email tickets, account inquiries & billing disputes.",
     activeRecord: "Claim #DISP-88 (Tonnage Query)",
     primaryAgentId: "dispute_shield",
@@ -85,6 +94,7 @@ const DATA_SYSTEMS = [
     shortName: "Report Console",
     icon: BarChart3,
     color: "purple",
+    recordType: "mixed",
     description: "Live executive KPI engine, cross-fleet discrepancy telemetry & automated briefing feed.",
     activeRecord: "Executive Briefing Generated",
     primaryAgentId: "ops_beacon",
@@ -195,6 +205,7 @@ interface ChatMessage {
   text: string;
   mood?: string;
   funnyAction?: string;
+  aiProvider?: string;
   timestamp: string;
 }
 
@@ -206,7 +217,34 @@ export function AgentFleetStudio({
 }: AgentFleetStudioProps) {
   const [selectedAgentId, setSelectedAgentId] = useState<string>("ticket_hawk");
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
+  const [systemRecords, setSystemRecords] = useState<OperationalRecord[]>([]);
+  const [loadingRecords, setLoadingRecords] = useState(false);
+  const [expandedRecordId, setExpandedRecordId] = useState<string | null>(null);
   const [dataFlowActive, setDataFlowActive] = useState(true);
+
+  // Fetch real ingested records whenever a data source tile is selected
+  useEffect(() => {
+    if (!selectedSystemId) {
+      setSystemRecords([]);
+      return;
+    }
+    const currentSys = DATA_SYSTEMS.find((s) => s.id === selectedSystemId);
+    if (!currentSys) return;
+
+    setLoadingRecords(true);
+    const filter = currentSys.recordType !== "mixed" ? { record_type: currentSys.recordType } : {};
+    api.listRecords(filter)
+      .then((recs) => {
+        setSystemRecords(recs || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load records for system:", err);
+        setSystemRecords([]);
+      })
+      .finally(() => {
+        setLoadingRecords(false);
+      });
+  }, [selectedSystemId]);
 
   // Guarantee all 5 agents (especially ReportBeacon / Report Console Agent) are always available
   const rawList = agents && agents.length > 0 ? agents : DEFAULT_FLEET_AGENTS;
@@ -220,9 +258,9 @@ export function AgentFleetStudio({
       {
         id: "th-init",
         sender: "agent",
-        text: "*adjusts laser scanning goggles with a soft click*\n\nGreetings! I am TicketHawk (TH-01). I protect your operations from scale discrepancies and weight leaks. Right now I'm reading live scale weights from North Landfill Scale #2. Ask me anything or click a prompt below!",
+        text: "Greetings! I am TicketHawk (TH-01). I protect your operations from scale discrepancies and weight leaks. Right now I'm reading live scale weights from North Landfill Scale #2. Ask me anything or click a prompt below!",
         mood: "happy",
-        funnyAction: "TicketHawk calibrates its optical sensors and scans ticket #SC-110",
+        funnyAction: "🔍 TicketHawk calibrates its optical sensors and scans ticket #SC-110",
         timestamp: "Just now",
       },
     ],
@@ -230,9 +268,9 @@ export function AgentFleetStudio({
       {
         id: "dp-init",
         sender: "agent",
-        text: "*spins radar telemetry tracker and radios on dispatch line*\n\n10-4 good buddy! DispatchPulse (DP-02) reporting for duty! I track all trucks live so drivers don't take unapproved detours or swap routes without dispatch knowing. What's on your radar?",
+        text: "10-4 good buddy! DispatchPulse (DP-02) reporting for duty! I track all trucks live so drivers don't take unapproved detours or swap routes without dispatch knowing. What's on your radar?",
         mood: "scanning",
-        funnyAction: "DispatchPulse activates its radar telemetry array with blinking blue status lights",
+        funnyAction: "🚚 DispatchPulse activates its radar telemetry array with blinking blue status lights",
         timestamp: "Just now",
       },
     ],
@@ -240,9 +278,9 @@ export function AgentFleetStudio({
       {
         id: "bs-init",
         sender: "agent",
-        text: "*taps brass precision monocle and audits rate matrices*\n\nGreetings! BillSentry (BS-03) at your service. Unbilled roll-off pickups and expired discount codes make my auditing circuits activate! I ensure every single service rendered turns into collected revenue.",
+        text: "Greetings! BillSentry (BS-03) at your service. Unbilled roll-off pickups and expired discount codes make my auditing circuits activate! I ensure every single service rendered turns into collected revenue.",
         mood: "proud",
-        funnyAction: "BillSentry stamps a clean 'RATE VERIFIED' on its audit log",
+        funnyAction: "💰 BillSentry stamps a clean 'RATE VERIFIED' on its audit log",
         timestamp: "Just now",
       },
     ],
@@ -250,9 +288,9 @@ export function AgentFleetStudio({
       {
         id: "ob-init",
         sender: "agent",
-        text: "*stabilizes on telemetry hoverpad and activates Report Console holographic projector*\n\nGreetings leadership! I am ReportBeacon (RB-04), your Operations Reporting & Analytics Agent. I synthesize live data across all operations agents and publish executive dashboards to the Report Console! You can chat with me here or jump directly to the Report Console.",
+        text: "Greetings leadership! I am ReportBeacon (RB-04), your Operations Reporting & Analytics Agent. I synthesize live data across all operations agents and publish executive dashboards to the Report Console! You can chat with me here or jump directly to the Report Console.",
         mood: "thinking",
-        funnyAction: "ReportBeacon projects a floating holographic 3D bar chart synced to the Report Console",
+        funnyAction: "🔮 ReportBeacon projects a floating holographic 3D bar chart synced to the Report Console",
         timestamp: "Just now",
       },
     ],
@@ -260,9 +298,9 @@ export function AgentFleetStudio({
       {
         id: "ds-init",
         sender: "agent",
-        text: "*buffs polished silver shield and salutes with diplomat pen*\n\nSalutations! DisputeShield (DS-05) here. When an upset customer claims they were overbilled, I pull TicketHawk's certified scale slips, write a courteous letter, and solve the dispute with verified proof!",
+        text: "Salutations! DisputeShield (DS-05) here. When an upset customer claims they were overbilled, I pull TicketHawk's certified scale slips, write a courteous letter, and solve the dispute with verified proof!",
         mood: "happy",
-        funnyAction: "DisputeShield readies its diplomatic pen and verified evidence log",
+        funnyAction: "🛡️ DisputeShield readies its diplomatic pen and verified evidence log",
         timestamp: "Just now",
       },
     ],
@@ -270,7 +308,18 @@ export function AgentFleetStudio({
 
   const [inputMessage, setInputMessage] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
+  const [llmBadge, setLlmBadge] = useState<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    api.getLLMStatus()
+      .then((status) => {
+        if (status?.badge) {
+          setLlmBadge(status.badge);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const selectedAgent = activeAgentsList.find((a) => a.id === selectedAgentId) || activeAgentsList[0];
 
@@ -313,6 +362,7 @@ export function AgentFleetStudio({
         text: res.response,
         mood: res.avatar_mood,
         funnyAction: res.funny_action,
+        aiProvider: res.ai_provider,
         timestamp: "Just now",
       };
       setChatMessages((prev) => ({
@@ -620,6 +670,162 @@ export function AgentFleetStudio({
               );
             })}
           </div>
+
+          {/* Active Data Source Live Records Inspector Drawer */}
+          {(() => {
+            const activeSystem = DATA_SYSTEMS.find((s) => s.id === selectedSystemId);
+            if (!activeSystem) return null;
+
+            return (
+              <div className="mt-3 rounded-xl border border-blue-200 bg-white p-4 shadow-sm dark:border-blue-900/60 dark:bg-slate-850 animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg bg-${activeSystem.color}-50 text-${activeSystem.color}-600 dark:bg-${activeSystem.color}-950/60 dark:text-${activeSystem.color}-400 border border-${activeSystem.color}-200/50 dark:border-${activeSystem.color}-800/50`}>
+                      <activeSystem.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                          {activeSystem.name}
+                        </h4>
+                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Live Hardware Feed Connected</span>
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {activeSystem.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2 self-end sm:self-center">
+                    {/* Ask Agent Button */}
+                    <button
+                      onClick={() => {
+                        setSelectedAgentId(activeSystem.primaryAgentId);
+                        const targetAgent = activeAgentsList.find((a) => a.id === activeSystem.primaryAgentId);
+                        handleSendChat(`What live records and telemetry are you monitoring from ${activeSystem.shortName}?`);
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60 transition"
+                    >
+                      <Bot className="h-3.5 w-3.5" />
+                      <span>Ask {activeAgentsList.find(a => a.id === activeSystem.primaryAgentId)?.name || "Agent"}</span>
+                    </button>
+                    {/* Close button */}
+                    <button
+                      onClick={() => setSelectedSystemId(null)}
+                      title="Close Inspector"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Records List / Table */}
+                <div className="mt-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <Database className="h-3.5 w-3.5 text-blue-500" />
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        Live Ingested Packets & Records ({systemRecords.length})
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-slate-400">
+                      Auto-reconciled against fleet operations
+                    </span>
+                  </div>
+
+                  {loadingRecords ? (
+                    <div className="py-8 flex flex-col items-center justify-center space-y-2 text-slate-400">
+                      <div className="h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs">Fetching real-time records from {activeSystem.shortName}...</span>
+                    </div>
+                  ) : systemRecords.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
+                      No active records found for this data source.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-lg border border-slate-200/80 dark:border-slate-750">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-50 dark:bg-slate-800/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200/80 dark:border-slate-750">
+                          <tr>
+                            <th className="py-2 px-3">Reference #</th>
+                            <th className="py-2 px-3">Customer / Terminal</th>
+                            <th className="py-2 px-3">Quantity / Load</th>
+                            <th className="py-2 px-3">Amount</th>
+                            <th className="py-2 px-3">Status</th>
+                            <th className="py-2 px-3">Service Date</th>
+                            <th className="py-2 px-3 text-right">Details</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-[11px]">
+                          {systemRecords.slice(0, 8).map((rec) => {
+                            const isExpanded = expandedRecordId === rec.id;
+                            return (
+                              <React.Fragment key={rec.id}>
+                                <tr className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition">
+                                  <td className="py-2 px-3 font-bold text-slate-900 dark:text-white">
+                                    {rec.external_reference}
+                                  </td>
+                                  <td className="py-2 px-3 font-sans text-slate-700 dark:text-slate-300">
+                                    {rec.customer_reference}
+                                  </td>
+                                  <td className="py-2 px-3 text-slate-600 dark:text-slate-400">
+                                    {rec.quantity ? `${rec.quantity} ${rec.unit || ""}` : "—"}
+                                  </td>
+                                  <td className="py-2 px-3 font-semibold text-slate-900 dark:text-white">
+                                    {rec.amount != null ? `$${rec.amount.toFixed(2)}` : "—"}
+                                  </td>
+                                  <td className="py-2 px-3 font-sans">
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                      rec.status === "verified" || rec.status === "matched"
+                                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                                        : rec.status === "discrepancy" || rec.status === "flagged"
+                                        ? "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                                        : "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                                    }`}>
+                                      {rec.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-2 px-3 text-slate-500">
+                                    {rec.service_date ? rec.service_date.split("T")[0] : rec.created_at?.split("T")[0] || "Today"}
+                                  </td>
+                                  <td className="py-2 px-3 text-right font-sans">
+                                    <button
+                                      onClick={() => setExpandedRecordId(isExpanded ? null : rec.id)}
+                                      className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium inline-flex items-center gap-1"
+                                    >
+                                      <span>{isExpanded ? "Hide" : "Inspect"}</span>
+                                      <ChevronDown className={`h-3 w-3 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                                    </button>
+                                  </td>
+                                </tr>
+                                {isExpanded && (
+                                  <tr className="bg-slate-50/90 dark:bg-slate-800/80">
+                                    <td colSpan={7} className="p-3">
+                                      <div className="rounded-lg bg-slate-900 text-slate-200 p-3 font-mono text-[10px] overflow-x-auto">
+                                        <div className="text-slate-400 mb-1 font-sans text-xs font-semibold">
+                                          Raw Telemetry Payload ({rec.external_reference}):
+                                        </div>
+                                        <pre>{JSON.stringify(rec.normalized_data || rec, null, 2)}</pre>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Visual Animated Data Beams (SVG Layer) */}
@@ -816,14 +1022,16 @@ export function AgentFleetStudio({
           
           {/* Chat Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center space-x-2.5">
+            <div className="flex items-center space-x-2.5 flex-wrap gap-y-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">
                 Live Chat with {selectedAgent.name}
               </h3>
-              <span className="text-[11px] font-mono text-slate-400">
-                (Operations & Intelligence Enabled)
-              </span>
+              {llmBadge && (
+                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+                  {llmBadge}
+                </span>
+              )}
             </div>
             <button
               onClick={() => {
@@ -848,7 +1056,7 @@ export function AgentFleetStudio({
               >
                 {/* Agent Action Caption */}
                 {msg.funnyAction && (
-                  <span className="text-[10px] italic text-slate-400 mb-1 px-2">
+                  <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1 px-1 flex items-center gap-1.5">
                     {msg.funnyAction}
                   </span>
                 )}
@@ -862,9 +1070,16 @@ export function AgentFleetStudio({
                 >
                   <p className="whitespace-pre-line">{msg.text}</p>
                 </div>
-                <span className="text-[9px] text-slate-400 mt-1 px-1">
-                  {msg.timestamp}
-                </span>
+                <div className="flex items-center space-x-2 mt-1 px-1">
+                  <span className="text-[9px] text-slate-400">
+                    {msg.timestamp}
+                  </span>
+                  {msg.aiProvider && (
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
+                      {msg.aiProvider}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
 

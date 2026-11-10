@@ -1,10 +1,16 @@
 import logging
 import os
 import secrets
+from pathlib import Path
 from typing import Any
+from dotenv import load_dotenv
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
+
+# Ensure .env from project root is reliably loaded into environment
+ROOT_DIR = Path(__file__).resolve().parents[3]
+load_dotenv(dotenv_path=ROOT_DIR / ".env")
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +18,10 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "AI Operations Exception Agent"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
+    
+    # Server Configuration
+    HOST: str = Field(default="127.0.0.1")
+    PORT: int = Field(default=8000)
     ENVIRONMENT: str = Field(default="development")
     
     # Database
@@ -47,11 +57,15 @@ class Settings(BaseSettings):
     GCS_BUCKET_NAME: str = Field(default="ops-agent-source-documents")
     MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB limit
     
-    # Agentic & Vertex AI
+    # Agentic & Multi-Provider LLM Keys
+    GEMINI_API_KEY: str | None = Field(default=None)
+    GOOGLE_API_KEY: str | None = Field(default=None)
+    OPENAI_API_KEY: str | None = Field(default=None)
     VERTEX_AI_PROJECT: str = Field(default="")
     VERTEX_AI_LOCATION: str = Field(default="us-central1")
-    GEMINI_MODEL: str = Field(default="gemini-1.5-pro")
-    USE_MOCK_LLM_IN_DEV: bool = Field(default=True)
+    GEMINI_MODEL: str = Field(default="gemini-2.5-flash")
+    OPENAI_MODEL: str = Field(default="gpt-4o-mini")
+    USE_MOCK_LLM_IN_DEV: bool = Field(default=False)
     AGENTIC_WORKER_URL: str = Field(default="https://opsera-agentic-1030854563974.us-central1.run.app")
     
     # CORS

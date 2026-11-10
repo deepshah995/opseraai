@@ -292,6 +292,10 @@ class ApiClient {
     return this.request<ResolutionAnalytics>(`/agents/resolution-analytics?timeframe=${encodeURIComponent(timeframe)}`);
   }
 
+  async getLLMStatus(): Promise<{ provider: string; model: string; configured: boolean; badge: string }> {
+    return this.request<{ provider: string; model: string; configured: boolean; badge: string }>("/agents/llm-status");
+  }
+
   async resolveBatchExceptions(): Promise<BatchResolutionResponse> {
     return this.request<BatchResolutionResponse>("/agents/resolve-batch", {
       method: "POST",

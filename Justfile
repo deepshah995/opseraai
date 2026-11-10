@@ -29,14 +29,28 @@ start:
         exit 1
     fi
 
+    # Read environment configuration (.env)
+    if [ -f .env ]; then
+        set -a
+        # Safely source .env without crashing on comments or complex strings
+        source .env
+        set +a
+    fi
+
+    APP_HOST="${HOST:-127.0.0.1}"
+    APP_PORT="${PORT:-8000}"
+    APP_ENV="${ENVIRONMENT:-development}"
+    LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "127.0.0.1")
+
     echo "========================================================================"
     echo "  🚀 AI Operations Exception Agent - Industrial Services"
     echo "========================================================================"
-    echo "  📡 Backend API:         http://127.0.0.1:8000"
-    echo "  📖 API Swagger Docs:    http://127.0.0.1:8000/docs"
+    echo "  📡 Backend API:         http://${APP_HOST}:${APP_PORT} (Env: ${APP_ENV})"
+    echo "  📖 API Swagger Docs:    http://${APP_HOST}:${APP_PORT}/docs"
     echo "  🤖 Agentic Worker:      http://127.0.0.1:8080"
     echo "  📖 Agentic Docs:        http://127.0.0.1:8080/docs"
-    echo "  💻 Frontend Dashboard:  http://localhost:3000"
+    echo "  💻 Mac Dashboard:       http://localhost:3000"
+    echo "  📱 iPhone / Mobile:     http://${LAN_IP}:3000"
     echo "------------------------------------------------------------------------"
     echo "  🔑 Default Account:     manager@apexwaste.com / OperationsPass123!"
     echo "========================================================================"
@@ -58,9 +72,9 @@ start:
 
     trap cleanup SIGINT SIGTERM EXIT
 
-    # 1. Start FastAPI Backend API (port 8000)
-    echo "▶️  Starting Backend API on port 8000..."
-    PYTHONPATH=. $UVICORN backend.main:app --host 127.0.0.1 --port 8000 --reload &
+    # 1. Start FastAPI Backend API
+    echo "▶️  Starting Backend API on ${APP_HOST}:${APP_PORT}..."
+    PYTHONPATH=. $UVICORN backend.main:app --host "${APP_HOST}" --port "${APP_PORT}" --reload &
     BACKEND_PID=$!
 
     # 2. Start LangGraph Agentic Investigation Worker (port 8080)
@@ -69,8 +83,8 @@ start:
     AGENTIC_PID=$!
 
     # 3. Start Next.js Frontend Dashboard (port 3000)
-    echo "▶️  Starting Next.js Frontend on port 3000..."
-    (cd frontend && npm run dev) &
+    echo "▶️  Starting Next.js Frontend on port 3000 (Proxy -> http://${APP_HOST}:${APP_PORT})..."
+    (cd frontend && PORT=3000 BACKEND_API_URL="http://${APP_HOST}:${APP_PORT}" npm run dev -- -H 0.0.0.0 -p 3000) &
     FRONTEND_PID=$!
 
     echo ""
@@ -80,9 +94,14 @@ start:
     # Wait for all background jobs
     wait
 
-# Start only the FastAPI backend API server (port 8000)
+# Start only the FastAPI backend API server
 backend:
-    PYTHONPATH=. .venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+    #!/usr/bin/env bash
+    if [ -f .env ]; then set -a; source .env; set +a; fi
+    APP_HOST="${HOST:-127.0.0.1}"
+    APP_PORT="${PORT:-8000}"
+    echo "▶️  Starting Backend API on ${APP_HOST}:${APP_PORT} (Env: ${ENVIRONMENT:-development})..."
+    PYTHONPATH=. .venv/bin/uvicorn backend.main:app --host "${APP_HOST}" --port "${APP_PORT}" --reload
 
 # Start only the LangGraph agentic investigation worker (port 8080)
 agent:
@@ -90,7 +109,7 @@ agent:
 
 # Start only the Next.js frontend web application (port 3000)
 frontend:
-    cd frontend && npm run dev
+    cd frontend && PORT=3000 npm run dev -- -H 0.0.0.0 -p 3000
 
 # Run the backend test suite with pytest
 test:

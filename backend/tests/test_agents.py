@@ -101,3 +101,11 @@ def test_list_agents_and_tutorials(client, auth_headers):
     assert "processed_count" in batch_data
     assert "resolutions" in batch_data
 
+    # Test 11: LLM provider status check
+    llm_status_res = client.get("/api/agents/llm-status", headers=auth_headers)
+    assert llm_status_res.status_code == 200
+    status_data = llm_status_res.json()
+    assert "provider" in status_data
+    assert "badge" in status_data
+
+

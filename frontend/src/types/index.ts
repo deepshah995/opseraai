@@ -248,6 +248,8 @@ export interface AgentChatResponse {
   funny_action: string;
   response: string;
   linked_systems_active: string[];
+  ai_provider?: string;
+  ai_model?: string;
 }
 
 export type MinionProfile = AgentStudioProfile;
