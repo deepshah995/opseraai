@@ -109,3 +109,144 @@ body {
 .animate-fade-in {
   animation: fadeInShort 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* =========================================================
+   Autonomous Operations Agent Live Animations
+   ========================================================= */
+@keyframes agentFloatA {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes agentFloatB {
+  0%, 100% {
+    transform: translateY(-1.5px);
+  }
+  50% {
+    transform: translateY(-6.5px);
+  }
+}
+
+@keyframes agentFloatC {
+  0%, 100% {
+    transform: translateY(-0.5px);
+  }
+  50% {
+    transform: translateY(-5.5px);
+  }
+}
+
+@keyframes laserScanVertical {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translateY(16px);
+    opacity: 0.95;
+  }
+}
+
+@keyframes radarWaveExpand {
+  0% {
+    r: 2;
+    opacity: 0.95;
+    stroke-width: 1.5;
+  }
+  100% {
+    r: 13;
+    opacity: 0;
+    stroke-width: 0.5;
+  }
+}
+
+@keyframes chartBarPulseA {
+  0%, 100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1.0);
+  }
+}
+
+@keyframes chartBarPulseB {
+  0%, 100% {
+    transform: scaleY(0.9);
+  }
+  50% {
+    transform: scaleY(0.28);
+  }
+}
+
+@keyframes chartBarPulseC {
+  0%, 100% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(1.15);
+  }
+}
+
+@keyframes chartBarPulseD {
+  0%, 100% {
+    transform: scaleY(0.75);
+  }
+  50% {
+    transform: scaleY(0.32);
+  }
+}
+
+@keyframes hologramFlicker {
+  0%, 100% {
+    opacity: 0.16;
+  }
+  50% {
+    opacity: 0.38;
+  }
+}
+
+@keyframes coinHover {
+  0%, 100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-3.5px) rotate(6deg);
+  }
+}
+
+@keyframes shieldAuraPulse {
+  0%, 100% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 2px rgba(244, 63, 94, 0.3));
+  }
+  50% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.75));
+  }
+}
+
+@keyframes ticketWiggle {
+  0%, 100% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(11deg) translateY(-1.5px);
+  }
+}
+
+.animate-agent-float-a {
+  animation: agentFloatA 3.2s ease-in-out infinite;
+}
+
+.animate-agent-float-b {
+  animation: agentFloatB 3.6s ease-in-out infinite;
+}
+
+.animate-agent-float-c {
+  animation: agentFloatC 2.9s ease-in-out infinite;
+}
+

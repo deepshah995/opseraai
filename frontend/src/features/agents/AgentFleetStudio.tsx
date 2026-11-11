@@ -163,13 +163,13 @@ const DEFAULT_FLEET_AGENTS: AgentDefinition[] = [
     id: "ops_beacon",
     name: "ReportBeacon",
     code_name: "RB-04",
-    title: "Report Console Agent",
-    tagline: "The Reporting & Analytics Oracle: Synthesizes live fleet telemetry, margin leaks, and executive KPI briefs on the Report Console.",
+    title: "Operations Reporting Agent",
+    tagline: "The Reporting & Analytics Oracle: Synthesizes live fleet telemetry, margin leaks, and executive KPI briefs.",
     category: "Operations Reporting & BI",
     color_theme: "purple",
     icon_name: "BarChart3",
     avatar_url: "/agents/ops_beacon.svg",
-    specialization: "Powers the Report Console with automated executive summaries & KPI telemetry",
+    specialization: "Powers live executive summaries & KPI telemetry",
     reconciles_records: ["invoice", "service_ticket", "load_record", "dispatch_record"],
     exception_types_handled: ["all_operational_exceptions"],
     key_metrics: { accuracy_rate: "99.9%", active_status: "Active & Publishing to Report Console" },
@@ -386,33 +386,50 @@ export function AgentFleetStudio({
     }
   };
 
-  // Render SVG Agent Avatar Character
+  // Render SVG Agent Avatar Character with Live Moving Elements
   const renderAgentAvatar = (agentId: string, isSelected: boolean) => {
     switch (agentId) {
       case "ticket_hawk":
         return (
           <div className="relative flex flex-col items-center">
-            {/* TicketHawk SVG Avatar */}
+            {/* TicketHawk SVG Avatar - Scale Guardian */}
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
-              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.15)" />
-              <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#hawkGradient)" />
-              <path d="M 27 55 L 73 55 L 73 90 C 73 97 65 100 50 100 C 35 100 27 97 27 90 Z" fill="#10b981" />
-              <rect x="34" y="55" width="6" height="42" fill="#34d399" />
-              <rect x="60" y="55" width="6" height="42" fill="#34d399" />
-              <rect x="23" y="38" width="54" height="6" fill="#1e293b" rx="2" />
-              <circle cx="40" cy="41" r="12" fill="#0f172a" stroke="#cbd5e1" strokeWidth="2.5" />
-              <circle cx="60" cy="41" r="12" fill="#0f172a" stroke="#cbd5e1" strokeWidth="2.5" />
-              <circle cx="40" cy="41" r="5" fill="#34d399" className={isSelected ? "animate-ping" : ""} />
-              <circle cx="60" cy="41" r="5" fill="#34d399" className={isSelected ? "animate-ping" : ""} />
-              <circle cx="42" cy="39" r="2" fill="#ffffff" />
-              <circle cx="62" cy="39" r="2" fill="#ffffff" />
-              <path d="M 43 62 Q 50 67 57 62" stroke="#064e3b" strokeWidth="2" fill="none" strokeLinecap="round" />
-              <g transform="translate(68, 70) rotate(15)">
-                <rect x="0" y="0" width="16" height="22" rx="2" fill="#ffffff" stroke="#10b981" strokeWidth="1.5" />
-                <line x1="3" y1="5" x2="13" y2="5" stroke="#10b981" strokeWidth="1.5" />
-                <line x1="3" y1="9" x2="11" y2="9" stroke="#94a3b8" strokeWidth="1" />
-                <line x1="3" y1="13" x2="13" y2="13" stroke="#94a3b8" strokeWidth="1" />
+              {/* Dynamic Ground Shadow */}
+              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
+              
+              {/* Animated Floating Robot Body */}
+              <g className="animate-agent-float-a" style={{ transformOrigin: "50px 60px" }}>
+                <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#hawkGradient)" />
+                <path d="M 27 55 L 73 55 L 73 90 C 73 97 65 100 50 100 C 35 100 27 97 27 90 Z" fill="#10b981" />
+                <rect x="34" y="55" width="6" height="42" fill="#34d399" />
+                <rect x="60" y="55" width="6" height="42" fill="#34d399" />
+                <rect x="23" y="38" width="54" height="6" fill="#1e293b" rx="2" />
+                
+                {/* Precision Scanning Goggles with active sensors */}
+                <circle cx="40" cy="41" r="12" fill="#0f172a" stroke="#cbd5e1" strokeWidth="2.5" />
+                <circle cx="60" cy="41" r="12" fill="#0f172a" stroke="#cbd5e1" strokeWidth="2.5" />
+                <circle cx="40" cy="41" r="6" fill="#064e3b" />
+                <circle cx="60" cy="41" r="6" fill="#064e3b" />
+                <circle cx="40" cy="41" r="4" fill="#34d399" className="animate-pulse" />
+                <circle cx="60" cy="41" r="4" fill="#34d399" className="animate-pulse" />
+                <circle cx="42" cy="39" r="1.5" fill="#ffffff" />
+                <circle cx="62" cy="39" r="1.5" fill="#ffffff" />
+                
+                {/* Mouth */}
+                <path d="M 43 62 Q 50 67 57 62" stroke="#064e3b" strokeWidth="2" fill="none" strokeLinecap="round" />
+                
+                {/* Certified Scale Slip with ACTIVE Live Laser Scanner Beam */}
+                <g transform="translate(68, 68)" className="animate-[ticketWiggle_3.5s_ease-in-out_infinite]" style={{ transformOrigin: "68px 68px" }}>
+                  <rect x="0" y="0" width="16" height="23" rx="2" fill="#ffffff" stroke="#10b981" strokeWidth="1.5" />
+                  {/* Moving Laser Scan Line */}
+                  <line x1="1" y1="2" x2="15" y2="2" stroke="#10b981" strokeWidth="2" strokeLinecap="round" className="animate-[laserScanVertical_1.8s_ease-in-out_infinite]" />
+                  <line x1="3" y1="6" x2="13" y2="6" stroke="#059669" strokeWidth="1.2" opacity="0.6" />
+                  <line x1="3" y1="10" x2="11" y2="10" stroke="#94a3b8" strokeWidth="1" />
+                  <line x1="3" y1="14" x2="13" y2="14" stroke="#94a3b8" strokeWidth="1" />
+                  <line x1="3" y1="18" x2="9" y2="18" stroke="#94a3b8" strokeWidth="1" />
+                </g>
               </g>
+
               <defs>
                 <linearGradient id="hawkGradient" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#fef08a" />
@@ -426,23 +443,45 @@ export function AgentFleetStudio({
       case "dispatch_pulse":
         return (
           <div className="relative flex flex-col items-center">
-            {/* DispatchPulse SVG Avatar */}
+            {/* DispatchPulse SVG Avatar - Telematics Sentinel */}
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
-              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.15)" />
-              <line x1="50" y1="20" x2="50" y2="6" stroke="#3b82f6" strokeWidth="2.5" />
-              <circle cx="50" cy="6" r="3.5" fill="#60a5fa" className="animate-ping" />
-              <rect x="25" y="25" width="50" height="70" rx="25" fill="url(#pulseGradient)" />
-              <path d="M 22 30 Q 50 20 78 30 L 85 36 L 50 34 L 15 36 Z" fill="#1d4ed8" />
-              <rect x="30" y="38" width="40" height="15" rx="7.5" fill="#0f172a" stroke="#93c5fd" strokeWidth="2" />
-              <circle cx="50" cy="45" r="5" fill="#38bdf8" className={isSelected ? "animate-pulse" : ""} />
-              <circle cx="52" cy="43" r="1.5" fill="#ffffff" />
-              <rect x="42" y="60" width="16" height="5" rx="2.5" fill="#1e3a8a" />
-              <rect x="20" y="92" width="60" height="14" rx="7" fill="#1e293b" />
-              <circle cx="30" cy="99" r="4" fill="#64748b" />
-              <circle cx="50" cy="99" r="4" fill="#64748b" />
-              <circle cx="70" cy="99" r="4" fill="#64748b" />
-              <rect x="12" y="65" width="12" height="18" rx="2" fill="#334155" />
-              <line x1="15" y1="65" x2="15" y2="58" stroke="#334155" strokeWidth="1.5" />
+              {/* Dynamic Ground Shadow */}
+              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
+              
+              {/* Animated Floating Robot Body */}
+              <g className="animate-agent-float-b" style={{ transformOrigin: "50px 60px" }}>
+                {/* Antenna Rod */}
+                <line x1="50" y1="22" x2="50" y2="7" stroke="#3b82f6" strokeWidth="2.5" />
+                
+                {/* Concentric Expanding Radar Waves from Antenna */}
+                <circle cx="50" cy="7" r="2" fill="none" stroke="#60a5fa" className="animate-[radarWaveExpand_2.2s_ease-out_infinite]" />
+                <circle cx="50" cy="7" r="2" fill="none" stroke="#38bdf8" className="animate-[radarWaveExpand_2.2s_ease-out_infinite] [animation-delay:0.75s]" />
+                <circle cx="50" cy="7" r="3.5" fill="#38bdf8" className="animate-pulse" />
+                <circle cx="50" cy="7" r="1.5" fill="#ffffff" />
+                
+                {/* Robot Torso */}
+                <rect x="25" y="25" width="50" height="70" rx="25" fill="url(#pulseGradient)" />
+                <path d="M 22 30 Q 50 20 78 30 L 85 36 L 50 34 L 15 36 Z" fill="#1d4ed8" />
+                
+                {/* Telemetry Visor & Wave Ping */}
+                <rect x="30" y="38" width="40" height="15" rx="7.5" fill="#0f172a" stroke="#93c5fd" strokeWidth="2" />
+                <circle cx="50" cy="45" r="5" fill="#38bdf8" className="animate-pulse" />
+                <circle cx="52" cy="43" r="1.5" fill="#ffffff" />
+                
+                {/* Mouth Plate */}
+                <rect x="42" y="60" width="16" height="5" rx="2.5" fill="#1e3a8a" />
+                
+                {/* Fleet Telematics Dashboard with Running LED Ticker */}
+                <rect x="20" y="92" width="60" height="14" rx="7" fill="#1e293b" />
+                <circle cx="30" cy="99" r="3.5" fill="#60a5fa" className="animate-pulse" />
+                <circle cx="50" cy="99" r="3.5" fill="#38bdf8" className="animate-pulse [animation-delay:0.35s]" />
+                <circle cx="70" cy="99" r="3.5" fill="#60a5fa" className="animate-pulse [animation-delay:0.7s]" />
+                
+                {/* Side Radar Fin */}
+                <rect x="12" y="65" width="12" height="18" rx="2" fill="#334155" />
+                <line x1="15" y1="65" x2="15" y2="58" stroke="#334155" strokeWidth="1.5" />
+              </g>
+
               <defs>
                 <linearGradient id="pulseGradient" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#93c5fd" />
@@ -456,21 +495,45 @@ export function AgentFleetStudio({
       case "bill_sentry":
         return (
           <div className="relative flex flex-col items-center">
-            {/* BillSentry SVG Avatar */}
+            {/* BillSentry SVG Avatar - Revenue Protector */}
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
-              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.15)" />
-              <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#sentryGradient)" />
-              <circle cx="60" cy="42" r="10" fill="#0f172a" stroke="#d97706" strokeWidth="2.5" />
-              <circle cx="60" cy="42" r="4" fill="#f59e0b" />
-              <path d="M 68 48 L 78 72" stroke="#d97706" strokeWidth="1.5" strokeDasharray="2,2" />
-              <circle cx="40" cy="42" r="7" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
-              <circle cx="40" cy="42" r="3" fill="#cbd5e1" />
-              <path d="M 43 58 Q 50 63 57 58" stroke="#78350f" strokeWidth="2" fill="none" />
-              <rect x="25" y="70" width="50" height="8" fill="#78350f" />
-              <rect x="42" y="67" width="16" height="14" rx="2" fill="#0f172a" stroke="#d97706" strokeWidth="1" />
-              <rect x="45" y="69" width="10" height="3" fill="#10b981" />
-              <circle cx="20" cy="75" r="8" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
-              <text x="18" y="79" fontSize="10" fontWeight="bold" fill="#78350f">$</text>
+              {/* Dynamic Ground Shadow */}
+              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
+              
+              {/* Animated Floating Robot Body */}
+              <g className="animate-agent-float-c" style={{ transformOrigin: "50px 60px" }}>
+                <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#sentryGradient)" />
+                
+                {/* Auditing Monocle with Active Scanner Lens */}
+                <circle cx="60" cy="42" r="10" fill="#0f172a" stroke="#d97706" strokeWidth="2.5" />
+                <circle cx="60" cy="42" r="5" fill="#f59e0b" className="animate-pulse" />
+                <circle cx="62" cy="40" r="1.5" fill="#ffffff" />
+                <path d="M 68 48 L 78 72" stroke="#d97706" strokeWidth="1.5" strokeDasharray="2,2" />
+                
+                {/* Secondary Eye */}
+                <circle cx="40" cy="42" r="7" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
+                <circle cx="40" cy="42" r="3" fill="#cbd5e1" />
+                <circle cx="41" cy="41" r="1" fill="#ffffff" />
+                
+                {/* Sharp Focus Mouth */}
+                <path d="M 43 58 Q 50 63 57 58" stroke="#78350f" strokeWidth="2" fill="none" />
+                
+                {/* Ledger Belt */}
+                <rect x="25" y="70" width="50" height="8" fill="#78350f" />
+                
+                {/* Chest LED Calculator Display with Blinking Digits */}
+                <rect x="42" y="67" width="16" height="14" rx="2" fill="#0f172a" stroke="#d97706" strokeWidth="1" />
+                <rect x="45" y="69" width="10" height="3" fill="#10b981" className="animate-pulse" />
+                <line x1="45" y1="75" x2="55" y2="75" stroke="#34d399" strokeWidth="1" strokeDasharray="1,1" />
+                
+                {/* Floating, Hovering Gold Coin with Dynamic Spin */}
+                <g className="animate-[coinHover_2.4s_ease-in-out_infinite]" style={{ transformOrigin: "20px 75px" }}>
+                  <circle cx="20" cy="75" r="9" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+                  <circle cx="20" cy="75" r="7" fill="none" stroke="#fef08a" strokeWidth="0.8" strokeDasharray="2,2" />
+                  <text x="17.2" y="79" fontSize="11" fontWeight="extrabold" fill="#78350f">$</text>
+                </g>
+              </g>
+
               <defs>
                 <linearGradient id="sentryGradient" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#fde68a" />
@@ -487,44 +550,49 @@ export function AgentFleetStudio({
             {/* ReportBeacon SVG Avatar - The Operations Reporting Agent */}
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
               {/* Telemetry Hover Pad with thrust glow */}
-              <ellipse cx="50" cy="112" rx="28" ry="6" fill="#a855f7" opacity="0.35" className="animate-pulse" />
-              <rect x="30" y="102" width="40" height="6" rx="3" fill="#7e22ce" stroke="#c084fc" strokeWidth="1" />
-              <circle cx="50" cy="105" r="2" fill="#38bdf8" />
+              <ellipse cx="50" cy="112" rx="28" ry="6" fill="#a855f7" opacity="0.4" className="animate-pulse" />
               
-              {/* Radar dome & hologram projection rays */}
-              <path d="M 38 25 A 12 12 0 0 1 62 25 Z" fill="#c084fc" opacity="0.9" />
-              <polygon points="50,22 10,0 90,0" fill="#a855f7" opacity="0.18" className="animate-pulse" />
-              <line x1="50" y1="22" x2="50" y2="10" stroke="#c084fc" strokeWidth="2" />
-              <circle cx="50" cy="9" r="3.5" fill="#e879f9" className={isSelected ? "animate-ping" : ""} />
-              <circle cx="50" cy="9" r="1.5" fill="#ffffff" />
-              
-              {/* Futuristic Robot Body */}
-              <rect x="25" y="25" width="50" height="74" rx="25" fill="url(#beaconGradient)" />
-              
-              {/* High-tech Analyst Visor with data wave */}
-              <rect x="30" y="38" width="40" height="16" rx="8" fill="#0f172a" stroke="#c084fc" strokeWidth="2" />
-              <circle cx="43" cy="46" r="3.5" fill="#e879f9" />
-              <circle cx="57" cy="46" r="3.5" fill="#e879f9" />
-              <line x1="36" y1="46" x2="64" y2="46" stroke="#c084fc" strokeWidth="1" opacity="0.6" strokeDasharray="2,2" />
-              
-              {/* Happy Robot Mouth */}
-              <path d="M 44 59 Q 50 64 56 59" stroke="#581c87" strokeWidth="2" fill="none" strokeLinecap="round" />
-              
-              {/* Chest Screen: Animated Live Operations Report Bar Chart */}
-              <rect x="30" y="66" width="40" height="22" rx="4" fill="#0f172a" stroke="#c084fc" strokeWidth="1.5" />
-              <rect x="34" y="78" width="4" height="6" fill="#34d399" />
-              <rect x="41" y="73" width="4" height="11" fill="#60a5fa" />
-              <rect x="48" y="70" width="4" height="14" fill="#a855f7" />
-              <rect x="55" y="75" width="4" height="9" fill="#f59e0b" />
-              <rect x="62" y="72" width="4" height="12" fill="#ec4899" />
-              
-              {/* Right Hand: Floating Holographic Executive Report Tablet */}
-              <g transform="translate(73, 58) rotate(10)">
-                <rect x="0" y="0" width="16" height="22" rx="3" fill="#1e1b4b" stroke="#a855f7" strokeWidth="1.5" />
-                <rect x="3" y="3" width="10" height="2" fill="#38bdf8" />
-                <rect x="3" y="7" width="8" height="2" fill="#e879f9" />
-                <rect x="3" y="11" width="10" height="2" fill="#34d399" />
-                <circle cx="8" cy="17" r="2" fill="#fbbf24" />
+              {/* Animated Floating Robot Body */}
+              <g className="animate-agent-float-b" style={{ transformOrigin: "50px 60px" }}>
+                <rect x="30" y="102" width="40" height="6" rx="3" fill="#7e22ce" stroke="#c084fc" strokeWidth="1" />
+                <circle cx="50" cy="105" r="2" fill="#38bdf8" />
+                
+                {/* Radar dome & hologram projection rays with dynamic shimmer */}
+                <path d="M 38 25 A 12 12 0 0 1 62 25 Z" fill="#c084fc" opacity="0.9" />
+                <polygon points="50,22 8,0 92,0" fill="#a855f7" className="animate-[hologramFlicker_2s_ease-in-out_infinite]" />
+                <line x1="50" y1="22" x2="50" y2="9" stroke="#c084fc" strokeWidth="2" />
+                <circle cx="50" cy="8" r="3.5" fill="#e879f9" className="animate-pulse" />
+                <circle cx="50" cy="8" r="1.5" fill="#ffffff" />
+                
+                {/* Futuristic Robot Body */}
+                <rect x="25" y="25" width="50" height="74" rx="25" fill="url(#beaconGradient)" />
+                
+                {/* High-tech Analyst Visor with data wave */}
+                <rect x="30" y="38" width="40" height="16" rx="8" fill="#0f172a" stroke="#c084fc" strokeWidth="2" />
+                <circle cx="43" cy="46" r="3.5" fill="#e879f9" className="animate-pulse" />
+                <circle cx="57" cy="46" r="3.5" fill="#e879f9" className="animate-pulse" />
+                <line x1="36" y1="46" x2="64" y2="46" stroke="#c084fc" strokeWidth="1" opacity="0.6" strokeDasharray="2,2" />
+                
+                {/* Happy Robot Mouth */}
+                <path d="M 44 59 Q 50 64 56 59" stroke="#581c87" strokeWidth="2" fill="none" strokeLinecap="round" />
+                
+                {/* Chest Screen: LIVE ANIMATED OPERATIONS REPORT BAR CHART */}
+                <rect x="30" y="66" width="40" height="22" rx="4" fill="#0f172a" stroke="#c084fc" strokeWidth="1.5" />
+                {/* Dynamic Height Telemetry Bars */}
+                <rect x="33" y="78" width="4.5" height="7" rx="1" fill="#34d399" className="animate-[chartBarPulseA_1.8s_ease-in-out_infinite]" style={{ transformOrigin: "35px 85px" }} />
+                <rect x="40" y="72" width="4.5" height="13" rx="1" fill="#60a5fa" className="animate-[chartBarPulseB_2.1s_ease-in-out_infinite]" style={{ transformOrigin: "42px 85px" }} />
+                <rect x="47" y="69" width="4.5" height="16" rx="1" fill="#a855f7" className="animate-[chartBarPulseC_1.6s_ease-in-out_infinite]" style={{ transformOrigin: "49px 85px" }} />
+                <rect x="54" y="74" width="4.5" height="11" rx="1" fill="#f59e0b" className="animate-[chartBarPulseD_2.3s_ease-in-out_infinite]" style={{ transformOrigin: "56px 85px" }} />
+                <rect x="61" y="71" width="4.5" height="14" rx="1" fill="#ec4899" className="animate-[chartBarPulseA_2.0s_ease-in-out_infinite]" style={{ transformOrigin: "63px 85px" }} />
+                
+                {/* Right Hand: Floating Holographic Executive Report Tablet */}
+                <g transform="translate(73, 58) rotate(10)" className="animate-[ticketWiggle_4s_ease-in-out_infinite]" style={{ transformOrigin: "73px 58px" }}>
+                  <rect x="0" y="0" width="16" height="22" rx="3" fill="#1e1b4b" stroke="#a855f7" strokeWidth="1.5" />
+                  <rect x="3" y="3" width="10" height="2" fill="#38bdf8" />
+                  <rect x="3" y="7" width="8" height="2" fill="#e879f9" />
+                  <rect x="3" y="11" width="10" height="2" fill="#34d399" />
+                  <circle cx="8" cy="17" r="2" fill="#fbbf24" className="animate-pulse" />
+                </g>
               </g>
 
               <defs>
@@ -541,26 +609,44 @@ export function AgentFleetStudio({
       default:
         return (
           <div className="relative flex flex-col items-center">
-            {/* DisputeShield SVG Avatar */}
+            {/* DisputeShield SVG Avatar - Trust Arbitrator */}
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
-              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.15)" />
-              <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#shieldGradient)" />
-              <polygon points="42,56 46,60 42,64" fill="#0f172a" />
-              <polygon points="58,56 54,60 58,64" fill="#0f172a" />
-              <circle cx="50" cy="60" r="2.5" fill="#e11d48" />
-              <circle cx="40" cy="40" r="6" fill="#0f172a" stroke="#f43f5e" strokeWidth="1.5" />
-              <circle cx="60" cy="40" r="6" fill="#0f172a" stroke="#f43f5e" strokeWidth="1.5" />
-              <circle cx="41" cy="39" r="2" fill="#ffffff" />
-              <circle cx="61" cy="39" r="2" fill="#ffffff" />
-              <path d="M 43 49 Q 50 54 57 49" stroke="#9f1239" strokeWidth="2" fill="none" strokeLinecap="round" />
-              <g transform="translate(62, 60)">
-                <path d="M 0 0 L 22 0 Q 22 18 11 26 Q 0 18 0 0 Z" fill="#ffffff" stroke="#e11d48" strokeWidth="2" />
-                <path d="M 4 4 L 18 4 Q 18 15 11 21 Q 4 15 4 4 Z" fill="#ffe4e6" />
-                <path d="M 11 6 L 11 18" stroke="#e11d48" strokeWidth="1.5" />
-                <path d="M 6 11 L 16 11" stroke="#e11d48" strokeWidth="1.5" />
+              {/* Dynamic Ground Shadow */}
+              <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
+              
+              {/* Animated Floating Robot Body */}
+              <g className="animate-agent-float-a" style={{ transformOrigin: "50px 60px" }}>
+                <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#shieldGradient)" />
+                <polygon points="42,56 46,60 42,64" fill="#0f172a" />
+                <polygon points="58,56 54,60 58,64" fill="#0f172a" />
+                
+                {/* Center Arbitration Core with Heartbeat Pulse */}
+                <circle cx="50" cy="60" r="3.5" fill="#e11d48" className="animate-ping" />
+                <circle cx="50" cy="60" r="2.5" fill="#fda4af" />
+                
+                {/* Alert Sensor Eyes */}
+                <circle cx="40" cy="40" r="6" fill="#0f172a" stroke="#f43f5e" strokeWidth="1.5" />
+                <circle cx="60" cy="40" r="6" fill="#0f172a" stroke="#f43f5e" strokeWidth="1.5" />
+                <circle cx="40" cy="40" r="3.5" fill="#fb7185" className="animate-pulse" />
+                <circle cx="60" cy="40" r="3.5" fill="#fb7185" className="animate-pulse" />
+                <circle cx="41" cy="39" r="1.5" fill="#ffffff" />
+                <circle cx="61" cy="39" r="1.5" fill="#ffffff" />
+                
+                {/* Confident Smile */}
+                <path d="M 43 49 Q 50 54 57 49" stroke="#9f1239" strokeWidth="2" fill="none" strokeLinecap="round" />
+                
+                {/* Protective Energy Shield with Active Forcefield Shimmer */}
+                <g transform="translate(62, 58)" className="animate-[shieldAuraPulse_2.5s_ease-in-out_infinite]" style={{ transformOrigin: "73px 71px" }}>
+                  <path d="M 0 0 L 22 0 Q 22 18 11 26 Q 0 18 0 0 Z" fill="#ffffff" stroke="#e11d48" strokeWidth="2" />
+                  <path d="M 4 4 L 18 4 Q 18 15 11 21 Q 4 15 4 4 Z" fill="#ffe4e6" />
+                  <path d="M 11 6 L 11 18" stroke="#e11d48" strokeWidth="1.5" />
+                  <path d="M 6 11 L 16 11" stroke="#e11d48" strokeWidth="1.5" />
+                </g>
+                
+                <line x1="16" y1="65" x2="26" y2="78" stroke="#0f172a" strokeWidth="2" />
+                <polygon points="14,63 16,68 18,65" fill="#f59e0b" />
               </g>
-              <line x1="16" y1="65" x2="26" y2="78" stroke="#0f172a" strokeWidth="2" />
-              <polygon points="14,63 16,68 18,65" fill="#f59e0b" />
+
               <defs>
                 <linearGradient id="shieldGradient" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#fecdd3" />
@@ -887,19 +973,17 @@ export function AgentFleetStudio({
                         {agent.name}
                       </span>
                     </div>
-                    <div className="flex items-center justify-center space-x-1">
+                    <div className="flex items-center justify-center space-x-1.5">
                       <span className="font-mono text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                         {agent.code_name}
                       </span>
-                      {agent.id === "ops_beacon" ? (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
-                          Report Console Agent
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                          {agent.title?.split(" ")[0]} Agent
-                        </span>
-                      )}
+                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/60">
+                        {agent.id === "ops_beacon"
+                          ? "Reporting Agent"
+                          : agent.id === "dispute_shield"
+                          ? "Dispute Agent"
+                          : `${agent.title?.split(" ")[0]} Agent`}
+                      </span>
                     </div>
                     <p className="text-[11px] text-slate-600 dark:text-slate-300 italic line-clamp-2 px-1 pt-1 leading-snug">
                       "{agent.tagline || profile.catchphrase}"

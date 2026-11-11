@@ -21,6 +21,9 @@ share/python-wheels/
 .pytest_cache/
 .ruff_cache/
 .venv/
+.venv
+.venv.nosync/
+.venv.icloud-old/
 env/
 venv/
 ENV/

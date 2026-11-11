@@ -61,23 +61,33 @@ export default function Home() {
     setIsWelcomeModalOpen(false);
   }, []);
 
-  // Sync tab from URL hash on mount and on hash changes
+  // Sync tab from URL pathname or hash on mount and on route changes
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const applyHash = () => {
+      const applyRoute = () => {
         const hash = window.location.hash.replace("#", "");
-        const validTabs: NavTab[] = ["dashboard", "agents", "studio", "reports", "minions", "exceptions", "approvals", "ingestion", "records", "audit", "settings"];
-        if (hash && validTabs.includes(hash as NavTab)) {
-          setCurrentTab(hash as NavTab);
+        const path = window.location.pathname.replace(/^\//, "").split("/")[0];
+        const validTabs: NavTab[] = [
+          "dashboard", "agents", "studio", "reports", "minions",
+          "exceptions", "approvals", "ingestion", "records", "audit", "settings"
+        ];
+        
+        const candidate = (hash || path) as NavTab;
+        if (candidate && validTabs.includes(candidate)) {
+          setCurrentTab(candidate);
           setIsWelcomeModalOpen(false);
-          if (hash !== "exceptions") {
+          if (candidate !== "exceptions") {
             setSelectedExceptionId(null);
           }
         }
       };
-      applyHash();
-      window.addEventListener("hashchange", applyHash);
-      return () => window.removeEventListener("hashchange", applyHash);
+      applyRoute();
+      window.addEventListener("hashchange", applyRoute);
+      window.addEventListener("popstate", applyRoute);
+      return () => {
+        window.removeEventListener("hashchange", applyRoute);
+        window.removeEventListener("popstate", applyRoute);
+      };
     }
   }, []);
 
@@ -85,8 +95,10 @@ export default function Home() {
   useEffect(() => {
     try {
       const hasSeen = localStorage.getItem("ops_tour_seen");
+      const path = typeof window !== "undefined" ? window.location.pathname.replace(/^\//, "").split("/")[0] : "";
       const hasHash = typeof window !== "undefined" && window.location.hash && window.location.hash !== "#dashboard";
-      if (!hasSeen && !hasHash) {
+      const hasPath = path && path !== "dashboard";
+      if (!hasSeen && !hasHash && !hasPath) {
         setIsWelcomeModalOpen(true);
       }
     } catch (_) {}
