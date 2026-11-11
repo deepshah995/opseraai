@@ -277,15 +277,23 @@ class ApiClient {
     });
   }
 
-  async chatWithAgent(agentId: string, message: string): Promise<AgentChatResponse> {
+  async chatWithAgent(
+    agentId: string,
+    message: string,
+    history: { role: "user" | "assistant"; content: string }[] = [],
+  ): Promise<AgentChatResponse> {
     return this.request<AgentChatResponse>(`/agents/${agentId}/chat`, {
       method: "POST",
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, history }),
     });
   }
 
-  async chatWithMinion(agentId: string, message: string): Promise<AgentChatResponse> {
-    return this.chatWithAgent(agentId, message);
+  async chatWithMinion(
+    agentId: string,
+    message: string,
+    history: { role: "user" | "assistant"; content: string }[] = [],
+  ): Promise<AgentChatResponse> {
+    return this.chatWithAgent(agentId, message, history);
   }
 
   async getResolutionAnalytics(timeframe: string = "Last 30 Days"): Promise<ResolutionAnalytics> {

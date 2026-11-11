@@ -6,13 +6,15 @@ Provides engaging, in-character, operations-grounded dialogue powered by:
 3. Deterministic In-Character Simulation Engine (resilient offline fallback)
 """
 
+import json
 import logging
 import os
-from pathlib import Path
 import random
 import re
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
+
 from dotenv import load_dotenv
 
 # Ensure .env from workspace root is loaded
@@ -168,8 +170,9 @@ OPERATIONS_JOKES = {
 OPERATIONS_JOKES["report_beacon"] = OPERATIONS_JOKES["ops_beacon"]
 
 # Circuit breaker state
-_LLM_CIRCUIT_OPEN_UNTIL: Optional[float] = None
-_LLM_LAST_ERROR: Optional[str] = None
+_LLM_CIRCUIT_OPEN_UNTIL: float | None = None
+_LLM_LAST_ERROR: str | None = None
+_PROVIDER_COOLDOWN_UNTIL: dict[str, float] = {}
 
 
 def is_llm_circuit_open() -> bool:
@@ -189,6 +192,22 @@ def trip_llm_circuit(reason: str, cooldown_seconds: float = 60.0) -> None:
     logger.warning(f"Chat LLM circuit tripped for {cooldown_seconds}s. Reason: {reason}")
 
 
+def _is_provider_cooling_down(provider_name: str) -> bool:
+    until = _PROVIDER_COOLDOWN_UNTIL.get(provider_name)
+    if until is None:
+        return False
+    if time.time() >= until:
+        _PROVIDER_COOLDOWN_UNTIL.pop(provider_name, None)
+        return False
+    return True
+
+
+def _cooldown_provider(provider_name: str, error_text: str) -> None:
+    is_auth_error = any(k in error_text.upper() for k in ("401", "UNAUTHENTICATED", "INVALID_API_KEY", "API_KEY_INVALID"))
+    cooldown = 600.0 if is_auth_error else 60.0
+    _PROVIDER_COOLDOWN_UNTIL[provider_name] = time.time() + cooldown
+
+
 def get_llm_status() -> dict[str, Any]:
     """
     Returns active LLM provider metadata and configuration status
@@ -200,14 +219,27 @@ def get_llm_status() -> dict[str, Any]:
     )
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip().strip('"').strip("'")
 
-    if gemini_key and not gemini_key.startswith("your-") and len(gemini_key) > 8:
+    gemini_ok = (
+        gemini_key
+        and not gemini_key.startswith("your-")
+        and len(gemini_key) > 8
+        and not _is_provider_cooling_down("Google Gemini 2.5 Flash")
+    )
+    openai_ok = (
+        openai_key
+        and not openai_key.startswith("your-")
+        and len(openai_key) > 8
+        and not _is_provider_cooling_down("OpenAI GPT-4o-mini")
+    )
+
+    if gemini_ok:
         return {
             "provider": "Google Gemini",
             "model": "gemini-2.5-flash",
             "configured": True,
             "badge": "⚡ Google Gemini 2.5 Flash",
         }
-    elif openai_key and not openai_key.startswith("your-") and len(openai_key) > 8:
+    elif openai_ok:
         return {
             "provider": "OpenAI",
             "model": "gpt-4o-mini",
@@ -222,37 +254,47 @@ def get_llm_status() -> dict[str, Any]:
     }
 
 
-def invoke_agent_llm(
-    profile: dict[str, Any],
-    user_message: str,
-    context: dict[str, Any] | None = None,
-    timeout_seconds: float = 5.0,
-) -> tuple[Optional[str], Optional[str], Optional[str]]:
-    """
-    Multi-provider LLM executor with cascading fallback:
-    1. Google Gemini 2.5 Flash
-    2. OpenAI GPT-4o-mini
-    Returns (response_text, provider_name, model_name), or (None, None, None) on failure.
-    """
-    if is_llm_circuit_open():
-        return None, None, None
+MAX_TOOL_ROUNDS = 5
+MAX_HISTORY_TURNS = 12
 
-    system_prompt = (
-        f"You are {profile['agent_name']} ({profile['title']}), an autonomous operational AI agent in an industrial operations and logistics control platform.\n\n"
-        f"AGENT IDENTITY & CHARACTER:\n"
-        f"- Personality & Style: {profile['personality']}\n"
-        f"- Catchphrase: \"{profile['catchphrase']}\"\n"
-        f"- Current Live Activity: {profile['current_live_action']}\n"
-        f"- Connected Real-Time Systems: {', '.join(profile['linked_systems'])}\n\n"
-        f"INSTRUCTIONS:\n"
-        f"1. Respond directly and strictly in character as {profile['agent_name']}.\n"
-        f"2. Always start or punctuate your reply with a physical or sensor action in asterisks (e.g. *calibrates scale slip #SC-110*, *adjusts laser scanning goggles*, *telemetry indicator blinks {profile['color']}*).\n"
-        f"3. Keep your reply concise, punchy (2 to 4 sentences maximum), witty, and operations-focused.\n"
-        f"4. If the user asks for a joke, tell an operations, hauling, weight scale, or logistics joke in character.\n"
-        f"5. If asked what you are doing or how you work, reference your active tasks and connected systems."
+
+def _build_system_prompt(profile: dict[str, Any], has_tools: bool) -> str:
+    data_rules = (
+        "LIVE DATABASE ACCESS:\n"
+        "You have read-only tools that query this organization's live operations database "
+        "(operational records, exceptions/discrepancies, investigations, approvals, documents, audit trail).\n"
+        "- Whenever the user asks about their data (counts, amounts, customers, invoices, tickets, exceptions, "
+        "approvals, trends, 'which', 'how many', 'show me', 'list', etc.) you MUST call the tools first and answer "
+        "ONLY from the tool results. Never invent IDs, numbers, customers or amounts.\n"
+        "- You may call several tools in a row (e.g. search, then fetch details) before answering.\n"
+        "- If the tools return nothing, say so plainly and suggest a related question.\n"
+        "- Format money as $1,234.56. Use short bullet lists (lines starting with '- ') for multiple items, and "
+        "**bold** for key figures. Show at most ~10 items and mention if there are more.\n"
+        "- For general conversation (greetings, small talk, explanations, advice) just chat naturally — no tools needed.\n\n"
+        if has_tools
+        else ""
+    )
+    return (
+        f"You are {profile['agent_name']} ({profile['title']}), a friendly, helpful AI operations assistant inside "
+        f"an industrial waste-hauling & logistics operations platform.\n\n"
+        f"PERSONA (light touch — helpfulness comes first):\n"
+        f"- Personality: {profile['personality']}\n"
+        f"- Specialty systems: {', '.join(profile['linked_systems'])}\n\n"
+        f"{data_rules}"
+        f"STYLE:\n"
+        f"1. Converse naturally like a capable human colleague. Answer exactly what was asked; keep it concise, "
+        f"but complete enough to be useful.\n"
+        f"2. You may optionally open with one short in-character action in asterisks (e.g. *adjusts scanning goggles*). "
+        f"Do not overdo the persona or catchphrases.\n"
+        f"3. You can help with any topic, not only your specialty; for other agents' domains, still answer using the tools.\n"
+        f"4. Remember earlier turns of this conversation and resolve follow-ups like 'that one' or 'what about the second?'."
     )
 
-    # 1. Primary: Google Gemini 2.5 Flash
+
+def _resolve_llm_candidates(timeout_seconds: float) -> list[tuple[Any, str, str]]:
+    """Return configured chat models in priority order: Gemini -> OpenAI."""
+    candidates: list[tuple[Any, str, str]] = []
+
     gemini_key = (
         os.environ.get("GEMINI_API_KEY", "").strip().strip('"').strip("'")
         or os.environ.get("GOOGLE_API_KEY", "").strip().strip('"').strip("'")
@@ -260,50 +302,144 @@ def invoke_agent_llm(
     if gemini_key and not gemini_key.startswith("your-") and len(gemini_key) > 8:
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
-            from langchain_core.messages import HumanMessage, SystemMessage
 
-            llm = ChatGoogleGenerativeAI(
-                model="gemini-2.5-flash",
-                temperature=0.4,
-                google_api_key=gemini_key,
-                timeout=timeout_seconds,
-            )
-            resp = llm.invoke([
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=user_message),
-            ])
-            if resp and getattr(resp, "content", None):
-                content = str(resp.content).strip()
-                if len(content) > 0:
-                    return content, "Google Gemini 2.5 Flash", "gemini-2.5-flash"
+            candidates.append((
+                ChatGoogleGenerativeAI(
+                    model="gemini-2.5-flash",
+                    temperature=0.3,
+                    google_api_key=gemini_key,
+                    timeout=timeout_seconds,
+                ),
+                "Google Gemini 2.5 Flash",
+                "gemini-2.5-flash",
+            ))
         except Exception as e:
-            logger.warning(f"Gemini chat invocation skipped/failed ({e}). Falling back to secondary provider.")
+            logger.warning(f"Gemini client unavailable ({e}).")
 
-    # 2. Secondary Fallback: OpenAI GPT-4o-mini
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip().strip('"').strip("'")
     if openai_key and not openai_key.startswith("your-") and len(openai_key) > 8:
         try:
             from langchain_openai import ChatOpenAI
-            from langchain_core.messages import HumanMessage, SystemMessage
 
-            llm = ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0.4,
-                api_key=openai_key,
-                timeout=timeout_seconds,
-            )
-            resp = llm.invoke([
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=user_message),
-            ])
-            if resp and getattr(resp, "content", None):
-                content = str(resp.content).strip()
-                if len(content) > 0:
-                    return content, "OpenAI GPT-4o-mini", "gpt-4o-mini"
+            candidates.append((
+                ChatOpenAI(model="gpt-4o-mini", temperature=0.3, api_key=openai_key, timeout=timeout_seconds),
+                "OpenAI GPT-4o-mini",
+                "gpt-4o-mini",
+            ))
         except Exception as e:
-            logger.warning(f"OpenAI chat invocation failed ({e}). Falling back to deterministic engine.")
+            logger.warning(f"OpenAI client unavailable ({e}).")
 
-    return None, None, None
+    return candidates
+
+
+def _message_text(content: Any) -> str:
+    """Normalize LangChain message content (str or list of content blocks) to plain text."""
+    if isinstance(content, str):
+        return content.strip()
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict) and block.get("type") == "text":
+                parts.append(str(block.get("text", "")))
+        return "".join(parts).strip()
+    return str(content or "").strip()
+
+
+def _run_chat_with_tools(
+    llm: Any,
+    system_prompt: str,
+    history: list[dict[str, str]],
+    user_message: str,
+    tools: list[Any],
+) -> tuple[str, list[str]]:
+    """Run a bounded tool-calling loop. Returns (final_text, tool_names_used)."""
+    from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+
+    messages: list[Any] = [SystemMessage(content=system_prompt)]
+    for turn in history[-MAX_HISTORY_TURNS:]:
+        text = (turn.get("content") or "").strip()
+        if not text:
+            continue
+        if turn.get("role") == "user":
+            messages.append(HumanMessage(content=text))
+        else:
+            messages.append(AIMessage(content=text))
+    messages.append(HumanMessage(content=user_message))
+
+    tool_map = {t.name: t for t in tools}
+    model = llm.bind_tools(tools) if tools else llm
+    used: list[str] = []
+
+    for _ in range(MAX_TOOL_ROUNDS):
+        resp = model.invoke(messages)
+        tool_calls = getattr(resp, "tool_calls", None) or []
+        if not tool_calls:
+            return _message_text(resp.content), used
+
+        messages.append(resp)
+        for call in tool_calls:
+            name = call.get("name")
+            tool = tool_map.get(name)
+            if tool is None:
+                result: Any = {"error": f"Unknown tool '{name}'."}
+            else:
+                try:
+                    result = tool.invoke(call.get("args") or {})
+                except Exception as e:
+                    result = {"error": f"Tool failed: {e!s}"}
+                if name not in used:
+                    used.append(name)
+            messages.append(ToolMessage(
+                content=json.dumps(result, default=str)[:12000],
+                tool_call_id=call.get("id") or name,
+            ))
+
+    # Tool budget exhausted: ask for a final answer without tools
+    messages.append(HumanMessage(content="Please give your final answer now based on the data retrieved above."))
+    resp = llm.invoke(messages)
+    return _message_text(resp.content), used
+
+
+def invoke_agent_llm(
+    profile: dict[str, Any],
+    user_message: str,
+    context: dict[str, Any] | None = None,
+    timeout_seconds: float = 30.0,
+    history: list[dict[str, str]] | None = None,
+    tools: list[Any] | None = None,
+) -> tuple[str | None, str | None, str | None, list[str]]:
+    """
+    Multi-provider conversational LLM executor with cascading fallback:
+    1. Google Gemini 2.5 Flash
+    2. OpenAI GPT-4o-mini
+    Supports multi-turn history and read-only database tools (tool-calling loop).
+    Returns (response_text, provider_name, model_name, tools_used), or (None, None, None, []) on failure.
+    """
+    if is_llm_circuit_open():
+        return None, None, None, []
+
+    system_prompt = _build_system_prompt(profile, has_tools=bool(tools))
+    candidates = _resolve_llm_candidates(timeout_seconds)
+    errors: list[str] = []
+
+    for llm, provider_name, model_name in candidates:
+        if _is_provider_cooling_down(provider_name):
+            continue
+        try:
+            text, used = _run_chat_with_tools(llm, system_prompt, history or [], user_message, tools or [])
+            if text:
+                return text, provider_name, model_name, used
+        except Exception as e:
+            _cooldown_provider(provider_name, str(e))
+            errors.append(f"{provider_name}: {e}")
+            logger.warning(f"{provider_name} chat invocation failed ({e}). Trying next provider.")
+
+    if candidates and errors and len(errors) == len(candidates):
+        trip_llm_circuit("; ".join(errors)[:500], cooldown_seconds=30.0)
+
+    return None, None, None, []
 
 
 def _generate_deterministic_chat_response(clean_id: str, profile: dict[str, Any], message: str) -> dict[str, Any]:
@@ -446,14 +582,103 @@ def _generate_deterministic_chat_response(clean_id: str, profile: dict[str, Any]
     }
 
 
+_LEADING_ACTION_RE = re.compile(r"^\s*\*(?!\*)([^*\n]{1,160})\*(?!\*)\s*")
+
+_DATA_INTENT_KEYWORDS = (
+    "how many", "how much", "total", "count", "list", "show", "which", "find", "search", "top",
+    "exception", "discrepanc", "invoice", "ticket", "record", "customer", "approval", "pending",
+    "open", "resolved", "unbilled", "duplicate", "rate", "dispatch", "load", "document", "summary",
+    "kpi", "revenue", "leak", "amount", "$",
+)
+
+
+def _looks_like_data_question(message: str) -> bool:
+    msg = message.lower()
+    return any(k in msg for k in _DATA_INTENT_KEYWORDS)
+
+
+def _fmt_money(value: Any) -> str:
+    try:
+        return f"${float(value or 0):,.2f}"
+    except (TypeError, ValueError):
+        return "$0.00"
+
+
+def _offline_data_answer(data_tools: Any, message: str) -> str | None:
+    """Best-effort DB answer when no LLM is available (keyword routing over the safe tools)."""
+    msg = message.lower()
+    try:
+        if "approval" in msg or "pending" in msg:
+            res = data_tools.list_pending_approvals(limit=10)
+            if not res["count"]:
+                return "There are no approvals waiting on a decision right now."
+            lines = [f"There are **{res['count']}** pending approval(s):"]
+            for a in res["approvals"]:
+                e = a["exception"]
+                lines.append(f"- {e['title']} ({e['type']}) — {_fmt_money(e['discrepancy_amount'])}")
+            return "\n".join(lines)
+
+        if any(k in msg for k in ("exception", "discrepanc", "issue", "unbilled", "duplicate", "mismatch")):
+            status = None
+            if "open" in msg:
+                status = "open"
+            elif "resolved" in msg and "unresolved" not in msg:
+                status = "resolved"
+            elif "unresolved" in msg or "active" in msg:
+                status = "unresolved"
+            res = data_tools.search_exceptions(status=status, limit=10)
+            if not res["count"]:
+                return "I couldn't find any matching exceptions."
+            label = f"{status} " if status else ""
+            lines = [f"Here are the top {label}exceptions by dollar impact:"]
+            for e in res["exceptions"]:
+                lines.append(
+                    f"- {e['title']} — {_fmt_money(e['discrepancy_amount'])} · {e['severity']} · {e['status']}"
+                )
+            return "\n".join(lines)
+
+        if any(k in msg for k in ("invoice", "ticket", "record", "dispatch", "load")):
+            rtype = next(
+                (t for k, t in (("invoice", "invoice"), ("ticket", "service_ticket"),
+                                ("dispatch", "dispatch_record"), ("load", "load_record")) if k in msg),
+                None,
+            )
+            res = data_tools.search_records(record_type=rtype, limit=10)
+            if not res["count"]:
+                return "I couldn't find any matching records."
+            lines = [f"Here are the latest {(rtype or 'record').replace('_', ' ')}s:"]
+            for r in res["records"]:
+                amt = f" — {_fmt_money(r['amount'])}" if r["amount"] is not None else ""
+                lines.append(f"- {r['external_reference']} · {r['customer']}{amt} · {r['status']}")
+            return "\n".join(lines)
+
+        s = data_tools.get_operations_summary()
+        by_status = ", ".join(f"{k}: {v}" for k, v in s["exceptions_by_status"].items()) or "none"
+        return (
+            "Here's the current operations snapshot:\n"
+            f"- **{s['total_records']}** operational records\n"
+            f"- **{s['total_exceptions']}** exceptions ({by_status})\n"
+            f"- **{_fmt_money(s['unresolved_discrepancy_amount_usd'])}** unresolved discrepancy value\n"
+            f"- **{_fmt_money(s['resolved_discrepancy_amount_usd'])}** resolved/recovered\n"
+            f"- **{s['pending_approvals']}** pending approvals"
+        )
+    except Exception as e:
+        logger.warning(f"Offline data answer failed: {e}")
+        return None
+
+
 def generate_minion_chat_response(
     agent_id: str,
     message: str,
     context: dict[str, Any] | None = None,
+    history: list[dict[str, str]] | None = None,
+    data_tools: Any | None = None,
 ) -> dict[str, Any]:
     """
-    Generate an engaging, witty, and operations-grounded chat response
-    from the perspective of the specified operations agent.
+    Generate a natural, conversational chat response from the selected operations agent.
+    - Multi-turn: `history` is a list of {"role": "user"|"assistant", "content": str}.
+    - Data-aware: `data_tools` (e.g. backend OperationsDataTools) exposes read-only,
+      tenant-scoped DB queries that the LLM can call via tool-calling.
     Uses multi-provider LLM (Gemini -> OpenAI) with deterministic fallback.
     """
     clean_id = agent_id.lower().replace("-", "_")
@@ -463,19 +688,32 @@ def generate_minion_chat_response(
     agent_name = profile["agent_name"]
     primary_emoji = profile.get("primary_emoji", "🤖")
 
+    tools: list[Any] = []
+    if data_tools is not None:
+        try:
+            tools = data_tools.as_langchain_tools()
+        except Exception as e:
+            logger.warning(f"Could not build chat data tools ({e}); continuing without DB access.")
+
     # 1. Attempt LLM invocation (Gemini -> OpenAI)
-    llm_text, provider_name, model_name = invoke_agent_llm(profile, message, context)
+    llm_text, provider_name, model_name, tools_used = invoke_agent_llm(
+        profile, message, context, history=history, tools=tools
+    )
 
     if llm_text:
-        # Extract action from asterisks if present
-        action_match = re.search(r"\*([^*]+)\*", llm_text)
+        # Extract a leading in-character action (single-asterisk only, so **bold** is untouched)
+        action_match = _LEADING_ACTION_RE.match(llm_text)
         if action_match:
             action_text = action_match.group(1).strip()
             funny_action = f"{primary_emoji} {agent_name} {action_text}"
             # Strip the leading asterisk action from the spoken text so it is not duplicated in the bubble
-            clean_speech = re.sub(r"^\s*\*([^*]+)\*\s*", "", llm_text).strip()
+            clean_speech = llm_text[action_match.end():].strip()
         else:
-            funny_action = f"{primary_emoji} {agent_name} synchronizes telemetry indicators"
+            funny_action = (
+                f"{primary_emoji} {agent_name} queried the live operations database"
+                if tools_used
+                else ""
+            )
             clean_speech = llm_text.strip()
 
         # If stripping left empty text (rare), restore original
@@ -503,7 +741,25 @@ def generate_minion_chat_response(
             "linked_systems_active": profile["linked_systems"],
             "ai_provider": provider_name,
             "ai_model": model_name,
+            "tools_used": tools_used,
         }
 
-    # 2. Resilient Rule Engine fallback
+    # 2. Offline DB fallback if the user asked a data question and we have DB access
+    if data_tools is not None and _looks_like_data_question(message):
+        db_answer = _offline_data_answer(data_tools, message)
+        if db_answer:
+            return {
+                "agent_id": clean_id,
+                "agent_name": agent_name,
+                "robot_nickname": agent_name,
+                "avatar_mood": "scanning",
+                "funny_action": f"{primary_emoji} {agent_name} queried the live operations database",
+                "response": db_answer,
+                "linked_systems_active": profile["linked_systems"],
+                "ai_provider": "Live DB Query Engine",
+                "ai_model": "sql-direct",
+                "tools_used": ["offline_db_query"],
+            }
+
+    # 3. Resilient Rule Engine fallback
     return _generate_deterministic_chat_response(clean_id, profile, message)

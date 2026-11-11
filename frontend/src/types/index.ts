@@ -240,6 +240,11 @@ export interface AgentStudioProfile {
   emojis: string;
 }
 
+export interface ChatHistoryTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface AgentChatResponse {
   agent_id: string;
   agent_name: string;
@@ -250,6 +255,7 @@ export interface AgentChatResponse {
   linked_systems_active: string[];
   ai_provider?: string;
   ai_model?: string;
+  tools_used?: string[];
 }
 
 export type MinionProfile = AgentStudioProfile;

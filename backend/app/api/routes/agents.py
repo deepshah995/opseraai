@@ -716,10 +716,18 @@ def resolve_dispute(
 
     return result
 
+class ChatHistoryTurn(BaseModel):
+    role: str = Field(..., pattern="^(user|assistant)$")
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
 class AgentChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=1000)
+    message: str = Field(..., min_length=1, max_length=2000)
+    history: list[ChatHistoryTurn] = Field(default_factory=list, max_length=20)
+
 
 MinionChatRequest = AgentChatRequest  # legacy alias
+
 
 @router.post("/{agent_id}/chat", summary="Chat interactively with an AI Agent")
 def chat_with_agent(
@@ -730,7 +738,8 @@ def chat_with_agent(
 ):
     """
     Interactive and operations-grounded chat with the autonomous AI Agent.
-    Explains real-time activities and live data system connections.
+    Supports multi-turn conversation history and live read-only database lookups
+    strictly scoped to the authenticated user's organization.
     """
     defn = get_agent_definition(agent_id)
     if not defn:
@@ -740,9 +749,18 @@ def chat_with_agent(
         )
 
     from agentic.app.agents.minion_chat import generate_minion_chat_response
+    from backend.app.services.chat_tools import OperationsDataTools
 
     context = {"organization_id": current_user.organization_id}
-    res = generate_minion_chat_response(agent_id, req.message, context)
+    history = [{"role": t.role, "content": t.content} for t in req.history]
+    data_tools = OperationsDataTools(db=db, organization_id=current_user.organization_id)
+    res = generate_minion_chat_response(
+        agent_id,
+        req.message,
+        context=context,
+        history=history,
+        data_tools=data_tools,
+    )
     return res
 
 

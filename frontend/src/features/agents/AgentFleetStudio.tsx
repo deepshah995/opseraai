@@ -206,7 +206,45 @@ interface ChatMessage {
   mood?: string;
   funnyAction?: string;
   aiProvider?: string;
+  toolsUsed?: string[];
   timestamp: string;
+}
+
+function renderFormattedChatText(text: string) {
+  const renderInlineBold = (line: string, keyPrefix: string) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, idx) => {
+      if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+        return (
+          <strong key={`${keyPrefix}-${idx}`} className="font-semibold">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return <span key={`${keyPrefix}-${idx}`}>{part}</span>;
+    });
+  };
+
+  const lines = text.split("\n");
+  return (
+    <div className="space-y-1">
+      {lines.map((line, i) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={i} className="h-1" />;
+        }
+        if (trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
+          return (
+            <div key={i} className="flex items-start gap-1.5 pl-1">
+              <span className="text-blue-500 select-none">•</span>
+              <span className="flex-1">{renderInlineBold(trimmed.slice(2), `b-${i}`)}</span>
+            </div>
+          );
+        }
+        return <p key={i}>{renderInlineBold(line, `p-${i}`)}</p>;
+      })}
+    </div>
+  );
 }
 
 export function AgentFleetStudio({
@@ -347,6 +385,14 @@ export function AgentFleetStudio({
       timestamp: "Now",
     };
 
+    const existingMessages = chatMessages[selectedAgentId] || [];
+    const historyPayload = existingMessages
+      .slice(-12)
+      .map((m) => ({
+        role: (m.sender === "user" ? "user" : "assistant") as "user" | "assistant",
+        content: m.text,
+      }));
+
     setChatMessages((prev) => ({
       ...prev,
       [selectedAgentId]: [...(prev[selectedAgentId] || []), userMsg],
@@ -355,7 +401,7 @@ export function AgentFleetStudio({
     setChatLoading(true);
 
     try {
-      const res: AgentChatResponse = await api.chatWithAgent(selectedAgentId, userText);
+      const res: AgentChatResponse = await api.chatWithAgent(selectedAgentId, userText, historyPayload);
       const agentMsg: ChatMessage = {
         id: `a-${Date.now()}`,
         sender: "agent",
@@ -363,6 +409,7 @@ export function AgentFleetStudio({
         mood: res.avatar_mood,
         funnyAction: res.funny_action,
         aiProvider: res.ai_provider,
+        toolsUsed: res.tools_used,
         timestamp: "Just now",
       };
       setChatMessages((prev) => ({
@@ -1152,12 +1199,24 @@ export function AgentFleetStudio({
                       : "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 rounded-bl-none border border-slate-200/60 dark:border-slate-700/60"
                   }`}
                 >
-                  <p className="whitespace-pre-line">{msg.text}</p>
+                  {msg.sender === "user" ? (
+                    <p className="whitespace-pre-line">{msg.text}</p>
+                  ) : (
+                    renderFormattedChatText(msg.text)
+                  )}
                 </div>
-                <div className="flex items-center space-x-2 mt-1 px-1">
+                <div className="flex items-center flex-wrap gap-1.5 mt-1 px-1">
                   <span className="text-[9px] text-slate-400">
                     {msg.timestamp}
                   </span>
+                  {msg.toolsUsed && msg.toolsUsed.length > 0 && (
+                    <span
+                      title={`DB tools queried: ${msg.toolsUsed.join(", ")}`}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60"
+                    >
+                      🗄️ Live DB ({msg.toolsUsed.length})
+                    </span>
+                  )}
                   {msg.aiProvider && (
                     <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
                       {msg.aiProvider}
@@ -1183,9 +1242,10 @@ export function AgentFleetStudio({
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
-                "What are you doing right now?",
-                "How do you catch errors?",
-                "How do all 5 agents team up?",
+                "Show me our open exceptions and dollar impact",
+                "Give me a live operations summary from the DB",
+                "Which approvals are pending right now?",
+                "Show invoices & exceptions for Apex Manufacturing",
                 "Tell me an operations joke!",
               ].map((chip, cIdx) => (
                 <button
