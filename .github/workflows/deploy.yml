@@ -81,6 +81,10 @@ jobs:
             ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-backend:latest
 
+      - name: Pre-warm Google Mirror Cache
+        run: |
+          curl -s -o /dev/null -w "Triggered mirror cache for opsera-backend: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/opsera-backend/manifests/${{ github.sha }}" || true
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -91,9 +95,9 @@ jobs:
 
       - name: Deploy opsera-backend to Cloud Run
         run: |
-          sleep 10
-          for attempt in 1 2 3 4 5 6; do
-            echo "Attempt $attempt: Deploying opsera-backend to Cloud Run..."
+          sleep 15
+          for attempt in $(seq 1 12); do
+            echo "Attempt $attempt of 12: Deploying opsera-backend to Cloud Run..."
             if gcloud run deploy opsera-backend \
               --project ${{ env.PROJECT_ID }} \
               --image docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }} \
@@ -109,12 +113,12 @@ jobs:
               echo "opsera-backend deployment succeeded!"
               break
             fi
-            if [ $attempt -eq 6 ]; then
-              echo "Deployment failed after 6 attempts."
+            if [ $attempt -eq 12 ]; then
+              echo "Deployment failed after 12 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 12 seconds..."
-            sleep 12
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
+            sleep 15
           done
 
           echo "Applying IAM invoker policy binding for public access..."
@@ -156,6 +160,10 @@ jobs:
             ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-agentic:latest
 
+      - name: Pre-warm Google Mirror Cache
+        run: |
+          curl -s -o /dev/null -w "Triggered mirror cache for opsera-agentic: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/opsera-agentic/manifests/${{ github.sha }}" || true
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -166,9 +174,9 @@ jobs:
 
       - name: Deploy opsera-agentic to Cloud Run
         run: |
-          sleep 10
-          for attempt in 1 2 3 4 5 6; do
-            echo "Attempt $attempt: Deploying opsera-agentic to Cloud Run..."
+          sleep 15
+          for attempt in $(seq 1 12); do
+            echo "Attempt $attempt of 12: Deploying opsera-agentic to Cloud Run..."
             if gcloud run deploy opsera-agentic \
               --project ${{ env.PROJECT_ID }} \
               --image docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }} \
@@ -184,12 +192,12 @@ jobs:
               echo "opsera-agentic deployment succeeded!"
               break
             fi
-            if [ $attempt -eq 6 ]; then
-              echo "Deployment failed after 6 attempts."
+            if [ $attempt -eq 12 ]; then
+              echo "Deployment failed after 12 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 12 seconds..."
-            sleep 12
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
+            sleep 15
           done
 
           echo "Applying IAM invoker policy binding for public access..."
@@ -231,6 +239,10 @@ jobs:
             ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
             ${{ env.DOCKER_USER }}/opsera-frontend:latest
 
+      - name: Pre-warm Google Mirror Cache
+        run: |
+          curl -s -o /dev/null -w "Triggered mirror cache for opsera-frontend: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/opsera-frontend/manifests/${{ github.sha }}" || true
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -247,9 +259,9 @@ jobs:
           fi
           echo "Using Backend URL: $BACKEND_URL"
 
-          sleep 10
-          for attempt in 1 2 3 4 5 6; do
-            echo "Attempt $attempt: Deploying opsera-frontend to Cloud Run..."
+          sleep 15
+          for attempt in $(seq 1 12); do
+            echo "Attempt $attempt of 12: Deploying opsera-frontend to Cloud Run..."
             if gcloud run deploy opsera-frontend \
               --project ${{ env.PROJECT_ID }} \
               --image docker.io/${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }} \
@@ -265,12 +277,12 @@ jobs:
               echo "opsera-frontend deployment succeeded!"
               break
             fi
-            if [ $attempt -eq 6 ]; then
-              echo "Deployment failed after 6 attempts."
+            if [ $attempt -eq 12 ]; then
+              echo "Deployment failed after 12 attempts."
               exit 1
             fi
-            echo "Image propagation to mirror.gcr.io pending. Retrying in 12 seconds..."
-            sleep 12
+            echo "Image propagation to mirror.gcr.io pending. Retrying in 15 seconds..."
+            sleep 15
           done
 
           echo "Applying IAM invoker policy binding for public access..."
