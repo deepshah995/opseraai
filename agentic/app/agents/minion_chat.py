@@ -8,11 +8,12 @@ Provides engaging, in-character, operations-grounded dialogue powered by:
 
 import logging
 import os
-from pathlib import Path
 import random
 import re
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
+
 from dotenv import load_dotenv
 
 # Ensure .env from workspace root is loaded
@@ -168,8 +169,8 @@ OPERATIONS_JOKES = {
 OPERATIONS_JOKES["report_beacon"] = OPERATIONS_JOKES["ops_beacon"]
 
 # Circuit breaker state
-_LLM_CIRCUIT_OPEN_UNTIL: Optional[float] = None
-_LLM_LAST_ERROR: Optional[str] = None
+_LLM_CIRCUIT_OPEN_UNTIL: float | None = None
+_LLM_LAST_ERROR: str | None = None
 
 
 def is_llm_circuit_open() -> bool:
@@ -227,7 +228,7 @@ def invoke_agent_llm(
     user_message: str,
     context: dict[str, Any] | None = None,
     timeout_seconds: float = 5.0,
-) -> tuple[Optional[str], Optional[str], Optional[str]]:
+) -> tuple[str | None, str | None, str | None]:
     """
     Multi-provider LLM executor with cascading fallback:
     1. Google Gemini 2.5 Flash
@@ -259,8 +260,8 @@ def invoke_agent_llm(
     )
     if gemini_key and not gemini_key.startswith("your-") and len(gemini_key) > 8:
         try:
-            from langchain_google_genai import ChatGoogleGenerativeAI
             from langchain_core.messages import HumanMessage, SystemMessage
+            from langchain_google_genai import ChatGoogleGenerativeAI
 
             llm = ChatGoogleGenerativeAI(
                 model="gemini-2.5-flash",
@@ -283,8 +284,8 @@ def invoke_agent_llm(
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip().strip('"').strip("'")
     if openai_key and not openai_key.startswith("your-") and len(openai_key) > 8:
         try:
-            from langchain_openai import ChatOpenAI
             from langchain_core.messages import HumanMessage, SystemMessage
+            from langchain_openai import ChatOpenAI
 
             llm = ChatOpenAI(
                 model="gpt-4o-mini",
