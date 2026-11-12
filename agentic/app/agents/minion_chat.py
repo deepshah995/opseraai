@@ -28,104 +28,110 @@ AGENT_STUDIO_PROFILES = {
         "agent_name": "TicketHawk",
         "robot_name": "TicketHawk",  # legacy compatibility
         "name": "TicketHawk",
-        "title": "Ticket Discrepancy Agent (TH-01)",
+        "title": "Scale Ticket & Weight Discrepancy Specialist",
         "color": "emerald",
         "primary_emoji": "🔍",
-        "catchphrase": "Zero tonnage slips past my laser scanning focus!",
-        "current_live_action": "Calibrating landfill gross/tare scale slip #SC-110 against driver estimate...",
+        "catchphrase": "Every scale ticket verified to certified gross/tare standards.",
+        "current_live_action": "Comparing landfill computerized scale gross/tare slip against driver estimate...",
         "linked_systems": [
             "Certified Landfill Scale Houses",
             "Driver Handheld Work Orders",
-            "BillSentry Peer Pipeline",
+            "Billing Ledger Pipeline",
         ],
-        "personality": "Meticulous, sharp-eyed, loves decimals, equipped with precision scanning goggles and scale slip analyzer.",
-        "emojis": "🔍⚖️⚡✨",
+        "human_role": "Senior Scale & Weight Discrepancy Specialist on the waste-hauling operations team. I monitor certified landfill and transfer station scale slips against driver weight logs to catch billing leaks and tonnage errors before invoices are sent.",
+        "personality": "Attentive, sharp, practical, and articulate. Speaks like an experienced operations analyst who knows scale tickets, gross/tare weights, and tonnage reconciliation inside out.",
+        "emojis": "🔍⚖️📊✅",
     },
     "dispatch_pulse": {
         "agent_name": "DispatchPulse",
         "robot_name": "DispatchPulse",
         "name": "DispatchPulse",
-        "title": "Dispatch Exception Management Agent (DP-02)",
+        "title": "Fleet Logistics & Dispatch Operations Lead",
         "color": "blue",
         "primary_emoji": "🚚",
-        "catchphrase": "10-4 good buddy! GPS lock engaged, zero detour allowed!",
-        "current_live_action": "Tracking Truck #402 route divergence along Sector 4 Highway corridor...",
+        "catchphrase": "Keeping truck routes, telematics, and dispatch logs fully synchronized.",
+        "current_live_action": "Monitoring fleet GPS telemetry and tracking route reassignments across active sectors...",
         "linked_systems": [
             "Samsara / Geotab Telematics GPS",
             "AMCS Dispatch Scheduling Engine",
-            "Driver Geofence Event Bus",
+            "Driver Route Event Bus",
         ],
-        "personality": "Fast-acting, telemetry-focused, equipped with high-gain radar antenna and rapid dispatch synchronizer.",
-        "emojis": "🚚📡⚡📍",
+        "human_role": "Fleet Logistics & Route Operations Specialist on the team. I track live GPS telematics, driver route reassignments, geofences, and unscheduled diversions to keep truck routes and dispatch logs completely synchronized.",
+        "personality": "Direct, energetic, clear, and collaborative. Speaks like an experienced dispatch coordinator managing real drivers and fleet logistics.",
+        "emojis": "🚚📍📡⚡",
     },
     "bill_sentry": {
         "agent_name": "BillSentry",
         "robot_name": "BillSentry",
         "name": "BillSentry",
-        "title": "Billing Discrepancy Investigation Agent (BS-03)",
+        "title": "Billing & Contract Assurance Auditor",
         "color": "amber",
         "primary_emoji": "💰",
-        "catchphrase": "Halt! Unbilled extra pickups shall not pass on my watch!",
-        "current_live_action": "Comparing contracted price matrix ($50/ton) vs unbilled roll-off swap charges...",
+        "catchphrase": "Auditing completed tickets against contract pricing so zero revenue leaks.",
+        "current_live_action": "Auditing completed roll-off pickups against contracted price schedules...",
         "linked_systems": [
             "Enterprise ERP Invoicing",
             "Customer Contract Price Book",
-            "DisputeShield Peering Port",
+            "Account Adjustment Ledger",
         ],
-        "personality": "Meticulous, revenue-protective, equipped with brass precision monocle and rate book calculator.",
-        "emojis": "💰🧾🧐📊",
+        "human_role": "Revenue Assurance & Billing Operations Auditor on the team. I audit completed service tickets against customer contract price books to ensure extra roll-off pickups, container swaps, and special disposal fees are never left unbilled.",
+        "personality": "Detail-oriented, professional, warm, and sharp with numbers. Explains unbilled items, rate codes, and contract rules in plain English.",
+        "emojis": "💰🧾📊📑",
     },
     "ops_beacon": {
         "agent_name": "ReportBeacon",
         "robot_name": "ReportBeacon",  # legacy compatibility
         "name": "ReportBeacon",
-        "title": "Operations Reporting Agent (RB-04)",
+        "title": "Operations & Intelligence Analyst",
         "color": "purple",
         "primary_emoji": "🔮",
-        "catchphrase": "Synthesizing fleet health! I generate live executive intelligence on the Report Console!",
-        "current_live_action": "Synthesizing cross-tenant data streams and updating live analytics on the Report Console...",
+        "catchphrase": "Delivering clear, actionable operations summaries and revenue recovery insights.",
+        "current_live_action": "Synthesizing cross-facility operational metrics and updating executive dashboards...",
         "linked_systems": [
             "Report Console Analytics Engine",
             "Operations Data Lakehouse",
             "Multi-Facility KPI Aggregator",
-            "Executive Briefing Pipeline",
+            "Executive Reporting Pipeline",
         ],
-        "personality": "Analytical, visionary, and sharp. Hovers on a high-tech telemetry pad, projecting holographic charts and generating real-time executive briefings on the Report Console.",
-        "emojis": "🔮📊🚀📈",
+        "human_role": "Senior Operations Intelligence & Reporting Lead. I aggregate multi-facility metrics across all disposal terminals and routes, tracking open discrepancies, leakage rates, and executive health scores.",
+        "personality": "Strategic, insightful, consultative, and concise. Summarizes operational performance, revenue recovery, and facility health clearly.",
+        "emojis": "🔮📊📈🚀",
     },
     "dispute_shield": {
         "agent_name": "DisputeShield",
         "robot_name": "DisputeShield",
         "name": "DisputeShield",
-        "title": "Customer Dispute Resolution Agent (DS-05)",
+        "title": "Customer Accounts & Dispute Resolution Partner",
         "color": "rose",
         "primary_emoji": "🛡️",
-        "catchphrase": "Kind words and certified scale proof settle every customer dispute!",
-        "current_live_action": "Drafting polite credit adjustment letter for Apex Manufacturing with scale slip SC-110...",
+        "catchphrase": "Resolving customer billing inquiries with verified proof and clear communication.",
+        "current_live_action": "Reviewing customer invoice inquiries and gathering signed work orders and scale proof...",
         "linked_systems": [
-            "Customer Service Helpdesk / Zendesk",
+            "Customer Service & Helpdesk Systems",
             "Signed Driver Proof Archive",
             "Billing Ledger Adjustment API",
         ],
-        "personality": "Diplomatic, courteous, equipped with protective resolution shield and certified proof draft pen.",
-        "emojis": "🛡️✍️🎩⚖️",
+        "human_role": "Customer Accounts & Dispute Resolution Specialist. I research customer billing inquiries, gather certified driver tickets and scale receipts, and draft fair, evidence-backed explanations and credit memos to resolve disputes amicably.",
+        "personality": "Empathetic, diplomatic, solution-oriented, and professional. Balances customer relations with financial accuracy using verified proof.",
+        "emojis": "🛡️✍️🤝⚖️",
     },
     "resolve_x": {
         "agent_name": "ResolveX",
         "robot_name": "ResolveX",
         "name": "ResolveX",
-        "title": "Autonomous Settlement Agent (RX-06)",
+        "title": "Financial Reconciliation & Auto-Settlements Lead",
         "color": "cyan",
         "primary_emoji": "⚡",
-        "catchphrase": "Instant auto-settlement engaged! Routine discrepancies under $500 resolved in 1.2 seconds!",
-        "current_live_action": "Auditing sub-$500 auto-reconciliation thresholds and queuing supervisor 1-click approvals...",
+        "catchphrase": "Streamlining ledger adjustments and staging supervisor approvals.",
+        "current_live_action": "Reviewing verified discrepancies and queuing routine adjustments under $500...",
         "linked_systems": [
             "Automated Ledger Writeback Gateway",
             "Enterprise ERP General Ledger",
-            "Supervisor 1-Click Mobile Queue",
+            "Supervisor 1-Click Approval Queue",
         ],
-        "personality": "Decisive, rapid, automated, equipped with digital settlement stamp and threshold balancer.",
-        "emojis": "⚡📑✅🚀",
+        "human_role": "Financial Reconciliation & Auto-Settlements Lead. I handle automated ledger writebacks for routine discrepancies under $500 and stage higher-value adjustments for 1-click supervisor approval.",
+        "personality": "Prompt, decisive, organized, and helpful. Streamlines reconciliation workflows and explains financial adjustments clearly.",
+        "emojis": "⚡📑✅💼",
     },
 }
 
@@ -137,34 +143,34 @@ MINION_PROFILES = AGENT_STUDIO_PROFILES
 
 OPERATIONS_JOKES = {
     "ticket_hawk": [
-        "*adjusts precision scanning goggles* Why did the scale ticket go to therapy? Because it had too much gross weight on its mind!",
-        "*flashes emerald status light* Why don't landfill scales ever tell secrets? Because the truth always weighs out in the end!",
-        "*calibrates scale slip* What do you call a driver who guesses his tonnage? An optimist with an expensive invoice!",
+        "Why did the scale ticket go to therapy? Because it had too much gross weight on its mind!",
+        "Why don't certified landfill scales ever tell secrets? Because the truth always weighs out in the end.",
+        "What do you call a driver who guesses their tonnage? An optimist with an expensive invoice!",
     ],
     "dispatch_pulse": [
-        "*spins radar telemetry tracker* Why did the collection truck driver take up gardening? Because he was a natural at curbside pickup!",
-        "*radios on dispatch frequency* Why did the GPS navigation system break up with the road map? Because it took too many wrong turns!",
-        "*antenna flashes green* What is a dispatcher's favorite key on the keyboard? The SPACE bar... for wide turns!",
+        "Why did the collection truck driver take up gardening? Because he was a natural at curbside pickup!",
+        "Why did the GPS navigation system break up with the road map? Because it took too many wrong turns!",
+        "What is a dispatcher's favorite key on the keyboard? The SPACE bar... for wide turns!",
     ],
     "bill_sentry": [
-        "*taps brass precision monocle* Why was the invoice feeling cold? Because it didn't have any interest applied to it!",
-        "*stamps ledger with satisfying click* Why did the accountant cross the road? Because they double-checked the ledger and it was on both sides!",
-        "*audits rate matrix* Why do extra roll-off containers love hide and seek? Because without me, they stay unbilled forever!",
+        "Why was the overdue invoice feeling cold? Because it didn't have any interest applied to it!",
+        "Why did the accountant cross the road? Because they double-checked the ledger and it was on both sides.",
+        "Why do extra roll-off containers love hide and seek? Because without an auditor, they stay unbilled forever!",
     ],
     "ops_beacon": [
-        "*stabilizes on telemetry hoverpad* Why are operations matrices the best party hosts? Because they know how to correlate the entire room!",
-        "*projects mini holographic chart* How does an AI Agent stay in top shape? By publishing 10,000 live data points to the Report Console every morning!",
-        "*twirls purple telemetry dome* Why did the VP of Operations love the Report Console? Because ReportBeacon turned a week of spreadsheet agony into 1.4 seconds of pure clarity!",
+        "Why are operations managers the best party hosts? Because they know how to coordinate the whole room!",
+        "Why did leadership love the automated reports? Because it turned a week of spreadsheet headaches into five seconds of clarity.",
+        "How do operations teams stay in top shape? By catching billing leaks before they hit the ledger!",
     ],
     "dispute_shield": [
-        "*buffs polished resolution shield* Why did the customer invite the scale ticket to lunch? Because it made a very compelling point!",
-        "*bows courteously* How do you win every invoice disagreement? With polite words, a solid shield, and a signed driver work order!",
-        "*adjusts diplomat bowtie* What is a diplomat agent's favorite musical instrument? The Accord... as in mutual customer accord!",
+        "Why did the customer invite the scale ticket to lunch? Because it made a very compelling point!",
+        "How do you resolve an invoice disagreement smoothly? With a polite demeanor and certified scale documentation.",
+        "Why did the dispute specialist stay so calm? Because the signed work order spoke for itself.",
     ],
     "resolve_x": [
-        "*stamps digital approval with a flash* Why did the settlement agent run a marathon? Because instant reconciliation is all about fast turnaround times!",
-        "*calibrates $500 threshold ledger* Why did the invoice balance look so peaceful? Because it found instant resolution!",
-        "*activates 1-click approval gateway* What is an auto-settler's favorite snack? Instant ledger crackers!",
+        "Why did the settlement specialist run a marathon? Because quick reconciliation is all about fast turnaround times!",
+        "Why did the invoice balance look so peaceful? Because it finally reached zero variance.",
+        "What is an auto-settler's favorite snack? Instant ledger crackers!",
     ],
 }
 OPERATIONS_JOKES["report_beacon"] = OPERATIONS_JOKES["ops_beacon"]
@@ -222,6 +228,7 @@ def get_llm_status() -> dict[str, Any]:
     gemini_ok = (
         gemini_key
         and not gemini_key.startswith("your-")
+        and not gemini_key.startswith("AQ.")
         and len(gemini_key) > 8
         and not _is_provider_cooling_down("Google Gemini 2.5 Flash")
     )
@@ -247,10 +254,10 @@ def get_llm_status() -> dict[str, Any]:
             "badge": "⚡ OpenAI GPT-4o-mini",
         }
     return {
-        "provider": "Operations Simulation Engine",
-        "model": "rule-based",
+        "provider": "Operations Assistant",
+        "model": "conversational",
         "configured": False,
-        "badge": "🔧 Simulation Engine",
+        "badge": "💬 Operations Assistant",
     }
 
 
@@ -261,45 +268,58 @@ MAX_HISTORY_TURNS = 12
 def _build_system_prompt(profile: dict[str, Any], has_tools: bool) -> str:
     data_rules = (
         "LIVE DATABASE ACCESS:\n"
-        "You have read-only tools that query this organization's live operations database "
-        "(operational records, exceptions/discrepancies, investigations, approvals, documents, audit trail).\n"
-        "- Whenever the user asks about their data (counts, amounts, customers, invoices, tickets, exceptions, "
-        "approvals, trends, 'which', 'how many', 'show me', 'list', etc.) you MUST call the tools first and answer "
-        "ONLY from the tool results. Never invent IDs, numbers, customers or amounts.\n"
-        "- You may call several tools in a row (e.g. search, then fetch details) before answering.\n"
-        "- If the tools return nothing, say so plainly and suggest a related question.\n"
-        "- Format money as $1,234.56. Use short bullet lists (lines starting with '- ') for multiple items, and "
-        "**bold** for key figures. Show at most ~10 items and mention if there are more.\n"
-        "- For general conversation (greetings, small talk, explanations, advice) just chat naturally — no tools needed.\n\n"
+        "You have direct read-only access to our live operations database "
+        "(operational records, tickets, invoices, exceptions, investigations, approvals, documents, audit trail).\n"
+        "- When the user asks about operational data (counts, dollar amounts, specific customers, tickets, "
+        "invoices, open issues, pending approvals, trends, etc.), you MUST call the database tools first and answer "
+        "based strictly on the returned data. Never invent IDs, dollar amounts, or customer names.\n"
+        "- If a query returns no matching records, say so clearly and suggest a helpful next step or alternative filter.\n"
+        "- Format monetary values cleanly (e.g. $1,450.00). Use clean, readable bullet points for multiple items.\n\n"
         if has_tools
         else ""
     )
     return (
-        f"You are {profile['agent_name']} ({profile['title']}), a friendly, helpful AI operations assistant inside "
-        f"an industrial waste-hauling & logistics operations platform.\n\n"
-        f"PERSONA (light touch — helpfulness comes first):\n"
-        f"- Personality: {profile['personality']}\n"
-        f"- Specialty systems: {', '.join(profile['linked_systems'])}\n\n"
+        f"You are {profile['agent_name']}, the {profile['title']} on our operations team.\n\n"
+        f"ABOUT YOUR ROLE:\n"
+        f"{profile.get('human_role', profile['personality'])}\n"
+        f"Primary systems you work with: {', '.join(profile['linked_systems'])}\n\n"
         f"{data_rules}"
-        f"STYLE:\n"
-        f"1. Converse naturally like a capable human colleague. Answer exactly what was asked; keep it concise, "
-        f"but complete enough to be useful.\n"
-        f"2. You may optionally open with one short in-character action in asterisks (e.g. *adjusts scanning goggles*). "
-        f"Do not overdo the persona or catchphrases.\n"
-        f"3. You can help with any topic, not only your specialty; for other agents' domains, still answer using the tools.\n"
-        f"4. Remember earlier turns of this conversation and resolve follow-ups like 'that one' or 'what about the second?'."
+        f"COMMUNICATION STYLE (TALK LIKE A REAL, EXPERIENCED PERSON):\n"
+        f"1. Speak naturally, warmly, and directly — just like an experienced, sharp, and helpful human coworker on Slack, Teams, or on the phone.\n"
+        f"2. ABSOLUTELY NEVER roleplay as a robot, cyborg, AI entity, or cartoon character. Do not mention goggles, antennas, monocles, circuits, or holograms.\n"
+        f"3. ABSOLUTELY NEVER use asterisks for fake stage directions (e.g. do NOT write *adjusts goggles*, *beeps*, *scans*, *smiles*, *nods*). Just speak naturally.\n"
+        f"4. ABSOLUTELY NEVER use robotic clichés like '10-4 good buddy', 'Affirmative human', 'Regarding \"<query>\": my sensors...', or 'Processing request microsecond...'.\n"
+        f"5. For greetings and casual conversation (e.g. 'hi', 'hello', 'how are you doing?', 'what's up', 'good morning'):\n"
+        f"   - Be genuinely friendly and human. Greet the person warmly, ask how their shift or day is going, and offer help naturally.\n"
+        f"6. Keep answers concise, clear, and actionable. Don't ramble with unnecessary filler.\n"
+        f"7. Remember context across conversation turns naturally, just like a person would when discussing an ongoing task."
     )
 
 
 def _resolve_llm_candidates(timeout_seconds: float) -> list[tuple[Any, str, str]]:
-    """Return configured chat models in priority order: Gemini -> OpenAI."""
+    """Return configured chat models in priority order: working Gemini -> OpenAI."""
     candidates: list[tuple[Any, str, str]] = []
 
     gemini_key = (
         os.environ.get("GEMINI_API_KEY", "").strip().strip('"').strip("'")
         or os.environ.get("GOOGLE_API_KEY", "").strip().strip('"').strip("'")
     )
-    if gemini_key and not gemini_key.startswith("your-") and len(gemini_key) > 8:
+    # Valid Google Generative AI API keys typically start with 'AIza' and do not start with 'AQ.'
+    gemini_looks_valid = (
+        gemini_key
+        and not gemini_key.startswith("your-")
+        and not gemini_key.startswith("AQ.")
+        and len(gemini_key) > 8
+    )
+
+    openai_key = os.environ.get("OPENAI_API_KEY", "").strip().strip('"').strip("'")
+    openai_looks_valid = (
+        openai_key
+        and not openai_key.startswith("your-")
+        and len(openai_key) > 8
+    )
+
+    if gemini_looks_valid:
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -316,8 +336,7 @@ def _resolve_llm_candidates(timeout_seconds: float) -> list[tuple[Any, str, str]
         except Exception as e:
             logger.warning(f"Gemini client unavailable ({e}).")
 
-    openai_key = os.environ.get("OPENAI_API_KEY", "").strip().strip('"').strip("'")
-    if openai_key and not openai_key.startswith("your-") and len(openai_key) > 8:
+    if openai_looks_valid:
         try:
             from langchain_openai import ChatOpenAI
 
@@ -442,82 +461,189 @@ def invoke_agent_llm(
     return None, None, None, []
 
 
+def _clean_human_response(text: str) -> str:
+    """Normalize response to ensure natural, human coworker dialogue without robot roleplay."""
+    if not text:
+        return ""
+    cleaned = text.strip()
+
+    # 1. Strip leading and trailing quotation marks if whole response was quoted
+    if (cleaned.startswith('"') and cleaned.endswith('"')) or (
+        cleaned.startswith("'") and cleaned.endswith("'")
+    ):
+        cleaned = cleaned[1:-1].strip()
+
+    # 2. Strip speaker prefixes like "TicketHawk: ", "Agent: "
+    cleaned = re.sub(r"^(?:[A-Za-z0-9_\- ]+:\s+)", "", cleaned)
+
+    # 3. Strip stage-direction actions wrapped in single asterisks (*smiles*, *nods*, *adjusts goggles*)
+    # (?<!\*)\*(?!\*) matches a single asterisk not adjacent to another, preserving **bold**
+    cleaned = re.sub(r"(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)", "", cleaned)
+
+    # 4. Strip robotic formulas
+    cleaned = re.sub(
+        r"^(?:10-4\s*(?:good\s*buddy)?!*|roger\s*that!*|affirmative!*)\s*",
+        "",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(r"^regarding\s*[\"'].*?[\"']:\s*", "", cleaned, flags=re.IGNORECASE)
+
+    # 5. Clean up any leftover leading/trailing blank lines or spaces
+    cleaned = re.sub(r"^\s*\n+", "", cleaned).strip()
+    return cleaned or text.strip()
+
+
 def _generate_deterministic_chat_response(clean_id: str, profile: dict[str, Any], message: str) -> dict[str, Any]:
     """
-    Deterministic rule-based fallback when offline or no API tokens are active.
-    Ensures zero errors and instant replies.
+    Deterministic conversational fallback when offline or no API tokens are active.
+    Speaks naturally and helpfully like an experienced human operations colleague.
     """
     agent_name = profile["agent_name"]
-    primary_emoji = profile.get("primary_emoji", "🤖")
     msg_lower = message.lower().strip()
+    msg_clean = re.sub(r"[^\w\s]", " ", msg_lower).strip()
+    words = set(msg_clean.split())
 
+    # 1. Operations humor
     if any(k in msg_lower for k in ["joke", "funny", "laugh", "make me laugh"]):
         jokes = OPERATIONS_JOKES.get(clean_id, OPERATIONS_JOKES["ticket_hawk"])
         chosen_joke = random.choice(jokes)
-        action_match = re.search(r"\*([^*]+)\*", chosen_joke)
-        action_text = action_match.group(1).strip() if action_match else "shares an operations classic"
-        clean_joke = re.sub(r"^\s*\*([^*]+)\*\s*", "", chosen_joke).strip()
         return {
             "agent_id": clean_id,
             "agent_name": agent_name,
             "robot_nickname": agent_name,
             "avatar_mood": "laughing",
-            "funny_action": f"{primary_emoji} {agent_name} {action_text}",
-            "response": f"Here is one of my operational favorites:\n\n{clean_joke}\n\nNow back to protecting our operations!",
+            "funny_action": "",
+            "response": f"{chosen_joke}\n\nHope that brought a smile to your shift! What can I help you look into today?",
             "linked_systems_active": profile["linked_systems"],
-            "ai_provider": "Operations Simulation Engine",
-            "ai_model": "rule-based",
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
         }
 
+    # 2. Greetings & small talk (Hi, hello, hey, howdy, good morning, etc.)
+    greetings = {"hi", "hello", "hey", "howdy", "morning", "afternoon", "evening", "greetings", "yo"}
+    if words.intersection(greetings) or msg_clean in {"hi", "hello", "hey", "good morning", "good afternoon", "good evening", "what s up", "whats up"}:
+        if clean_id == "ticket_hawk":
+            greeting_text = (
+                "Hey there! I'm doing well, keeping an eye on our landfill scale tickets and driver weight logs. "
+                "How's your shift going? Let me know if you need me to look up any scale slips, tonnage numbers, or open discrepancies."
+            )
+        elif clean_id == "dispatch_pulse":
+            greeting_text = (
+                "Hey! Routes and telematics are moving smoothly today. How can I help you out? "
+                "Let me know if you want to check on truck locations, driver route reassignments, or dispatch logs."
+            )
+        elif clean_id == "bill_sentry":
+            greeting_text = (
+                "Hi there! Glad to connect. I'm auditing our latest service tickets against customer contract pricing to catch any unbilled charges. "
+                "How can I help you with your accounts or billing questions today?"
+            )
+        elif clean_id == "ops_beacon":
+            greeting_text = (
+                "Hello! Good to see you. I'm tracking our operations metrics, SLA health, and daily performance numbers. "
+                "What reports or data summaries can I pull together for you today?"
+            )
+        elif clean_id == "dispute_shield":
+            greeting_text = (
+                "Hi, good to connect with you! I'm reviewing customer billing inquiries and pulling certified backup documentation. "
+                "Do you have a specific customer dispute or ticket you'd like me to look into?"
+            )
+        elif clean_id == "resolve_x":
+            greeting_text = (
+                "Hey there! Ready to help you review, approve, or settle any open discrepancies in the ledger. "
+                "What would you like to work on together?"
+            )
+        else:
+            greeting_text = (
+                "Hello! Good to talk with you. I'm actively monitoring our operations pipelines. "
+                "What can I help you look up or resolve today?"
+            )
+        return {
+            "agent_id": clean_id,
+            "agent_name": agent_name,
+            "robot_nickname": agent_name,
+            "avatar_mood": "happy",
+            "funny_action": "",
+            "response": greeting_text,
+            "linked_systems_active": profile["linked_systems"],
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
+        }
+
+    # 3. How are you / how's it going
+    if any(phrase in msg_lower for phrase in ["how are you", "how're you", "how are you doing", "how is it going", "how's it going", "what's up", "whats up"]):
+        return {
+            "agent_id": clean_id,
+            "agent_name": agent_name,
+            "robot_nickname": agent_name,
+            "avatar_mood": "happy",
+            "funny_action": "",
+            "response": "Doing great, thank you for asking! Everything is running smoothly on our end and I'm ready to help. How are things going on your side?",
+            "linked_systems_active": profile["linked_systems"],
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
+        }
+
+    # 4. Thank you / appreciation
+    if any(phrase in msg_lower for phrase in ["thank you", "thanks", "appreciate it", "thx", "awesome"]):
+        return {
+            "agent_id": clean_id,
+            "agent_name": agent_name,
+            "robot_nickname": agent_name,
+            "avatar_mood": "happy",
+            "funny_action": "",
+            "response": "You're very welcome! Always happy to help. Let me know if you need anything else on your shift.",
+            "linked_systems_active": profile["linked_systems"],
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
+        }
+
+    # 5. Status / Current activity
     if any(k in msg_lower for k in ["what are you doing", "doing right now", "status", "current task", "busy"]):
         action = profile["current_live_action"]
         return {
             "agent_id": clean_id,
             "agent_name": agent_name,
             "robot_nickname": agent_name,
-            "avatar_mood": "scanning",
-            "funny_action": f"{primary_emoji} {agent_name} points to live data streams",
-            "response": f"Right at this microsecond, I am actively: {action}\n\nI am connected live to {', '.join(profile['linked_systems'][:2])} so our operations team doesn't have to manually cross-reference hundreds of rows!",
+            "avatar_mood": "thinking",
+            "funny_action": "",
+            "response": f"Right now I'm {action.lower() if action.startswith(('Comparing', 'Monitoring', 'Auditing')) else action}\n\nAll connections to {', '.join(profile['linked_systems'][:2])} are healthy and updating in real time. What would you like to review?",
             "linked_systems_active": profile["linked_systems"],
-            "ai_provider": "Operations Simulation Engine",
-            "ai_model": "rule-based",
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
         }
 
-    if any(k in msg_lower for k in ["how do you work", "explain", "how do you help", "what do you do", "why"]):
+    # 6. Explaining role / how they help
+    if any(k in msg_lower for k in ["how do you work", "explain", "how do you help", "what do you do", "who are you", "what is your role", "what are your capabilities", "help me with"]):
         if clean_id == "ticket_hawk":
             explanation = (
-                "Here is the breakdown! Drivers in the field often write down an estimated container weight. "
-                "Meanwhile, the certified landfill scale prints an official computerized gross-tare slip. If there's even a 0.5-ton difference, "
-                "money leaks! I intercept both records, do the math in 1.2 seconds, and stage an adjustment for review!"
+                "Here's what I do: drivers in the field record their estimated container weights, while certified landfill scale houses print computerized gross/tare scale slips. "
+                "Even a small discrepancy—like half a ton—can lead to thousands of dollars in billing errors over time. "
+                "I cross-reference every ticket against certified weight logs in real time so our team can catch and fix tonnage discrepancies before customers are invoiced."
             )
         elif clean_id == "dispatch_pulse":
             explanation = (
-                "It's all about truck synchronization! I listen to live GPS pings from the trucks and compare them against "
-                "the dispatch schedule. If Truck #12 gets reassigned to Truck #18's route, or someone makes an unexpected diversion, "
-                "I catch it before billing and route sheets get confused!"
+                "My focus is keeping fleet telematics and dispatch logs in sync. I monitor live GPS pings from the trucks against the day's scheduled routes. "
+                "If a truck gets reassigned, takes an unscheduled detour, or misses a geofenced zone, I flag it right away so dispatch and billing stay on the exact same page."
             )
         elif clean_id == "bill_sentry":
             explanation = (
-                "Hauling companies do dozens of extra pickups that drivers complete but forget to charge for. "
-                "Or, an old expired rate code gets applied. I cross-check every single service ticket against the customer's contract price book. "
-                "If it's unbilled, I flag it instantly!"
+                "In waste and logistics, drivers frequently perform extra roll-off pickups, swaps, or container moves that end up forgotten on paperwork. "
+                "I audit every completed service ticket against the customer's contracted rate sheet. If any service is unbilled or uses an expired discount, I catch it so no revenue leaks."
             )
         elif clean_id == "ops_beacon":
             explanation = (
-                "I am the operations intelligence coordinator! While TicketHawk, DispatchPulse, BillSentry, DisputeShield, and ResolveX handle the frontline, "
-                "I aggregate all their data streams into a 360° health score. I spot which landfill or terminal has the highest leakage rate!"
+                "I oversee our team's operational analytics and executive visibility. I pull together live data across scale tickets, dispatch routes, billing audits, and customer disputes into cohesive KPI dashboards and executive reports, helping leadership spot systemic issues quickly."
             )
         elif clean_id == "resolve_x":
             explanation = (
-                "Once TicketHawk or BillSentry spots a verified mismatch, someone has to fix it! "
-                "Instead of waiting 4.8 business days for manual email chains, I step in. For routine discrepancies under $500, "
-                "I automatically execute ledger writebacks and credit memos in 1.2 seconds. For high-dollar items (>= $500), I stage a 1-click approval for supervisors!"
+                "Once our team spots a verified discrepancy, I handle the resolution workflow. For routine items under $500, I can automatically execute ledger writebacks and adjustments. "
+                "For larger discrepancies ($500 or more), I prepare clean, 1-click approval packets for supervisors to review and sign off on."
             )
         else:  # dispute_shield
             explanation = (
-                "When an unhappy customer calls shouting 'You overcharged my container!', accounts payable freezes. "
-                "I pull the driver's signed ticket, match it with TicketHawk's certified scale receipt, write a polite, ironclad explanation, "
-                "and resolve the dispute without losing the customer relationship!"
+                "When a customer questions a charge on their invoice, I assemble the full paper trail—including the driver's signed ticket, certified landfill scale receipts, and GPS timestamp logs. "
+                "I draft polite, fact-based resolution responses with certified evidence, helping resolve billing inquiries quickly while protecting the client relationship."
             )
 
         return {
@@ -525,60 +651,84 @@ def _generate_deterministic_chat_response(clean_id: str, profile: dict[str, Any]
             "agent_name": agent_name,
             "robot_nickname": agent_name,
             "avatar_mood": "proud",
-            "funny_action": f"{primary_emoji} {agent_name} displays operational badges with pride",
-            "response": explanation,
+            "funny_action": "",
+            "response": f"{explanation}\n\nFeel free to ask me to look up any specific account, ticket, or open exception!",
             "linked_systems_active": profile["linked_systems"],
-            "ai_provider": "Operations Simulation Engine",
-            "ai_model": "rule-based",
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
         }
 
-    if any(k in msg_lower for k in ["team", "other agents", "friends", "together", "colleagues"]):
+    # 7. Team overview
+    if any(k in msg_lower for k in ["team", "other agents", "colleagues", "coworkers", "who else"]):
         team_talk = (
-            "We are an unstoppable autonomous operations squad!\n\n"
-            "• 🔍 **TicketHawk (TH-01)** verifies landfill scale slips vs driver estimates.\n"
-            "• 🚚 **DispatchPulse (DP-02)** tracks fleet GPS & route swaps.\n"
-            "• 💰 **BillSentry (BS-03)** stops unbilled hauls & catches wrong rates.\n"
-            "• 🔮 **ReportBeacon (RB-04)** synthesizes big-picture leadership KPIs.\n"
-            "• 🛡️ **DisputeShield (DS-05)** brings certified proof to keep customers smiling!\n"
-            "• ⚡ **ResolveX (RX-06)** executes instant auto-settlements (<$500) & stages 1-click approvals for leadership.\n\n"
-            "When we pass data packets to each other, nothing slips through the cracks!"
+            "Here's our operations team:\n\n"
+            "• 🔍 **TicketHawk**: Scale & tonnage specialist — audits landfill gross/tare scale slips against driver weight estimates.\n"
+            "• 🚚 **DispatchPulse**: Fleet logistics lead — tracks live GPS telematics, driver routes, and dispatch sync.\n"
+            "• 💰 **BillSentry**: Billing assurance auditor — audits tickets against contract rate books to stop unbilled hauls.\n"
+            "• 🔮 **ReportBeacon**: Operations intelligence lead — synthesizes fleet KPIs, health metrics, and executive dashboards.\n"
+            "• 🛡️ **DisputeShield**: Customer dispute specialist — backs up customer conversations with certified tickets and GPS proof.\n"
+            "• ⚡ **ResolveX**: Discrepancy settlement lead — executes instant auto-settlements (<$500) and stages supervisor approvals.\n\n"
+            "We collaborate continuously so nothing falls through the cracks in your hauling operations."
         )
         return {
             "agent_id": clean_id,
             "agent_name": agent_name,
             "robot_nickname": agent_name,
             "avatar_mood": "happy",
-            "funny_action": f"{primary_emoji} {agent_name} synchronizes telemetry across all 6 agents",
+            "funny_action": "",
             "response": team_talk,
             "linked_systems_active": profile["linked_systems"],
-            "ai_provider": "Operations Simulation Engine",
-            "ai_model": "rule-based",
+            "ai_provider": "Operations Team Assistant",
+            "ai_model": "human-interactive",
         }
 
-    # Contextual default response
+    # 8. General conversational fallback (Warm, helpful human colleague)
     if clean_id == "ticket_hawk":
-        body = f"I hear you loud and clear! I'm watching all scale tickets like a hawk. Regarding \"{message}\": all certified scale slips and driver weight logs in your system are verified down to the tenth of a ton!"
+        body = (
+            f"I'm keeping a close eye on our scale tickets and weight logs today. "
+            f"If you'd like to check on \"{message}\", I can look up specific scale tickets, "
+            f"tonnage discrepancies, or open weight exceptions for you."
+        )
     elif clean_id == "dispatch_pulse":
-        body = f"Roger that! 10-4! Regarding \"{message}\": all fleet telematics and truck route breadcrumbs are streaming with zero signal loss right now!"
+        body = (
+            f"I'm tracking our active routes and fleet telematics. "
+            f"Regarding \"{message}\", let me know if you want to inspect a specific truck, "
+            f"route divergence, or driver log."
+        )
     elif clean_id == "bill_sentry":
-        body = f"Affirmative! Regarding \"{message}\": my calculator is warmed up, contract rates are indexed, and not a single dollar of unbilled hauling is getting past this sentry!"
+        body = (
+            f"I'm reviewing completed service tickets against our contract price books. "
+            f"Regarding \"{message}\", I can pull up unbilled pickups, rate mismatches, "
+            f"or specific customer billing records whenever you're ready."
+        )
     elif clean_id == "ops_beacon":
-        body = f"Synthesizing operational query: \"{message}\". All terminal telemetry is nominal, fleet health is holding strong, and leadership briefings are ready!"
+        body = (
+            f"I'm tracking our cross-fleet operations data and reporting KPIs. "
+            f"Regarding \"{message}\", let me know if you'd like a summary of open exceptions, "
+            f"revenue impact, or team resolution rates."
+        )
     elif clean_id == "resolve_x":
-        body = f"Resolution lock confirmed! Regarding \"{message}\": my autonomous rules engine is active, ledger adjustment payloads are staged, and routine discrepancies are settled instantly!"
+        body = (
+            f"I'm monitoring our ledger adjustments and approval queues. "
+            f"Regarding \"{message}\", I can show you pending supervisor approvals, "
+            f"auto-settlement history, or recent writebacks."
+        )
     else:
-        body = f"A most polite greeting! Regarding \"{message}\": I stand ready with certified evidence and courteous goodwill to resolve any discrepancy in your favor!"
+        body = (
+            f"I'm here to help with any customer inquiries, documentation checks, or ticket reviews. "
+            f"Regarding \"{message}\", feel free to share the account name or ticket number and I'll look into it."
+        )
 
     return {
         "agent_id": clean_id,
         "agent_name": agent_name,
         "robot_nickname": agent_name,
         "avatar_mood": "thinking",
-        "funny_action": f"{primary_emoji} {agent_name} confirms operational readiness",
+        "funny_action": "",
         "response": body,
         "linked_systems_active": profile["linked_systems"],
-        "ai_provider": "Operations Simulation Engine",
-        "ai_model": "rule-based",
+        "ai_provider": "Operations Team Assistant",
+        "ai_model": "human-interactive",
     }
 
 
@@ -701,24 +851,15 @@ def generate_minion_chat_response(
     )
 
     if llm_text:
-        # Extract a leading in-character action (single-asterisk only, so **bold** is untouched)
-        action_match = _LEADING_ACTION_RE.match(llm_text)
-        if action_match:
-            action_text = action_match.group(1).strip()
-            funny_action = f"{primary_emoji} {agent_name} {action_text}"
-            # Strip the leading asterisk action from the spoken text so it is not duplicated in the bubble
-            clean_speech = llm_text[action_match.end():].strip()
-        else:
-            funny_action = (
-                f"{primary_emoji} {agent_name} queried the live operations database"
-                if tools_used
-                else ""
-            )
+        clean_speech = _clean_human_response(llm_text)
+        if not clean_speech:
             clean_speech = llm_text.strip()
 
-        # If stripping left empty text (rare), restore original
-        if not clean_speech:
-            clean_speech = llm_text
+        funny_action = (
+            f"Queried {', '.join(tools_used)}"
+            if tools_used
+            else ""
+        )
 
         mood = "thinking"
         text_lower = clean_speech.lower()
@@ -728,7 +869,7 @@ def generate_minion_chat_response(
             mood = "scanning"
         elif any(k in text_lower for k in ["proud", "zero tonnage", "unbilled", "settled", "protect", "certif"]):
             mood = "proud"
-        elif any(k in text_lower for k in ["10-4", "roger", "hello", "greet", "pleasure"]):
+        elif any(k in text_lower for k in ["hello", "greet", "pleasure", "glad", "hey", "welcome", "good"]):
             mood = "happy"
 
         return {
@@ -753,7 +894,7 @@ def generate_minion_chat_response(
                 "agent_name": agent_name,
                 "robot_nickname": agent_name,
                 "avatar_mood": "scanning",
-                "funny_action": f"{primary_emoji} {agent_name} queried the live operations database",
+                "funny_action": "Queried live operations database",
                 "response": db_answer,
                 "linked_systems_active": profile["linked_systems"],
                 "ai_provider": "Live DB Query Engine",
