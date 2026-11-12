@@ -94,22 +94,46 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy opsera-backend to Cloud Run
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           sleep 15
+          ENV_VARS="ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=false,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage,AGENTIC_WORKER_URL=https://opsera-agentic-1030854563974.us-central1.run.app,CORS_ORIGINS=https://opsera-frontend-1030854563974.us-central1.run.app"
+          if [ -n "$GEMINI_API_KEY" ]; then
+            ENV_VARS="${ENV_VARS},GEMINI_API_KEY=${GEMINI_API_KEY}"
+          fi
+          if [ -n "$OPENAI_API_KEY" ]; then
+            ENV_VARS="${ENV_VARS},OPENAI_API_KEY=${OPENAI_API_KEY}"
+          fi
+
+          SECRETS_ARGS=()
+          if [ -z "$GEMINI_API_KEY" ] && gcloud secrets describe GEMINI_API_KEY --project ${{ env.PROJECT_ID }} >/dev/null 2>&1; then
+            SECRETS_ARGS+=("--update-secrets" "GEMINI_API_KEY=GEMINI_API_KEY:latest")
+          fi
+          if [ -z "$OPENAI_API_KEY" ] && gcloud secrets describe OPENAI_API_KEY --project ${{ env.PROJECT_ID }} >/dev/null 2>&1; then
+            SECRETS_ARGS+=("--update-secrets" "OPENAI_API_KEY=OPENAI_API_KEY:latest")
+          fi
+
           for attempt in $(seq 1 12); do
             echo "Attempt $attempt of 12: Deploying opsera-backend to Cloud Run..."
-            if gcloud run deploy opsera-backend \
-              --project ${{ env.PROJECT_ID }} \
-              --image docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }} \
-              --platform managed \
-              --region ${{ env.REGION }} \
-              --allow-unauthenticated \
-              --port 8080 \
-              --set-env-vars "ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=true,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage,AGENTIC_WORKER_URL=https://opsera-agentic-1030854563974.us-central1.run.app,CORS_ORIGINS=https://opsera-frontend-1030854563974.us-central1.run.app" \
-              --memory 1Gi \
-              --cpu 1 \
-              --min-instances 0 \
-              --max-instances 2; then
+            DEPLOY_CMD=(gcloud run deploy opsera-backend
+              --project "${{ env.PROJECT_ID }}"
+              --image "docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}"
+              --platform managed
+              --region "${{ env.REGION }}"
+              --allow-unauthenticated
+              --port 8080
+              --set-env-vars "$ENV_VARS"
+              --memory 1Gi
+              --cpu 1
+              --min-instances 0
+              --max-instances 2
+            )
+            if [ ${#SECRETS_ARGS[@]} -gt 0 ]; then
+              DEPLOY_CMD+=("${SECRETS_ARGS[@]}")
+            fi
+            if "${DEPLOY_CMD[@]}"; then
               echo "opsera-backend deployment succeeded!"
               break
             fi
@@ -173,22 +197,46 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy opsera-agentic to Cloud Run
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           sleep 15
+          ENV_VARS="ENVIRONMENT=production,USE_MOCK_LLM_IN_DEV=false"
+          if [ -n "$GEMINI_API_KEY" ]; then
+            ENV_VARS="${ENV_VARS},GEMINI_API_KEY=${GEMINI_API_KEY}"
+          fi
+          if [ -n "$OPENAI_API_KEY" ]; then
+            ENV_VARS="${ENV_VARS},OPENAI_API_KEY=${OPENAI_API_KEY}"
+          fi
+
+          SECRETS_ARGS=()
+          if [ -z "$GEMINI_API_KEY" ] && gcloud secrets describe GEMINI_API_KEY --project ${{ env.PROJECT_ID }} >/dev/null 2>&1; then
+            SECRETS_ARGS+=("--update-secrets" "GEMINI_API_KEY=GEMINI_API_KEY:latest")
+          fi
+          if [ -z "$OPENAI_API_KEY" ] && gcloud secrets describe OPENAI_API_KEY --project ${{ env.PROJECT_ID }} >/dev/null 2>&1; then
+            SECRETS_ARGS+=("--update-secrets" "OPENAI_API_KEY=OPENAI_API_KEY:latest")
+          fi
+
           for attempt in $(seq 1 12); do
             echo "Attempt $attempt of 12: Deploying opsera-agentic to Cloud Run..."
-            if gcloud run deploy opsera-agentic \
-              --project ${{ env.PROJECT_ID }} \
-              --image docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }} \
-              --platform managed \
-              --region ${{ env.REGION }} \
-              --allow-unauthenticated \
-              --port 8080 \
-              --set-env-vars "ENVIRONMENT=production,USE_MOCK_LLM_IN_DEV=true" \
-              --memory 1Gi \
-              --cpu 1 \
-              --min-instances 0 \
-              --max-instances 2; then
+            DEPLOY_CMD=(gcloud run deploy opsera-agentic
+              --project "${{ env.PROJECT_ID }}"
+              --image "docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}"
+              --platform managed
+              --region "${{ env.REGION }}"
+              --allow-unauthenticated
+              --port 8080
+              --set-env-vars "$ENV_VARS"
+              --memory 1Gi
+              --cpu 1
+              --min-instances 0
+              --max-instances 2
+            )
+            if [ ${#SECRETS_ARGS[@]} -gt 0 ]; then
+              DEPLOY_CMD+=("${SECRETS_ARGS[@]}")
+            fi
+            if "${DEPLOY_CMD[@]}"; then
               echo "opsera-agentic deployment succeeded!"
               break
             fi
