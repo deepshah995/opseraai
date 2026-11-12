@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  Bot, 
-  Send, 
-  RotateCcw, 
-  Scale, 
-  Satellite, 
-  FileCheck2, 
-  Building2, 
-  Users2, 
-  ArrowRight, 
-  Zap, 
-  Activity, 
-  Radio, 
+import {
+  Bot,
+  Send,
+  RotateCcw,
+  Scale,
+  Satellite,
+  FileCheck2,
+  Building2,
+  Users2,
+  ArrowRight,
+  Zap,
+  Activity,
+  Radio,
   ChevronRight,
   BarChart3,
   X,
@@ -289,7 +289,7 @@ export function AgentFleetStudio({
   const activeAgentsList = rawList.some((a) => a.id === "ops_beacon")
     ? rawList
     : [...rawList, DEFAULT_FLEET_AGENTS.find((a) => a.id === "ops_beacon")!];
-  
+
   // Interactive Chat State initialized with agent personalities
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({
     ticket_hawk: [
@@ -351,7 +351,7 @@ export function AgentFleetStudio({
           setLlmBadge(status.badge);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const selectedAgent = activeAgentsList.find((a) => a.id === selectedAgentId) || activeAgentsList[0];
@@ -438,7 +438,7 @@ export function AgentFleetStudio({
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
               {/* Dynamic Ground Shadow */}
               <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
-              
+
               {/* Animated Floating Robot Body */}
               <g className="animate-agent-float-a" style={{ transformOrigin: "50px 60px" }}>
                 <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#hawkGradient)" />
@@ -446,7 +446,7 @@ export function AgentFleetStudio({
                 <rect x="34" y="55" width="6" height="42" fill="#34d399" />
                 <rect x="60" y="55" width="6" height="42" fill="#34d399" />
                 <rect x="23" y="38" width="54" height="6" fill="#1e293b" rx="2" />
-                
+
                 {/* Precision Scanning Goggles with active sensors */}
                 <circle cx="40" cy="41" r="12" fill="#0f172a" stroke="#cbd5e1" strokeWidth="2.5" />
                 <circle cx="60" cy="41" r="12" fill="#0f172a" stroke="#cbd5e1" strokeWidth="2.5" />
@@ -456,10 +456,10 @@ export function AgentFleetStudio({
                 <circle cx="60" cy="41" r="4" fill="#34d399" className="animate-pulse" />
                 <circle cx="42" cy="39" r="1.5" fill="#ffffff" />
                 <circle cx="62" cy="39" r="1.5" fill="#ffffff" />
-                
+
                 {/* Mouth */}
                 <path d="M 43 62 Q 50 67 57 62" stroke="#064e3b" strokeWidth="2" fill="none" strokeLinecap="round" />
-                
+
                 {/* Certified Scale Slip with ACTIVE Live Laser Scanner Beam */}
                 <g transform="translate(68, 68)" className="animate-[ticketWiggle_3.5s_ease-in-out_infinite]" style={{ transformOrigin: "68px 68px" }}>
                   <rect x="0" y="0" width="16" height="23" rx="2" fill="#ffffff" stroke="#10b981" strokeWidth="1.5" />
@@ -489,36 +489,36 @@ export function AgentFleetStudio({
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
               {/* Dynamic Ground Shadow */}
               <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
-              
+
               {/* Animated Floating Robot Body */}
               <g className="animate-agent-float-b" style={{ transformOrigin: "50px 60px" }}>
                 {/* Antenna Rod */}
                 <line x1="50" y1="22" x2="50" y2="7" stroke="#3b82f6" strokeWidth="2.5" />
-                
+
                 {/* Concentric Expanding Radar Waves from Antenna */}
                 <circle cx="50" cy="7" r="2" fill="none" stroke="#60a5fa" className="animate-[radarWaveExpand_2.2s_ease-out_infinite]" />
                 <circle cx="50" cy="7" r="2" fill="none" stroke="#38bdf8" className="animate-[radarWaveExpand_2.2s_ease-out_infinite] [animation-delay:0.75s]" />
                 <circle cx="50" cy="7" r="3.5" fill="#38bdf8" className="animate-pulse" />
                 <circle cx="50" cy="7" r="1.5" fill="#ffffff" />
-                
+
                 {/* Robot Torso */}
                 <rect x="25" y="25" width="50" height="70" rx="25" fill="url(#pulseGradient)" />
                 <path d="M 22 30 Q 50 20 78 30 L 85 36 L 50 34 L 15 36 Z" fill="#1d4ed8" />
-                
+
                 {/* Telemetry Visor & Wave Ping */}
                 <rect x="30" y="38" width="40" height="15" rx="7.5" fill="#0f172a" stroke="#93c5fd" strokeWidth="2" />
                 <circle cx="50" cy="45" r="5" fill="#38bdf8" className="animate-pulse" />
                 <circle cx="52" cy="43" r="1.5" fill="#ffffff" />
-                
+
                 {/* Mouth Plate */}
                 <rect x="42" y="60" width="16" height="5" rx="2.5" fill="#1e3a8a" />
-                
+
                 {/* Fleet Telematics Dashboard with Running LED Ticker */}
                 <rect x="20" y="92" width="60" height="14" rx="7" fill="#1e293b" />
                 <circle cx="30" cy="99" r="3.5" fill="#60a5fa" className="animate-pulse" />
                 <circle cx="50" cy="99" r="3.5" fill="#38bdf8" className="animate-pulse [animation-delay:0.35s]" />
                 <circle cx="70" cy="99" r="3.5" fill="#60a5fa" className="animate-pulse [animation-delay:0.7s]" />
-                
+
                 {/* Side Radar Fin */}
                 <rect x="12" y="65" width="12" height="18" rx="2" fill="#334155" />
                 <line x1="15" y1="65" x2="15" y2="58" stroke="#334155" strokeWidth="1.5" />
@@ -541,33 +541,33 @@ export function AgentFleetStudio({
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
               {/* Dynamic Ground Shadow */}
               <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
-              
+
               {/* Animated Floating Robot Body */}
               <g className="animate-agent-float-c" style={{ transformOrigin: "50px 60px" }}>
                 <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#sentryGradient)" />
-                
+
                 {/* Auditing Monocle with Active Scanner Lens */}
                 <circle cx="60" cy="42" r="10" fill="#0f172a" stroke="#d97706" strokeWidth="2.5" />
                 <circle cx="60" cy="42" r="5" fill="#f59e0b" className="animate-pulse" />
                 <circle cx="62" cy="40" r="1.5" fill="#ffffff" />
                 <path d="M 68 48 L 78 72" stroke="#d97706" strokeWidth="1.5" strokeDasharray="2,2" />
-                
+
                 {/* Secondary Eye */}
                 <circle cx="40" cy="42" r="7" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
                 <circle cx="40" cy="42" r="3" fill="#cbd5e1" />
                 <circle cx="41" cy="41" r="1" fill="#ffffff" />
-                
+
                 {/* Sharp Focus Mouth */}
                 <path d="M 43 58 Q 50 63 57 58" stroke="#78350f" strokeWidth="2" fill="none" />
-                
+
                 {/* Ledger Belt */}
                 <rect x="25" y="70" width="50" height="8" fill="#78350f" />
-                
+
                 {/* Chest LED Calculator Display with Blinking Digits */}
                 <rect x="42" y="67" width="16" height="14" rx="2" fill="#0f172a" stroke="#d97706" strokeWidth="1" />
                 <rect x="45" y="69" width="10" height="3" fill="#10b981" className="animate-pulse" />
                 <line x1="45" y1="75" x2="55" y2="75" stroke="#34d399" strokeWidth="1" strokeDasharray="1,1" />
-                
+
                 {/* Floating, Hovering Gold Coin with Dynamic Spin */}
                 <g className="animate-[coinHover_2.4s_ease-in-out_infinite]" style={{ transformOrigin: "20px 75px" }}>
                   <circle cx="20" cy="75" r="9" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
@@ -593,31 +593,31 @@ export function AgentFleetStudio({
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
               {/* Telemetry Hover Pad with thrust glow */}
               <ellipse cx="50" cy="112" rx="28" ry="6" fill="#a855f7" opacity="0.4" className="animate-pulse" />
-              
+
               {/* Animated Floating Robot Body */}
               <g className="animate-agent-float-b" style={{ transformOrigin: "50px 60px" }}>
                 <rect x="30" y="102" width="40" height="6" rx="3" fill="#7e22ce" stroke="#c084fc" strokeWidth="1" />
                 <circle cx="50" cy="105" r="2" fill="#38bdf8" />
-                
+
                 {/* Radar dome & hologram projection rays with dynamic shimmer */}
                 <path d="M 38 25 A 12 12 0 0 1 62 25 Z" fill="#c084fc" opacity="0.9" />
                 <polygon points="50,22 8,0 92,0" fill="#a855f7" className="animate-[hologramFlicker_2s_ease-in-out_infinite]" />
                 <line x1="50" y1="22" x2="50" y2="9" stroke="#c084fc" strokeWidth="2" />
                 <circle cx="50" cy="8" r="3.5" fill="#e879f9" className="animate-pulse" />
                 <circle cx="50" cy="8" r="1.5" fill="#ffffff" />
-                
+
                 {/* Futuristic Robot Body */}
                 <rect x="25" y="25" width="50" height="74" rx="25" fill="url(#beaconGradient)" />
-                
+
                 {/* High-tech Analyst Visor with data wave */}
                 <rect x="30" y="38" width="40" height="16" rx="8" fill="#0f172a" stroke="#c084fc" strokeWidth="2" />
                 <circle cx="43" cy="46" r="3.5" fill="#e879f9" className="animate-pulse" />
                 <circle cx="57" cy="46" r="3.5" fill="#e879f9" className="animate-pulse" />
                 <line x1="36" y1="46" x2="64" y2="46" stroke="#c084fc" strokeWidth="1" opacity="0.6" strokeDasharray="2,2" />
-                
+
                 {/* Happy Robot Mouth */}
                 <path d="M 44 59 Q 50 64 56 59" stroke="#581c87" strokeWidth="2" fill="none" strokeLinecap="round" />
-                
+
                 {/* Chest Screen: LIVE ANIMATED OPERATIONS REPORT BAR CHART */}
                 <rect x="30" y="66" width="40" height="22" rx="4" fill="#0f172a" stroke="#c084fc" strokeWidth="1.5" />
                 {/* Dynamic Height Telemetry Bars */}
@@ -626,7 +626,7 @@ export function AgentFleetStudio({
                 <rect x="47" y="69" width="4.5" height="16" rx="1" fill="#a855f7" className="animate-[chartBarPulseC_1.6s_ease-in-out_infinite]" style={{ transformOrigin: "49px 85px" }} />
                 <rect x="54" y="74" width="4.5" height="11" rx="1" fill="#f59e0b" className="animate-[chartBarPulseD_2.3s_ease-in-out_infinite]" style={{ transformOrigin: "56px 85px" }} />
                 <rect x="61" y="71" width="4.5" height="14" rx="1" fill="#ec4899" className="animate-[chartBarPulseA_2.0s_ease-in-out_infinite]" style={{ transformOrigin: "63px 85px" }} />
-                
+
                 {/* Right Hand: Floating Holographic Executive Report Tablet */}
                 <g transform="translate(73, 58) rotate(10)" className="animate-[ticketWiggle_4s_ease-in-out_infinite]" style={{ transformOrigin: "73px 58px" }}>
                   <rect x="0" y="0" width="16" height="22" rx="3" fill="#1e1b4b" stroke="#a855f7" strokeWidth="1.5" />
@@ -655,17 +655,17 @@ export function AgentFleetStudio({
             <svg viewBox="0 0 100 120" className={`w-20 h-24 transition-transform duration-300 ${isSelected ? "scale-110 drop-shadow-xl" : "hover:scale-105"}`}>
               {/* Dynamic Ground Shadow */}
               <ellipse cx="50" cy="112" rx="30" ry="6" fill="rgba(0,0,0,0.18)" className="animate-pulse" />
-              
+
               {/* Animated Floating Robot Body */}
               <g className="animate-agent-float-a" style={{ transformOrigin: "50px 60px" }}>
                 <rect x="25" y="25" width="50" height="75" rx="25" fill="url(#shieldGradient)" />
                 <polygon points="42,56 46,60 42,64" fill="#0f172a" />
                 <polygon points="58,56 54,60 58,64" fill="#0f172a" />
-                
+
                 {/* Center Arbitration Core with Heartbeat Pulse */}
                 <circle cx="50" cy="60" r="3.5" fill="#e11d48" className="animate-ping" />
                 <circle cx="50" cy="60" r="2.5" fill="#fda4af" />
-                
+
                 {/* Alert Sensor Eyes */}
                 <circle cx="40" cy="40" r="6" fill="#0f172a" stroke="#f43f5e" strokeWidth="1.5" />
                 <circle cx="60" cy="40" r="6" fill="#0f172a" stroke="#f43f5e" strokeWidth="1.5" />
@@ -673,10 +673,10 @@ export function AgentFleetStudio({
                 <circle cx="60" cy="40" r="3.5" fill="#fb7185" className="animate-pulse" />
                 <circle cx="41" cy="39" r="1.5" fill="#ffffff" />
                 <circle cx="61" cy="39" r="1.5" fill="#ffffff" />
-                
+
                 {/* Confident Smile */}
                 <path d="M 43 49 Q 50 54 57 49" stroke="#9f1239" strokeWidth="2" fill="none" strokeLinecap="round" />
-                
+
                 {/* Protective Energy Shield with Active Forcefield Shimmer */}
                 <g transform="translate(62, 58)" className="animate-[shieldAuraPulse_2.5s_ease-in-out_infinite]" style={{ transformOrigin: "73px 71px" }}>
                   <path d="M 0 0 L 22 0 Q 22 18 11 26 Q 0 18 0 0 Z" fill="#ffffff" stroke="#e11d48" strokeWidth="2" />
@@ -684,7 +684,7 @@ export function AgentFleetStudio({
                   <path d="M 11 6 L 11 18" stroke="#e11d48" strokeWidth="1.5" />
                   <path d="M 6 11 L 16 11" stroke="#e11d48" strokeWidth="1.5" />
                 </g>
-                
+
                 <line x1="16" y1="65" x2="26" y2="78" stroke="#0f172a" strokeWidth="2" />
                 <polygon points="14,63 16,68 18,65" fill="#f59e0b" />
               </g>
@@ -705,7 +705,7 @@ export function AgentFleetStudio({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-12">
-      
+
       {/* Studio Header & Atmosphere Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-slate-800">
         <div>
@@ -729,11 +729,10 @@ export function AgentFleetStudio({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setDataFlowActive((prev) => !prev)}
-            className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
-              dataFlowActive
+            className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${dataFlowActive
                 ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800"
                 : "bg-white text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
-            }`}
+              }`}
           >
             <Radio className={`h-3.5 w-3.5 ${dataFlowActive ? "text-blue-600 animate-pulse" : "text-slate-400"}`} />
             <span>{dataFlowActive ? "Data Packets Flowing" : "Data Flow Paused"}</span>
@@ -743,7 +742,7 @@ export function AgentFleetStudio({
 
       {/* Main Studio Arena: Interactive Ecosystem Map */}
       <div className="relative rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50/70 via-white to-slate-50/70 p-6 shadow-xs dark:border-slate-800 dark:from-slate-900 dark:via-slate-850 dark:to-slate-900 overflow-hidden">
-        
+
         {/* Subtle background grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
@@ -760,7 +759,7 @@ export function AgentFleetStudio({
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {DATA_SYSTEMS.map((sys) => {
               const Icon = sys.icon;
-              const isLinkedToSelected = agentProfile.linked_systems?.some((ls: string) => 
+              const isLinkedToSelected = agentProfile.linked_systems?.some((ls: string) =>
                 ls.toLowerCase().includes(sys.shortName.toLowerCase()) || sys.name.toLowerCase().includes(ls.toLowerCase())
               );
               const isManuallySelected = selectedSystemId === sys.id;
@@ -769,11 +768,10 @@ export function AgentFleetStudio({
                 <div
                   key={sys.id}
                   onClick={() => setSelectedSystemId(isManuallySelected ? null : sys.id)}
-                  className={`group relative p-3 rounded-xl border transition-all cursor-pointer ${
-                    isManuallySelected || isLinkedToSelected
+                  className={`group relative p-3 rounded-xl border transition-all cursor-pointer ${isManuallySelected || isLinkedToSelected
                       ? "border-blue-500 bg-white shadow-md dark:border-blue-500 dark:bg-slate-800 ring-2 ring-blue-400/20"
                       : "border-slate-200/80 bg-white/80 hover:bg-white dark:border-slate-800 dark:bg-slate-850/80 hover:border-slate-300"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center space-x-2">
                     <div className={`p-1.5 rounded-lg bg-${sys.color}-50 text-${sys.color}-600 dark:bg-${sys.color}-950/60 dark:text-${sys.color}-400`}>
@@ -908,13 +906,12 @@ export function AgentFleetStudio({
                                     {rec.amount != null ? `$${rec.amount.toFixed(2)}` : "—"}
                                   </td>
                                   <td className="py-2 px-3 font-sans">
-                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                      rec.status === "verified" || rec.status === "matched"
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${rec.status === "verified" || rec.status === "matched"
                                         ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
                                         : rec.status === "discrepancy" || rec.status === "flagged"
-                                        ? "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
-                                        : "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                                    }`}>
+                                          ? "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                                          : "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                                      }`}>
                                       {rec.status}
                                     </span>
                                   </td>
@@ -989,11 +986,10 @@ export function AgentFleetStudio({
                 <div
                   key={agent.id}
                   onClick={() => setSelectedAgentId(agent.id)}
-                  className={`group relative flex flex-col items-center justify-between rounded-xl border p-4 text-center cursor-pointer transition-all duration-200 ${
-                    isSelected
+                  className={`group relative flex flex-col items-center justify-between rounded-xl border p-4 text-center cursor-pointer transition-all duration-200 ${isSelected
                       ? "border-blue-500 bg-white ring-2 ring-blue-500/25 shadow-lg dark:border-blue-500 dark:bg-slate-800"
                       : "border-slate-200/90 bg-white/90 hover:bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-850 shadow-xs"
-                  }`}
+                    }`}
                 >
                   {/* Active Indicator Pin */}
                   {isSelected && (
@@ -1023,8 +1019,8 @@ export function AgentFleetStudio({
                         {agent.id === "ops_beacon"
                           ? "Reporting Agent"
                           : agent.id === "dispute_shield"
-                          ? "Dispute Agent"
-                          : `${agent.title?.split(" ")[0]} Agent`}
+                            ? "Dispute Agent"
+                            : `${agent.title?.split(" ")[0]} Agent`}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-600 dark:text-slate-300 italic line-clamp-2 px-1 pt-1 leading-snug">
@@ -1052,7 +1048,7 @@ export function AgentFleetStudio({
 
       {/* Interactive Agent Inspector & Live Chat Dock */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left Column: Agent Dossier & Active Data Wiring */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
           <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -1145,7 +1141,7 @@ export function AgentFleetStudio({
 
         {/* Right Column: Interactive Agent Chat (2 cols) */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 lg:col-span-2 flex flex-col justify-between space-y-4">
-          
+
           {/* Chat Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center space-x-2.5 flex-wrap gap-y-1">
@@ -1188,11 +1184,10 @@ export function AgentFleetStudio({
                 )}
 
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-xs ${
-                    msg.sender === "user"
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-xs ${msg.sender === "user"
                       ? "bg-blue-600 text-white rounded-br-none"
                       : "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 rounded-bl-none border border-slate-200/60 dark:border-slate-700/60"
-                  }`}
+                    }`}
                 >
                   {msg.sender === "user" ? (
                     <p className="whitespace-pre-line">{msg.text}</p>
