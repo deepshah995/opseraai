@@ -1,4 +1,3 @@
-
 from backend.app.db.base import Base, TimestampMixin, generate_uuid
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -16,3 +15,5 @@ class Organization(Base, TimestampMixin):
     exceptions: Mapped[list["Exception"]] = relationship("Exception", back_populates="organization", cascade="all, delete-orphan")
     investigations: Mapped[list["Investigation"]] = relationship("Investigation", back_populates="organization", cascade="all, delete-orphan")
     audit_events: Mapped[list["AuditEvent"]] = relationship("AuditEvent", back_populates="organization", cascade="all, delete-orphan")
+    workflows: Mapped[list["SwarmWorkflow"]] = relationship("SwarmWorkflow", back_populates="organization", cascade="all, delete-orphan")
+    connectors: Mapped[list["AppConnector"]] = relationship("AppConnector", back_populates="organization", cascade="all, delete-orphan")

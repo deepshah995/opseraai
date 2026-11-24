@@ -1,13 +1,10 @@
 [project]
 name = "operations-agent-agentic"
-version = "1.0.0"
-description = "LangGraph & Vertex AI Gemini Agentic Workflow for Operations Exceptions"
+version = "2.0.0"
+description = "Google Antigravity SDK Multi-Agent Manufacturing Operations Swarm"
 requires-python = ">=3.11"
 dependencies = [
-    "langgraph>=0.2.0",
-    "langchain-core>=0.3.0",
-    "langchain-google-genai>=2.0.0",
-    "langchain-openai>=0.2.0",
+    "google-antigravity>=0.1.24",
     "python-dotenv>=1.0.0",
     "pydantic>=2.6.0",
     "pydantic-settings>=2.2.0",

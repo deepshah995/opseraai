@@ -1,8 +1,8 @@
 import logging
 from datetime import UTC, datetime
 
-from agentic.app.graph.state import InvestigationState
-from agentic.app.graph.workflow import investigation_graph
+from agentic.app.swarm.state import InvestigationState
+from agentic.app.swarm.workflow import investigation_swarm
 from backend.app.core.config import settings
 from backend.app.db.models.agent_run import AgentRun
 from backend.app.db.models.approval import Approval
@@ -77,7 +77,7 @@ class InvestigationService:
             organization_id=organization_id,
             exception_id=exception_id,
             status="in_progress",
-            workflow_version="v1.0",
+            workflow_version="antigravity-v2",
             input_snapshot={
                 "exception": {
                     "id": exc.id,
@@ -99,14 +99,14 @@ class InvestigationService:
             investigation_id=inv.id,
             status="running",
             attempt_number=1,
-            workflow_version="v1.0",
-            model_identifier="gemini-1.5-pro",
+            workflow_version="antigravity-v2",
+            model_identifier=settings.GEMINI_MODEL or "gemini-4-hydrogen",
             started_at=datetime.now(UTC),
         )
         db.add(agent_run)
         db.commit()
 
-        # 4. Invoke LangGraph Workflow
+        # 4. Invoke Google Antigravity SDK Swarm Investigation
         initial_state: InvestigationState = {
             "organization_id": organization_id,
             "exception_id": exception_id,
@@ -129,6 +129,9 @@ class InvestigationService:
             "requires_human_approval": False,
             "status": "queued",
             "step_history": [],
+            "cost_savings_usd": 0.0,
+            "time_saved_minutes": 0.0,
+            "sdk_metadata": {},
             "error": None,
         }
 
@@ -164,8 +167,7 @@ class InvestigationService:
                     )
 
             if not final_state:
-                thread_config = {"configurable": {"thread_id": f"inv_{inv.id}"}}
-                final_state = investigation_graph.invoke(initial_state, config=thread_config)
+                final_state = investigation_swarm.invoke(initial_state)
 
             # 5. Persist Investigation Results & Grounded Evidence
             inv.status = "awaiting_review"
@@ -211,13 +213,15 @@ class InvestigationService:
             audit = AuditEvent(
                 organization_id=organization_id,
                 actor_type="agent",
-                actor_id="langgraph_gemini_v1",
+                actor_id="antigravity_sdk_swarm",
                 action="investigation_completed",
                 resource_type="investigation",
                 resource_id=inv.id,
                 action_metadata={
                     "exception_id": exc.id,
                     "confidence": inv.confidence,
+                    "cost_savings_usd": final_state.get("cost_savings_usd", 0.0),
+                    "time_saved_minutes": final_state.get("time_saved_minutes", 45.0),
                     "action_recommended": (final_state.get("proposed_resolution") or {}).get("recommended_action"),
                 },
             )

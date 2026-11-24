@@ -1,29 +1,21 @@
-/**
- * Spreadsheet & CSV Template Exporter for OpsCheck AI.
- * Generates user-friendly, Excel-compatible templates with pre-filled realistic sample data.
- */
-
 export interface TemplateDefinition {
   id: string;
   name: string;
-  category: string;
+  record_type: string;
   description: string;
-  fileName: string;
-  recordType: string;
+  filename: string;
   headers: string[];
-  requiredFields: string[];
-  fieldExplanations: Record<string, string>;
-  rows: string[][];
+  rows: (string | number)[][];
 }
 
 export const TEMPLATES: Record<string, TemplateDefinition> = {
   service_ticket: {
     id: "service_ticket",
-    name: "Service Tickets Template",
-    category: "Hauling & Field Services",
-    description: "For roll-off dumpsters, compactor pulls, septic pumping, and recurring route pick-ups.",
-    fileName: "opscheck_service_tickets_template.csv",
-    recordType: "service_ticket",
+    name: "Material Work Order & PO Template",
+    record_type: "service_ticket",
+    description:
+      "Tracks shop-floor work orders, raw material issues, contracted rate, and planned quantities.",
+    filename: "mfg_work_orders_po_template",
     headers: [
       "ticket_number",
       "customer_name",
@@ -32,87 +24,48 @@ export const TEMPLATES: Record<string, TemplateDefinition> = {
       "unit",
       "rate",
       "amount",
-      "driver",
-      "truck_id",
-      "job_site",
       "notes",
     ],
-    requiredFields: ["ticket_number", "customer_name", "service_date", "amount"],
-    fieldExplanations: {
-      ticket_number: "Unique Ticket # (e.g., TKT-1001)",
-      customer_name: "Customer / Account Name",
-      service_date: "Date of service (YYYY-MM-DD or MM/DD/YYYY)",
-      quantity: "Quantity or weight (e.g. 8.5)",
-      unit: "Unit of measure (tons, yards, pulls, gallons, hours)",
-      rate: "Agreed price per unit in dollars (e.g. 80.00)",
-      amount: "Total charge in dollars (e.g. 680.00)",
-      driver: "Driver name (optional)",
-      truck_id: "Truck number (optional)",
-      job_site: "Service location / address (optional)",
-      notes: "Additional job notes or container size (optional)",
-    },
     rows: [
       [
-        "TKT-4401",
-        "Apex Construction LLC",
-        "2026-10-24",
-        "8.5",
+        "WO-4401",
+        "Apex Construction & Metals",
+        "2026-11-12",
+        4.5,
         "tons",
-        "80.00",
-        "680.00",
-        "Dave Vance",
-        "TRK-104",
-        "400 Industrial Pkwy",
-        "30yd roll-off dumpster haul",
+        151.11,
+        680.0,
+        "304 Stainless CNC Bracket Batch A",
       ],
       [
-        "TKT-7720",
-        "BioPharm Chemical Labs",
-        "2026-10-25",
-        "2500",
-        "gallons",
-        "0.85",
-        "2125.00",
-        "Dave Vance",
-        "TNK-55",
-        "Building C Treatment Bay",
-        "Industrial washwater collection",
-      ],
-      [
-        "TKT-9912",
-        "GreenValley Municipal Complex",
-        "2026-10-26",
-        "1.0",
-        "pulls",
-        "1450.00",
-        "1450.00",
-        "Marcus Cole",
-        "TRK-201",
-        "Main Transfer Bay",
-        "Emergency weekend commercial compactor pull",
-      ],
-      [
-        "TKT-5544",
-        "Delta Logistics Hub",
-        "2026-10-27",
-        "6.0",
+        "WO-4410",
+        "Metro Automotive Tier-1",
+        "2026-11-14",
+        6.8,
         "tons",
-        "130.00",
-        "780.00",
-        "Carlos Mendez",
-        "TRK-108",
-        "Dock 14 Recycling",
-        "Commercial cardboard baler haul",
+        50.0,
+        340.0,
+        "6061 Aluminum Extrusion Lot",
+      ],
+      [
+        "WO-4415",
+        "Vanguard Industrial Supply",
+        "2026-11-16",
+        2.0,
+        "runs",
+        225.0,
+        450.0,
+        "Precision Laser Cut Housing",
       ],
     ],
   },
   invoice: {
     id: "invoice",
-    name: "Customer Invoices Template",
-    category: "Billing & Accounting",
-    description: "For customer bills, line-item charges, and cross-referencing against driver tickets.",
-    fileName: "opscheck_customer_invoices_template.csv",
-    recordType: "invoice",
+    name: "Supplier & Customer Invoice Template",
+    record_type: "invoice",
+    description:
+      "ERP billing & AP invoices audited by CostSentry for 3-way PO rate creep and duplicate billing.",
+    filename: "mfg_invoices_template",
     headers: [
       "invoice_number",
       "customer_name",
@@ -121,270 +74,217 @@ export const TEMPLATES: Record<string, TemplateDefinition> = {
       "unit",
       "rate",
       "amount",
-      "ticket_numbers",
-      "payment_terms",
+      "related_ticket",
     ],
-    requiredFields: ["invoice_number", "customer_name", "invoice_date", "amount"],
-    fieldExplanations: {
-      invoice_number: "Invoice # generated in accounting (e.g. INV-9021)",
-      customer_name: "Customer Name billed",
-      invoice_date: "Date the invoice was issued",
-      quantity: "Billed quantity (tons, pulls, etc.)",
-      unit: "Unit of measurement",
-      rate: "Billed rate per unit",
-      amount: "Total billed dollars on this invoice line",
-      ticket_numbers: "Service ticket numbers included in this bill (comma separated)",
-      payment_terms: "Payment terms (e.g., Net 30, Due on Receipt)",
-    },
     rows: [
       [
         "INV-9021",
-        "Apex Construction LLC",
-        "2026-10-25",
-        "11.25",
+        "Apex Construction & Metals",
+        "2026-11-12",
+        4.5,
         "tons",
-        "80.00",
-        "900.00",
-        "TKT-4401",
-        "Net 30",
+        200.0,
+        900.0,
+        "WO-4401",
       ],
       [
-        "INV-8801",
-        "Delta Logistics Hub",
-        "2026-10-27",
-        "6.0",
+        "INV-9024",
+        "Metro Automotive Tier-1",
+        "2026-11-14",
+        6.8,
         "tons",
-        "130.00",
-        "780.00",
-        "TKT-5544",
-        "Net 30",
+        50.0,
+        340.0,
+        "WO-4410",
       ],
       [
-        "INV-8802",
-        "Delta Logistics Hub",
-        "2026-10-28",
-        "6.0",
-        "tons",
-        "130.00",
-        "780.00",
-        "TKT-5544",
-        "Net 30",
-      ],
-      [
-        "INV-9550",
-        "Summit Materials Quarry",
-        "2026-10-26",
-        "1.0",
-        "hauls",
-        "420.00",
-        "420.00",
-        "TKT-3319",
-        "Net 15",
+        "INV-9028",
+        "Summit Stamping & Tool",
+        "2026-11-17",
+        1.0,
+        "lot",
+        420.0,
+        420.0,
+        "WO-4411",
       ],
     ],
   },
   load_record: {
     id: "load_record",
-    name: "Scale & Disposal Receipts Template",
-    category: "Landfill & Transfer Stations",
-    description: "For gross/tare scale receipts, disposal manifests, and tipping fee expenses.",
-    fileName: "opscheck_scale_receipts_template.csv",
-    recordType: "load_record",
+    name: "Receiving Scale & Dock Inspection Template",
+    record_type: "load_record",
+    description:
+      "Certified receiving dock floor-scale slips compared by BOMGuard against PO and BOM standard weights.",
+    filename: "mfg_receiving_scale_slips_template",
     headers: [
-      "scale_ticket_no",
+      "scale_ticket_id",
       "customer_name",
-      "scale_date",
+      "weigh_date",
       "net_tons",
-      "tipping_rate",
-      "tipping_fee",
-      "facility_name",
-      "waste_type",
+      "unit",
+      "rate",
+      "total_charge",
+      "material_type",
     ],
-    requiredFields: ["scale_ticket_no", "customer_name", "scale_date", "net_tons", "tipping_fee"],
-    fieldExplanations: {
-      scale_ticket_no: "Scale / Manifest Ticket # from facility (e.g. SC-8812)",
-      customer_name: "Customer associated with load",
-      scale_date: "Date and time weighed at scale",
-      net_tons: "Net weight in tons (Gross lbs minus Tare lbs / 2000)",
-      tipping_rate: "Disposal fee charged per ton",
-      tipping_fee: "Total disposal cost paid",
-      facility_name: "Landfill or Transfer Station name",
-      waste_type: "Type of waste disposed (C&D, MSW, Sludge, Scrap Metal)",
-    },
     rows: [
       [
-        "SC-8812",
-        "Apex Construction LLC",
-        "2026-10-24",
-        "8.5",
-        "30.00",
-        "255.00",
-        "Metro Transfer Station",
-        "C&D Debris",
+        "RCV-110",
+        "Metro Automotive Tier-1",
+        "2026-11-14",
+        4.0,
+        "tons",
+        50.0,
+        200.0,
+        "6061 Aluminum Billet",
       ],
       [
-        "MAN-3301",
-        "BioPharm Chemical Labs",
-        "2026-10-25",
-        "7.5",
-        "50.00",
-        "375.00",
-        "North Water Recovery",
-        "Industrial Washwater",
+        "RCV-114",
+        "Apex Construction & Metals",
+        "2026-11-12",
+        4.5,
+        "tons",
+        151.11,
+        680.0,
+        "304L Cold Rolled Steel",
       ],
       [
-        "SC-9904",
-        "Horizon Metal Works",
-        "2026-10-26",
-        "14.2",
-        "34.00",
-        "482.80",
-        "County Landfill #4",
-        "Heavy Ferrous Scrap",
+        "RCV-118",
+        "Titan Polymer Molding",
+        "2026-11-18",
+        11.2,
+        "tons",
+        65.0,
+        728.0,
+        "HDPE Injection Resin",
       ],
     ],
   },
   dispatch_record: {
     id: "dispatch_record",
-    name: "Dispatch Route Logs Template",
-    category: "Fleet & Routing",
-    description: "For scheduled routes, truck assignments, and driver log verification.",
-    fileName: "opscheck_dispatch_logs_template.csv",
-    recordType: "dispatch_record",
+    name: "Production Schedule & Machine Cell Template",
+    record_type: "dispatch_record",
+    description:
+      "Shop-floor CNC / assembly shift assignments checked by LinePulse to detect unlogged changeovers.",
+    filename: "mfg_production_schedule_template",
     headers: [
       "dispatch_id",
       "customer_name",
-      "dispatch_date",
-      "truck_id",
-      "driver_name",
-      "status",
-      "rate",
-      "amount",
-      "scheduled_haul",
+      "scheduled_date",
+      "units",
+      "unit_type",
+      "unit_rate",
+      "estimated_value",
+      "cell_status",
     ],
-    requiredFields: ["dispatch_id", "customer_name", "dispatch_date", "amount"],
-    fieldExplanations: {
-      dispatch_id: "Dispatch route ID (e.g. DSP-6602)",
-      customer_name: "Customer Name scheduled",
-      dispatch_date: "Scheduled date",
-      truck_id: "Assigned truck or roll-off rig",
-      driver_name: "Assigned driver name",
-      status: "Route status (completed, in_progress, scheduled)",
-      rate: "Scheduled rate",
-      amount: "Expected total revenue",
-      scheduled_haul: "Description of scheduled haul",
-    },
     rows: [
       [
-        "DSP-6602",
-        "Summit Materials Quarry",
-        "2026-10-25",
-        "TRK-208",
-        "Ken Adams",
-        "completed",
-        "420.00",
-        "420.00",
-        "Morning Aggregate Haul",
+        "SCH-771",
+        "Summit Stamping & Tool",
+        "2026-11-16",
+        1.0,
+        "run",
+        0.0,
+        0.0,
+        "Completed CNC Cell B (ERP Showed Cancelled)",
       ],
       [
-        "DSP-6603",
-        "Horizon Metal Works",
-        "2026-10-26",
-        "TRK-108",
-        "Carlos Mendez",
-        "completed",
-        "850.00",
-        "850.00",
-        "Metal Scrap Bin Exchange",
+        "SCH-774",
+        "Apex Construction & Metals",
+        "2026-11-12",
+        1.0,
+        "run",
+        150.0,
+        150.0,
+        "Completed",
+      ],
+      [
+        "SCH-779",
+        "Vanguard Industrial Supply",
+        "2026-11-16",
+        1.0,
+        "run",
+        225.0,
+        225.0,
+        "Completed",
       ],
     ],
   },
 };
 
-/**
- * Trigger client-side download of a CSV or Excel-ready spreadsheet.
- * Includes UTF-8 BOM (\uFEFF) so Microsoft Excel opens it cleanly without character glitches.
- */
-export function downloadTemplate(templateId: string, format: "csv" | "excel" = "csv"): void {
+function sanitizeCsvCell(val: string | number): string {
+  let raw = String(val ?? "");
+  if (/^[=+\-@\t\r]/.test(raw)) {
+    raw = `'${raw}`;
+  }
+  return `"${raw.replace(/"/g, '""')}"`;
+}
+
+export function downloadTemplate(
+  templateId: string,
+  format: "csv" | "excel" = "csv",
+): void {
   const template = TEMPLATES[templateId] || TEMPLATES.service_ticket;
-  
-  const escapeCsv = (val: string) => {
-    if (val.includes(",") || val.includes('"') || val.includes("\n")) {
-      return `"${val.replace(/"/g, '""')}"`;
-    }
-    return val;
-  };
+  const rows = [template.headers, ...template.rows];
+  const csvContent = rows
+    .map((row) => row.map((cell) => sanitizeCsvCell(cell)).join(","))
+    .join("\n");
 
-  const headerLine = template.headers.map(escapeCsv).join(",");
-  const dataLines = template.rows.map((row) => row.map(escapeCsv).join(","));
-  const csvContent = [headerLine, ...dataLines].join("\r\n");
-
-  // UTF-8 BOM (\uFEFF) ensures Excel reads columns cleanly
-  const blob = new Blob(["\uFEFF" + csvContent], {
-    type: "text/csv;charset=utf-8;",
-  });
-
+  const bom = format === "excel" ? "\uFEFF" : "";
+  const mime =
+    format === "excel" ? "text/csv;charset=utf-8;" : "text/csv;charset=utf-8;";
+  const ext = "csv";
+  const blob = new Blob([bom + csvContent], { type: mime });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  const ext = format === "excel" ? ".csv" : ".csv";
-  link.setAttribute("href", url);
-  link.setAttribute("download", template.fileName.replace(".csv", ext));
+  link.href = url;
+  link.download = `${template.filename}.${ext}`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
-/**
- * Standard required fields needed for exception reconciliation matching.
- */
 export const REQUIRED_TEMPLATE_COLUMNS = [
   {
     field: "external_reference",
-    label: "Ticket or Invoice #",
-    description: "Unique identifier on the document (e.g. TKT-1001, INV-5002, SC-8812)",
+    label: "Work Order / PO / Invoice #",
     required: true,
+    aliases: "ticket_number, po_number, invoice_number, rcv_id, reference",
+    description: "Unique PO, work order, receiving slip, or invoice number",
   },
   {
     field: "customer_reference",
-    label: "Customer / Account Name",
-    description: "The name of the company or job site billed",
+    label: "Supplier / Customer Name",
     required: true,
+    aliases: "supplier_name, customer_name, vendor, account",
+    description: "Supplier or customer account name",
   },
   {
     field: "service_date",
-    label: "Date of Service / Billing",
-    description: "The date work was done or the invoice was generated",
+    label: "Transaction Date",
     required: true,
-  },
-  {
-    field: "amount",
-    label: "Total Dollar Amount ($)",
-    description: "Total charge (or calculated from Quantity × Rate)",
-    required: true,
+    aliases: "service_date, receive_date, invoice_date, scheduled_date",
+    description: "Transaction date (YYYY-MM-DD)",
   },
   {
     field: "quantity",
     label: "Quantity / Weight",
-    description: "Tons, yards, gallons, pulls, or hours",
     required: false,
+    aliases: "quantity, qty, net_tons, weight, units",
+    description: "Measured count, weight, or machine run hours",
   },
   {
     field: "rate",
-    label: "Price per Unit ($)",
-    description: "Agreed haul rate, tipping rate, or disposal price",
+    label: "Unit Rate ($)",
     required: false,
+    aliases: "rate, unit_price, unit_rate",
+    description: "Contracted unit price in USD",
   },
   {
-    field: "unit",
-    label: "Unit of Measurement",
-    description: "tons, pulls, yards, gallons, or hours",
-    required: false,
-  },
-  {
-    field: "status",
-    label: "Record Status",
-    description: "completed, billed, or pending",
-    required: false,
+    field: "amount",
+    label: "Total Amount ($)",
+    required: true,
+    aliases: "amount, total, invoice_amount",
+    description: "Total line or invoice amount in USD",
   },
 ];

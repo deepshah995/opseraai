@@ -6,11 +6,14 @@ from backend.app.api.routes.analytics import router as analytics_router
 from backend.app.api.routes.approvals import router as approvals_router
 from backend.app.api.routes.audit import router as audit_router
 from backend.app.api.routes.auth import router as auth_router
+from backend.app.api.routes.connectors import router as connectors_router
 from backend.app.api.routes.documents import router as docs_router
 from backend.app.api.routes.exceptions import router as exceptions_router
 from backend.app.api.routes.investigations import router as investigations_router
 from backend.app.api.routes.organizations import router as orgs_router
+from backend.app.api.routes.previews import router as previews_router
 from backend.app.api.routes.records import router as records_router
+from backend.app.api.routes.workflows import router as workflows_router
 from backend.app.core.config import settings
 from backend.app.core.logging import setup_logging
 from backend.app.core.security import hash_password
@@ -24,20 +27,20 @@ from fastapi.responses import JSONResponse
 setup_logging()
 logger = logging.getLogger("operations_agent")
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure database tables exist
+    del app
     Base.metadata.create_all(bind=engine)
-    
-    # Auto-seed initial demo tenant and admin user if empty
+
     db = SessionLocal()
     try:
         existing_org = db.query(Organization).first()
         if not existing_org:
-            logger.info("Initializing default tenant: Apex Industrial Waste & Recycling...")
+            logger.info("Initializing default tenant: Apex Precision Manufacturing...")
             demo_org = Organization(
                 id="apex-industrial-tenant-01",
-                name="Apex Industrial Waste & Recycling",
+                name="Apex Precision Manufacturing",
             )
             db.add(demo_org)
             db.flush()
@@ -45,24 +48,30 @@ async def lifespan(app: FastAPI):
             demo_user = User(
                 id="user-ops-mgr-01",
                 organization_id=demo_org.id,
-                email="manager@apexwaste.com",
+                email="manager@apexmfg.com",
                 hashed_password=hash_password("OperationsPass123!"),
-                display_name="Sarah Jenkins (Ops Manager)",
+                display_name="Sarah Jenkins (Plant Ops Manager)",
                 role="operations_manager",
             )
             db.add(demo_user)
             db.commit()
-            logger.info("Default tenant and operations manager initialized.")
+            logger.info("Default manufacturing tenant and plant manager initialized.")
 
-        # Ensure demo records and exceptions are seeded if table is empty
+        from backend.app.api.routes.connectors import ensure_default_connectors
+        from backend.app.api.routes.workflows import ensure_default_workflows
         from backend.app.db.models.record import OperationalRecord
+
+        admin_user = db.query(User).first()
         if db.query(OperationalRecord).count() == 0:
-            logger.info("Auto-seeding initial demo records and running exception detection...")
+            logger.info("Auto-seeding initial manufacturing records and running exception detection...")
             from backend.app.api.routes.records import seed_demo_data
-            admin_user = db.query(User).first()
+
             if admin_user:
                 seed_demo_data(current_user=admin_user, db=db)
-                logger.info("Demo records and exceptions initialized.")
+                logger.info("Manufacturing demo records and exceptions initialized.")
+        if admin_user:
+            ensure_default_workflows(db, admin_user.organization_id)
+            ensure_default_connectors(db, admin_user.organization_id)
     except Exception as e:
         logger.warning(f"Startup initialization notice: {e}")
     finally:
@@ -71,14 +80,14 @@ async def lifespan(app: FastAPI):
     yield
     logger.info("Application shutting down.")
 
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Deterministic Reconciliation & LangGraph AI Operations Exception Agent for Industrial Services",
+    description="Manufacturing Operations Agent Swarm powered by Google Antigravity SDK",
     lifespan=lifespan,
 )
 
-# CORS Middleware
 origins = (
     settings.CORS_ORIGINS
     if isinstance(settings.CORS_ORIGINS, list)
@@ -93,7 +102,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Security Headers Middleware
+
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     try:
@@ -113,7 +122,7 @@ async def add_security_headers(request: Request, call_next):
             },
         )
 
-# Register API Routers
+
 api_v1_prefix = "/api"
 app.include_router(auth_router, prefix=api_v1_prefix)
 app.include_router(orgs_router, prefix=api_v1_prefix)
@@ -125,6 +134,10 @@ app.include_router(approvals_router, prefix=api_v1_prefix)
 app.include_router(audit_router, prefix=api_v1_prefix)
 app.include_router(analytics_router, prefix=api_v1_prefix)
 app.include_router(agents_router, prefix=api_v1_prefix)
+app.include_router(workflows_router, prefix=api_v1_prefix)
+app.include_router(connectors_router, prefix=api_v1_prefix)
+app.include_router(previews_router, prefix=api_v1_prefix)
+
 
 @app.get("/healthz", tags=["Health"])
 @app.get("/api/healthz", tags=["Health"])
@@ -134,4 +147,5 @@ def health_check():
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT,
+        "sdk": "google-antigravity",
     }

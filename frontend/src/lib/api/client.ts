@@ -16,6 +16,11 @@ import {
   MinionChatResponse,
   ResolutionAnalytics,
   BatchResolutionResponse,
+  AppConnector,
+  SwarmWorkflow,
+  SwarmRun,
+  WorkflowNode,
+  WorkflowEdge,
 } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -258,7 +263,7 @@ class ApiClient {
   }
 
   async generateOpsReport(timeframe: string = "Last 30 Days"): Promise<AgentRunResult> {
-    return this.request<AgentRunResult>("/agents/ops_beacon/report", {
+    return this.request<AgentRunResult>("/agents/plant_beacon/report", {
       method: "POST",
       body: JSON.stringify({ timeframe }),
     });
@@ -271,7 +276,7 @@ class ApiClient {
     disputed_amount: number;
     exception_id?: string;
   }): Promise<AgentRunResult> {
-    return this.request<AgentRunResult>("/agents/dispute_shield/resolve", {
+    return this.request<AgentRunResult>("/agents/quality_shield/resolve", {
       method: "POST",
       body: JSON.stringify(params),
     });
@@ -300,14 +305,156 @@ class ApiClient {
     return this.request<ResolutionAnalytics>(`/agents/resolution-analytics?timeframe=${encodeURIComponent(timeframe)}`);
   }
 
-  async getLLMStatus(): Promise<{ provider: string; model: string; configured: boolean; badge: string }> {
-    return this.request<{ provider: string; model: string; configured: boolean; badge: string }>("/agents/llm-status");
+  async getLLMStatus(): Promise<{ provider: string; model: string; configured: boolean; badge: string; sdk?: string }> {
+    return this.request<{ provider: string; model: string; configured: boolean; badge: string; sdk?: string }>("/agents/llm-status");
   }
 
   async resolveBatchExceptions(): Promise<BatchResolutionResponse> {
     return this.request<BatchResolutionResponse>("/agents/resolve-batch", {
       method: "POST",
     });
+  }
+
+  // --- Swarm Orchestration Workflows ---
+  async listWorkflows(): Promise<SwarmWorkflow[]> {
+    return this.request<SwarmWorkflow[]>("/workflows");
+  }
+
+  async createWorkflow(params: {
+    name: string;
+    description?: string;
+    category?: string;
+    nodes: WorkflowNode[];
+    edges: WorkflowEdge[];
+    estimated_cost_savings_usd?: number;
+    estimated_hours_saved_monthly?: number;
+  }): Promise<SwarmWorkflow> {
+    return this.request<SwarmWorkflow>("/workflows", {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+  }
+
+  async updateWorkflow(
+    workflowId: string,
+    params: {
+      name?: string;
+      description?: string;
+      category?: string;
+      is_active?: boolean;
+      nodes?: WorkflowNode[];
+      edges?: WorkflowEdge[];
+      estimated_cost_savings_usd?: number;
+      estimated_hours_saved_monthly?: number;
+    },
+  ): Promise<SwarmWorkflow> {
+    return this.request<SwarmWorkflow>(`/workflows/${workflowId}`, {
+      method: "PUT",
+      body: JSON.stringify(params),
+    });
+  }
+
+  async deleteWorkflow(workflowId: string): Promise<void> {
+    return this.request<void>(`/workflows/${workflowId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async runWorkflow(workflowId: string, dryRun: boolean = false): Promise<SwarmRun> {
+    return this.request<SwarmRun>(`/workflows/${workflowId}/run`, {
+      method: "POST",
+      body: JSON.stringify({ dry_run: dryRun }),
+    });
+  }
+
+  async listWorkflowRuns(workflowId: string): Promise<SwarmRun[]> {
+    return this.request<SwarmRun[]>(`/workflows/${workflowId}/runs`);
+  }
+
+  // --- App Connectors (Google Sheets, Google Docs, ERP, Slack) ---
+  async listConnectors(): Promise<AppConnector[]> {
+    return this.request<AppConnector[]>("/connectors");
+  }
+
+  async createConnector(params: {
+    connector_type: string;
+    name: string;
+    description?: string;
+    sync_direction?: "import" | "export" | "bidirectional";
+    external_url?: string;
+    config?: Record<string, any>;
+    credential_token?: string;
+  }): Promise<AppConnector> {
+    return this.request<AppConnector>("/connectors", {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+  }
+
+  async updateConnector(
+    connectorId: string,
+    params: {
+      name?: string;
+      description?: string;
+      sync_direction?: "import" | "export" | "bidirectional";
+      status?: "connected" | "ready" | "paused";
+      external_url?: string;
+      config?: Record<string, any>;
+      credential_token?: string;
+    },
+  ): Promise<AppConnector> {
+    return this.request<AppConnector>(`/connectors/${connectorId}`, {
+      method: "PATCH",
+      body: JSON.stringify(params),
+    });
+  }
+
+  async deleteConnector(connectorId: string): Promise<void> {
+    return this.request<void>(`/connectors/${connectorId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async syncConnector(
+    connectorId: string,
+    params: {
+      mode: "import" | "export";
+      record_type?: "service_ticket" | "invoice" | "load_record" | "dispatch_record";
+      csv_override?: string;
+      use_live_fetch?: boolean;
+      document_title?: string;
+    },
+  ): Promise<{ connector: AppConnector; sync_result: Record<string, any> }> {
+    return this.request<{ connector: AppConnector; sync_result: Record<string, any> }>(
+      `/connectors/${connectorId}/sync`,
+      {
+        method: "POST",
+        body: JSON.stringify(params),
+      },
+    );
+  }
+
+  async downloadConnectorExport(connectorId: string, filename: string): Promise<void> {
+    const headers: Record<string, string> = {
+      "X-Tenant-ID": this.currentOrgId,
+    };
+    if (this.token) {
+      headers["Authorization"] = `Bearer ${this.token}`;
+    }
+    const res = await fetch(`${BASE_URL}/connectors/${connectorId}/export`, { headers });
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(errorBody.detail || `Download failed (${res.status})`);
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 }
 

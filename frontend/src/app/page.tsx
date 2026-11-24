@@ -13,6 +13,8 @@ import { AuditTrailView } from "@/features/audit/AuditTrailView";
 import { SettingsView } from "@/features/settings/SettingsView";
 import { AgentsHubView } from "@/features/agents/AgentsHubView";
 import { ReportingAgentView } from "@/features/reporting/ReportingAgentView";
+import { ConnectorsView } from "@/features/connectors/ConnectorsView";
+import { HowItWorksView } from "@/features/guide/HowItWorksView";
 import { TourWelcomeModal } from "@/components/walkthrough/TourWelcomeModal";
 import { OperationsTour } from "@/components/walkthrough/OperationsTour";
 
@@ -68,7 +70,7 @@ export default function Home() {
         const hash = window.location.hash.replace("#", "");
         const path = window.location.pathname.replace(/^\//, "").split("/")[0];
         const validTabs: NavTab[] = [
-          "dashboard", "agents", "studio", "reports", "minions",
+          "dashboard", "agents", "studio", "builder", "connectors", "guide", "reports", "minions",
           "exceptions", "approvals", "ingestion", "records", "audit", "settings"
         ];
         
@@ -96,11 +98,7 @@ export default function Home() {
     try {
       const hasSeen = localStorage.getItem("ops_tour_seen");
       const path = typeof window !== "undefined" ? window.location.pathname.replace(/^\//, "").split("/")[0] : "";
-      const hasHash = typeof window !== "undefined" && window.location.hash && window.location.hash !== "#dashboard";
-      const hasPath = path && path !== "dashboard";
-      if (!hasSeen && !hasHash && !hasPath) {
-        setIsWelcomeModalOpen(true);
-      }
+      // Keep initial load calm and uncluttered; users can launch Tour or How It Works anytime from header/sidebar.
     } catch (_) {}
   }, []);
 
@@ -168,7 +166,7 @@ export default function Home() {
       setCurrentInvestigation(inv);
       await loadData();
     } catch (e: any) {
-      alert(`Investigation trigger failed: ${e.message}`);
+      console.error(`Investigation trigger failed: ${e.message}`);
     } finally {
       setInvestigatingId(null);
     }
@@ -183,6 +181,7 @@ export default function Home() {
       <Navbar 
         onRefresh={loadData}
         onStartTour={() => setIsWelcomeModalOpen(true)}
+        onOpenGuide={() => handleTabChange("guide")}
         onSeed={async () => {
           await api.seedDemoData(true);
           await loadData();
@@ -219,8 +218,29 @@ export default function Home() {
               onRefreshData={loadData}
               onSelectException={handleSelectException}
               initialSelectedAgentId={selectedAgentId}
+              initialTab="studio"
               onNavigateToReports={() => handleTabChange("reports")}
+              onNavigateTab={(t) => handleTabChange(t as NavTab)}
             />
+          )}
+
+          {currentTab === "builder" && (
+            <AgentsHubView
+              summary={summary}
+              exceptions={exceptions}
+              onRefreshData={loadData}
+              onSelectException={handleSelectException}
+              initialSelectedAgentId={selectedAgentId}
+              initialTab="builder"
+              onNavigateToReports={() => handleTabChange("reports")}
+              onNavigateTab={(t) => handleTabChange(t as NavTab)}
+            />
+          )}
+
+          {currentTab === "connectors" && <ConnectorsView />}
+
+          {currentTab === "guide" && (
+            <HowItWorksView onNavigateTab={(t) => handleTabChange(t as NavTab)} />
           )}
 
           {(currentTab === "studio" || currentTab === "minions") && (
@@ -232,6 +252,7 @@ export default function Home() {
               initialSelectedAgentId={selectedAgentId}
               initialTab="studio"
               onNavigateToReports={() => handleTabChange("reports")}
+              onNavigateTab={(t) => handleTabChange(t as NavTab)}
             />
           )}
 

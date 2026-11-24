@@ -45,7 +45,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
 
   // DB Connector State
   const [dbSystem, setDbSystem] = useState<string>("postgres");
-  const [dbHost, setDbHost] = useState<string>("db.internal.apexwaste.com");
+  const [dbHost, setDbHost] = useState<string>("db.internal.apexmfg.com");
   const [dbPort, setDbPort] = useState<number>(5432);
   const [dbName, setDbName] = useState<string>("operations_prod");
   const [dbUser, setDbUser] = useState<string>("ops_reader");
@@ -82,7 +82,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
       // Initialize custom mapping with inferred mapping
       setCustomMapping(res.inferred_mapping || {});
     } catch (err: any) {
-      alert(`Preview failed: ${err.message}`);
+      setCommitMessage(`Preview failed: ${err.message}`);
     } finally {
       setPreviewLoading(false);
     }
@@ -118,7 +118,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
       setSelectedFile(null);
       onRefresh();
     } catch (err: any) {
-      alert(`Commit failed: ${err.message}`);
+      setCommitMessage(`Commit failed: ${err.message}`);
     } finally {
       setCommitLoading(false);
     }
@@ -147,7 +147,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
       }
       setDbNotice(`Connected successfully to ${dbSystem.toUpperCase()} database! Found ${res.available_tables.length} tables.`);
     } catch (err: any) {
-      alert(`Database connection test failed: ${err.message}`);
+      setDbNotice(`Database connection test failed: ${err.message}`);
     } finally {
       setDbConnecting(false);
     }
@@ -168,7 +168,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
       else if (tableName.includes("billing") || tableName.includes("invoice")) setDbImportRecordType("invoice");
       else if (tableName.includes("manifest") || tableName.includes("scale")) setDbImportRecordType("load_record");
     } catch (err: any) {
-      alert(`Failed to preview table: ${err.message}`);
+      setDbNotice(`Failed to preview table: ${err.message}`);
     } finally {
       setTablePreviewLoading(false);
     }
@@ -206,7 +206,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
       setActiveTab("csv");
       onRefresh();
     } catch (err: any) {
-      alert(`Import failed: ${err.message}`);
+      setDbNotice(`Import failed: ${err.message}`);
     } finally {
       setDbImportLoading(false);
     }
@@ -220,10 +220,10 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
       setPdfUploading(true);
       await api.uploadDocument(pdfFile, "invoice_pdf");
       setPdfFile(null);
+      setCommitMessage("Document uploaded and extracted via Manufacturing Document Adapter.");
       onRefresh();
-      alert("Document uploaded and processed successfully via Document AI extraction adapter!");
     } catch (err: any) {
-      alert(`PDF upload failed: ${err.message}`);
+      setCommitMessage(`PDF upload failed: ${err.message}`);
     } finally {
       setPdfUploading(false);
     }
@@ -387,10 +387,10 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
                     onChange={(e) => setRecordType(e.target.value)}
                     className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                   >
-                    <option value="service_ticket">Service Tickets (Roll-off, Compactor, Grease)</option>
-                    <option value="invoice">Customer Invoices & Billing Lines</option>
-                    <option value="load_record">Scale / Landfill Disposal Receipts</option>
-                    <option value="dispatch_record">Dispatch Route Logs</option>
+                    <option value="service_ticket">Material Work Orders &amp; POs</option>
+                    <option value="invoice">Supplier &amp; Customer Invoices</option>
+                    <option value="load_record">Receiving Dock Scale Slips</option>
+                    <option value="dispatch_record">Production Cell Schedules</option>
                   </select>
                 </div>
 
@@ -644,7 +644,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
                     <option value="mysql">MySQL / MariaDB</option>
                     <option value="mssql">Microsoft SQL Server</option>
                     <option value="softpak">Soft-Pak Waste ERP</option>
-                    <option value="wasteworks">WasteWorks Landfill & Hauling ERP</option>
+                    <option value="odoo_mfg">Odoo / NetSuite Manufacturing ERP</option>
                     <option value="quickbooks">QuickBooks Enterprise / Online</option>
                   </select>
                 </div>
@@ -775,10 +775,10 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
                         onChange={(e) => setDbImportRecordType(e.target.value)}
                         className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                       >
-                        <option value="service_ticket">Service Tickets</option>
-                        <option value="invoice">Customer Invoices</option>
-                        <option value="load_record">Scale Disposal Receipts</option>
-                        <option value="dispatch_record">Dispatch Route Logs</option>
+                        <option value="service_ticket">Work Orders &amp; POs</option>
+                        <option value="invoice">Invoices</option>
+                        <option value="load_record">Receiving Scale Slips</option>
+                        <option value="dispatch_record">Production Schedules</option>
                       </select>
                     </div>
                   </div>

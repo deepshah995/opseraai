@@ -1,28 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  BarChart3, 
-  Sparkles, 
-  CheckCircle2, 
-  Clock, 
-  TrendingUp, 
-  DollarSign, 
-  ShieldCheck, 
-  Scale, 
-  Truck, 
-  Receipt, 
-  Bot, 
-  Zap, 
-  RefreshCw, 
-  ArrowRight, 
-  ChevronRight, 
-  AlertTriangle, 
-  FileText, 
+import { SwarmBotAvatar, getCompanionMeta } from "@/components/agents/SwarmBotAvatar";
+import {
+  Sparkles,
+  TrendingUp,
+  DollarSign,
+  ShieldCheck,
+  Bot,
+  Zap,
+  RefreshCw,
+  ArrowRight,
   Building2,
   Calendar,
   Check,
-  Percent
+  Percent,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 import { ResolutionAnalytics, AgentRunResult } from "@/types";
 import { api } from "@/lib/api/client";
@@ -30,61 +24,6 @@ import { api } from "@/lib/api/client";
 interface ReportingAgentViewProps {
   onNavigateToConsole?: (agentId: string) => void;
   onNavigateToExceptions?: () => void;
-}
-
-// ReportBeacon (RB-04) Animated Cartoon Character for the Report Console
-function ReportAgentAvatar({ className = "w-20 h-24", isAnimated = true }: { className?: string; isAnimated?: boolean }) {
-  return (
-    <svg viewBox="0 0 100 120" className={`${className} transition-transform duration-300 drop-shadow-md`}>
-      {/* Telemetry Hover Pad with thrust glow */}
-      <ellipse cx="50" cy="112" rx="28" ry="6" fill="#a855f7" opacity="0.35" className={isAnimated ? "animate-pulse" : ""} />
-      <rect x="30" y="102" width="40" height="6" rx="3" fill="#7e22ce" stroke="#c084fc" strokeWidth="1" />
-      <circle cx="50" cy="105" r="2" fill="#38bdf8" />
-      
-      {/* Radar dome & hologram projection rays */}
-      <path d="M 38 25 A 12 12 0 0 1 62 25 Z" fill="#c084fc" opacity="0.9" />
-      <polygon points="50,22 10,0 90,0" fill="#a855f7" opacity="0.18" className={isAnimated ? "animate-pulse" : ""} />
-      <line x1="50" y1="22" x2="50" y2="10" stroke="#c084fc" strokeWidth="2" />
-      <circle cx="50" cy="9" r="3.5" fill="#e879f9" className={isAnimated ? "animate-ping" : ""} />
-      <circle cx="50" cy="9" r="1.5" fill="#ffffff" />
-      
-      {/* Futuristic Robot Body */}
-      <rect x="25" y="25" width="50" height="74" rx="25" fill="url(#reportBeaconGrad)" />
-      
-      {/* High-tech Analyst Visor with data wave */}
-      <rect x="30" y="38" width="40" height="16" rx="8" fill="#0f172a" stroke="#c084fc" strokeWidth="2" />
-      <circle cx="43" cy="46" r="3.5" fill="#e879f9" />
-      <circle cx="57" cy="46" r="3.5" fill="#e879f9" />
-      <line x1="36" y1="46" x2="64" y2="46" stroke="#c084fc" strokeWidth="1" opacity="0.6" strokeDasharray="2,2" />
-      
-      {/* Happy Robot Mouth */}
-      <path d="M 44 59 Q 50 64 56 59" stroke="#581c87" strokeWidth="2" fill="none" strokeLinecap="round" />
-      
-      {/* Chest Screen: Animated Live Operations Report Bar Chart */}
-      <rect x="30" y="66" width="40" height="22" rx="4" fill="#0f172a" stroke="#c084fc" strokeWidth="1.5" />
-      <rect x="34" y="78" width="4" height="6" fill="#34d399" />
-      <rect x="41" y="73" width="4" height="11" fill="#60a5fa" />
-      <rect x="48" y="70" width="4" height="14" fill="#a855f7" />
-      <rect x="55" y="75" width="4" height="9" fill="#f59e0b" />
-      <rect x="62" y="72" width="4" height="12" fill="#ec4899" />
-      
-      {/* Right Hand: Floating Holographic Executive Report Tablet */}
-      <g transform="translate(73, 58) rotate(10)">
-        <rect x="0" y="0" width="16" height="22" rx="3" fill="#1e1b4b" stroke="#a855f7" strokeWidth="1.5" />
-        <rect x="3" y="3" width="10" height="2" fill="#38bdf8" />
-        <rect x="3" y="7" width="8" height="2" fill="#e879f9" />
-        <rect x="3" y="11" width="10" height="2" fill="#34d399" />
-        <circle cx="8" cy="17" r="2" fill="#fbbf24" />
-      </g>
-
-      <defs>
-        <linearGradient id="reportBeaconGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f3e8ff" />
-          <stop offset="100%" stopColor="#7e22ce" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
 }
 
 export function ReportingAgentView({
@@ -137,7 +76,7 @@ export function ReportingAgentView({
       setExecutiveReport(res);
       await loadData(timeframe);
       setReportSuccessNotice(
-        `ReportBeacon Executive Report Generated for ${timeframe}! Health score indexed at ${res?.health_score_pct ?? 75}%. Scanned ${res?.kpis?.total_records_audited ?? 47} operational records.`
+        `PlantBeacon Executive Savings Report Generated for ${timeframe}! Health score: ${res?.health_score_pct ?? 92}%. Audited ${res?.kpis?.total_records_audited ?? 42} plant records.`
       );
     } catch (e) {
       console.error("Failed to generate executive report:", e);
@@ -171,36 +110,41 @@ export function ReportingAgentView({
   return (
     <div className="space-y-6 pb-16 animate-in fade-in duration-300">
       
-      {/* ReportBeacon Reporting Agent Hero Header */}
+      {/* PlantBeacon Reporting Agent Hero Header */}
       <div className="relative overflow-hidden rounded-2xl border border-purple-200/80 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 p-6 sm:p-8 text-white shadow-lg dark:border-purple-800">
         <div className="absolute right-0 top-0 -mr-16 -mt-16 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
         <div className="absolute left-1/3 bottom-0 h-48 w-48 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
-            {/* ReportBeacon Visual Cartoon Character - The Operations Report Agent */}
             <div className="relative flex-shrink-0 flex flex-col items-center">
-              <ReportAgentAvatar className="w-20 h-24" />
-              <span className="mt-1 font-mono text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-950/90 text-purple-200 border border-purple-400/30">
-                Report Agent • RB-04
+              <div className="p-2 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
+                <SwarmBotAvatar
+                  agentId="plant_beacon"
+                  mood={generatingReport || runningSweep ? "scanning" : "proud"}
+                  size="lg"
+                />
+              </div>
+              <span className="mt-1.5 font-mono text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-950/90 text-indigo-200 border border-indigo-400/30">
+                PlantBeacon (Sunny-Bot) • PB-05
               </span>
             </div>
 
             <div className="space-y-1 max-w-2xl">
               <div className="flex items-center space-x-2">
-                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-purple-800/80 text-purple-200 border border-purple-700/60">
-                  EXECUTIVE CONSOLE
+                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-indigo-800/80 text-indigo-200 border border-indigo-700/60">
+                  PLANT SAVINGS &amp; ROI
                 </span>
-                <span className="text-xs font-semibold text-purple-300 flex items-center space-x-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>Operations Intelligence &amp; Analytics Dashboard</span>
+                <span className="text-xs font-semibold text-indigo-200 flex items-center space-x-1">
+                  <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>{kpis.hours_saved ?? 0} Hours Reclaimed MTD</span>
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                Operations Report Console
+                Manufacturing Savings &amp; ROI Console
               </h1>
-              <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed">
-                Executive dashboard with automated resolution telemetry, financial analytics, facility benchmarks, and interactive discrepancy audit streams generated by ReportBeacon across all 5 specialized operations agents.
+              <p className="text-xs sm:text-sm text-indigo-200/90 leading-relaxed">
+                Real-time cost savings, time reclaimed, work-cell benchmarks, and discrepancy audits compiled by PlantBeacon across your 5 Google Antigravity SDK swarm agents.
               </p>
             </div>
           </div>
@@ -230,7 +174,7 @@ export function ReportingAgentView({
               className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-purple-950/30 transition transform active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Sparkles className={`h-4 w-4 ${generatingReport ? "animate-spin text-amber-300" : "text-amber-300"}`} />
-              <span>{generatingReport ? "ReportBeacon Synthesizing..." : "Generate Live Operations Report"}</span>
+              <span>{generatingReport ? "PlantBeacon Synthesizing..." : "Generate Plant ROI Report"}</span>
             </button>
 
             {/* Secondary Audit Action: Run Fleet Auto-Reconcile */}
@@ -238,7 +182,7 @@ export function ReportingAgentView({
               id="btn-auto-reconcile"
               onClick={handleRunAgentSweep}
               disabled={runningSweep}
-              title="Instructs ReportBeacon to audit open discrepancies across the fleet and auto-settle verified variances (<$500)"
+              title="Instructs Swarm to audit open discrepancies and auto-settle verified variances (<$500)"
               className="inline-flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-md transition disabled:opacity-50 cursor-pointer"
             >
               <Zap className={`h-3.5 w-3.5 text-emerald-400 ${runningSweep ? "animate-bounce" : ""}`} />
@@ -389,44 +333,40 @@ export function ReportingAgentView({
             </div>
             <div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                ReportBeacon Executive Resolution Briefing
+                PlantBeacon Executive Cost &amp; Time Savings Briefing
               </h3>
               <p className="text-xs text-slate-500">
-                Live AI-synthesized narrative for operations leadership ({timeframe})
+                Live Antigravity SDK summary for plant leadership ({timeframe})
               </p>
             </div>
           </div>
           <button
             onClick={handleGenerateBriefing}
             disabled={generatingReport}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition disabled:opacity-50"
           >
             <RefreshCw className={`h-3 w-3 ${generatingReport ? "animate-spin" : ""}`} />
-            <span>{generatingReport ? "Synthesizing..." : "Generate Fresh AI Briefing"}</span>
+            <span>{generatingReport ? "Synthesizing..." : "Generate Fresh ROI Briefing"}</span>
           </button>
         </div>
 
         <div className="pt-4 flex flex-col sm:flex-row gap-4 items-start">
-          {/* ReportBeacon Character Presenting the Briefing */}
           <div className="flex flex-col items-center flex-shrink-0 pt-1">
-            <ReportAgentAvatar className="w-16 h-20" />
-            <span className="font-mono text-[9px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 px-2 py-0.5 rounded-full mt-1 border border-purple-300 dark:border-purple-800">
-              ReportBeacon
+            <SwarmBotAvatar
+              agentId="plant_beacon"
+              mood={generatingReport ? "scanning" : "happy"}
+              size="md"
+            />
+            <span className="font-mono text-[9px] font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full mt-1.5 border border-indigo-200">
+              {getCompanionMeta("plant_beacon").nickname}
             </span>
-            <span className="text-[9px] text-slate-400 mt-0.5">Report Agent</span>
           </div>
 
           <div className="flex-1 w-full space-y-3">
-            <div className="relative rounded-xl bg-purple-50/70 p-4 border border-purple-100 dark:bg-purple-950/30 dark:border-purple-900/50">
-              {/* Pointer indicator towards ReportBeacon */}
-              <div className="hidden sm:block absolute -left-2 top-6 w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent border-r-6 border-r-purple-200 dark:border-r-purple-900" />
+            <div className="relative rounded-xl bg-indigo-50/70 p-4 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/50">
               <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
                 {executiveReport?.executive_summary || (
-                  `Operations Intelligence Briefing covering ${timeframe}: 
-                  Reconciliation Health is indexed at ${kpis.resolution_rate_pct}%. 
-                  The AI Agent fleet audited ${facilities.reduce((acc, f) => acc + f.records_audited, 0) || 47} operational records across scale houses, fleet dispatch manifests, and ERP invoicing. 
-                  A total of $${kpis.total_leakage_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })} in discrepancies was detected, with $${kpis.recovered_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })} successfully recovered through automated adjustments. 
-                  Average cycle time has been compressed from 4.8 business days to 1.2 seconds with 99.6% efficiency gain.`
+                  `Manufacturing Swarm Briefing covering ${timeframe}: Reconciliation Health is ${kpis.resolution_rate_pct}%. The Swarm audited ${facilities.reduce((acc, f) => acc + f.records_audited, 0) || 47} receiving slips, POs, CNC work orders, and invoices—identifying $${kpis.total_leakage_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })} in cost savings and saving ~${kpis.hours_saved ?? 0} engineering & AP hours.`
                 )}
               </p>
             </div>
@@ -436,22 +376,22 @@ export function ReportingAgentView({
               <div className="flex items-start space-x-2 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                 <Check className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <strong className="text-slate-900 dark:text-white block font-semibold">Tonnage Reconciliations:</strong>
-                  <span className="text-slate-500">TicketHawk verified scale slips #SC-8812 &amp; #SC-110 against driver tickets.</span>
+                  <strong className="text-slate-900 dark:text-white block font-semibold">Receiving &amp; BOM Audits:</strong>
+                  <span className="text-slate-500">BOMGuard verified dock scale slips #RCV-8812 &amp; #RCV-110 against supplier POs.</span>
                 </div>
               </div>
               <div className="flex items-start space-x-2 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                 <Check className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <strong className="text-slate-900 dark:text-white block font-semibold">Fleet Schedule Realignment:</strong>
-                  <span className="text-slate-500">DispatchPulse synchronized truck swap TRK-208 to TRK-104 with zero penalty.</span>
+                  <strong className="text-slate-900 dark:text-white block font-semibold">CNC Cell Realignment:</strong>
+                  <span className="text-slate-500">LinePulse synchronized CNC Cell B changeover with zero downtime penalty.</span>
                 </div>
               </div>
               <div className="flex items-start space-x-2 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                 <Check className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <strong className="text-slate-900 dark:text-white block font-semibold">Unbilled Haul Capture:</strong>
-                  <span className="text-slate-500">BillSentry flagged compactor pull #TKT-9912 ($1,450.00) for immediate billing.</span>
+                  <strong className="text-slate-900 dark:text-white block font-semibold">3-Way PO Cost Recovery:</strong>
+                  <span className="text-slate-500">CostSentry flagged unbilled production batch #WO-4412 ($1,450.00) for billing.</span>
                 </div>
               </div>
             </div>
@@ -465,70 +405,66 @@ export function ReportingAgentView({
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
               <Bot className="h-4 w-4 text-blue-600" />
-              <span>Agents in Action: Resolution Contribution</span>
+              <span>Manufacturing Swarm: Cost &amp; Time Savings Breakdown</span>
             </h3>
             <p className="text-xs text-slate-500">
-              Performance metrics for each specialized agent in resolving industrial discrepancies
+              Live contribution across all 5 specialized Google Antigravity SDK agents
             </p>
           </div>
-          <button 
-            onClick={() => onNavigateToConsole && onNavigateToConsole("ticket_hawk")}
+          <button
+            onClick={() => onNavigateToConsole && onNavigateToConsole("bom_guard")}
             className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 font-semibold flex items-center"
           >
-            Open Fleet Hub <ArrowRight className="h-3 w-3 ml-1" />
+            Open Swarm Studio <ArrowRight className="h-3 w-3 ml-1" />
           </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-          
-          {/* Card 1: TicketHawk */}
+
+          {/* Card 1: BOMGuard */}
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
-                    <Scale className="h-4 w-4" />
-                  </div>
+                  <SwarmBotAvatar agentId="bom_guard" mood="happy" size="sm" />
                   <div>
-                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">TicketHawk</h4>
-                    <span className="font-mono text-[10px] text-slate-400">TH-01</span>
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">BOMGuard</h4>
+                    <span className="font-mono text-[10px] text-slate-400">Hawk-Bot · BG-01</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950">
-                  99.1% Acc
+                  99.4% Acc
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
-                Resolves gross/tare landfill scale mismatches vs field estimates.
+                Catches receiving dock short-ships &amp; BOM material scrap variance.
               </p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs">
                 <div className="flex justify-between text-slate-500">
-                  <span>Scale Mismatches:</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.ticket_hawk?.handled_count ?? 3}</span>
+                  <span>Weight Audits:</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.bom_guard?.handled_count ?? 3}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
-                  <span>Value Reconciled:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">${(agentPerf.ticket_hawk?.recovered_usd ?? 807).toLocaleString()}</span>
+                  <span>Savings Found:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">${(agentPerf.bom_guard?.recovered_usd ?? 807).toLocaleString()}</span>
                 </div>
               </div>
             </div>
             <div className="mt-3 pt-2 text-[10px] text-emerald-600 font-semibold flex items-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse" />
-              <span>{agentPerf.ticket_hawk?.status || "Active & Calibrating Scales"}</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-1" />
+              <span>{agentPerf.bom_guard?.status || "Active & Auditing BOMs"}</span>
             </div>
           </div>
 
-          {/* Card 2: DispatchPulse */}
+          {/* Card 2: LinePulse */}
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
-                    <Truck className="h-4 w-4" />
-                  </div>
+                  <SwarmBotAvatar agentId="line_pulse" mood="happy" size="sm" />
                   <div>
-                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">DispatchPulse</h4>
-                    <span className="font-mono text-[10px] text-slate-400">DP-02</span>
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">LinePulse</h4>
+                    <span className="font-mono text-[10px] text-slate-400">Bolt-Bot · LP-03</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950">
@@ -536,73 +472,69 @@ export function ReportingAgentView({
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
-                Synchronizes vehicle swaps &amp; telematics GPS schedule drift.
+                Syncs ERP production schedules with CNC machine cell runs.
               </p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs">
                 <div className="flex justify-between text-slate-500">
-                  <span>Route Swaps Caught:</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.dispatch_pulse?.handled_count ?? 2}</span>
+                  <span>Cell Shifts Synced:</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.line_pulse?.handled_count ?? 2}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
-                  <span>SLA Penalties Saved:</span>
-                  <span className="font-bold text-blue-600 dark:text-blue-400">${(agentPerf.dispatch_pulse?.recovered_usd ?? 420).toLocaleString()}</span>
+                  <span>Capacity Saved:</span>
+                  <span className="font-bold text-blue-600 dark:text-blue-400">${(agentPerf.line_pulse?.recovered_usd ?? 420).toLocaleString()}</span>
                 </div>
               </div>
             </div>
             <div className="mt-3 pt-2 text-[10px] text-blue-600 font-semibold flex items-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-1 animate-pulse" />
-              <span>{agentPerf.dispatch_pulse?.status || "Active & Tracking Telematics"}</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-1" />
+              <span>{agentPerf.line_pulse?.status || "Tracking Machine Cells"}</span>
             </div>
           </div>
 
-          {/* Card 3: BillSentry */}
+          {/* Card 3: CostSentry */}
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400">
-                    <Receipt className="h-4 w-4" />
-                  </div>
+                  <SwarmBotAvatar agentId="cost_sentry" mood="happy" size="sm" />
                   <div>
-                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">BillSentry</h4>
-                    <span className="font-mono text-[10px] text-slate-400">BS-03</span>
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">CostSentry</h4>
+                    <span className="font-mono text-[10px] text-slate-400">Penny-Bot · CS-02</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950">
-                  99.4% Acc
+                  99.6% Acc
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
-                Detects unbilled container hauls, rate code drift &amp; duplicate invoices.
+                3-way PO price checks, unbilled production &amp; duplicate bills.
               </p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs">
                 <div className="flex justify-between text-slate-500">
-                  <span>Billing Issues Handled:</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.bill_sentry?.handled_count ?? 6}</span>
+                  <span>3-Way Audits:</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.cost_sentry?.handled_count ?? 6}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
-                  <span>Revenue Recovered:</span>
-                  <span className="font-bold text-amber-600 dark:text-amber-400">${(agentPerf.bill_sentry?.recovered_usd ?? 4627).toLocaleString()}</span>
+                  <span>Cost Saved:</span>
+                  <span className="font-bold text-amber-600 dark:text-amber-400">${(agentPerf.cost_sentry?.recovered_usd ?? 4627).toLocaleString()}</span>
                 </div>
               </div>
             </div>
             <div className="mt-3 pt-2 text-[10px] text-amber-600 font-semibold flex items-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 mr-1 animate-pulse" />
-              <span>{agentPerf.bill_sentry?.status || "Active & Auditing ERP Invoices"}</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 mr-1" />
+              <span>{agentPerf.cost_sentry?.status || "Auditing Vendor AP"}</span>
             </div>
           </div>
 
-          {/* Card 4: DisputeShield */}
+          {/* Card 4: QualityShield */}
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-1.5 rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
-                    <ShieldCheck className="h-4 w-4" />
-                  </div>
+                  <SwarmBotAvatar agentId="quality_shield" mood="happy" size="sm" />
                   <div>
-                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">DisputeShield</h4>
-                    <span className="font-mono text-[10px] text-slate-400">DS-05</span>
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">QualityShield</h4>
+                    <span className="font-mono text-[10px] text-slate-400">Aegis-Bot · QS-04</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-950">
@@ -610,88 +542,81 @@ export function ReportingAgentView({
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
-                Resolves customer claims with signed receipts &amp; certified scale proof.
+                Compiles supplier NCR evidence packets &amp; QA claims.
               </p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs">
                 <div className="flex justify-between text-slate-500">
-                  <span>Claims Arbitrated:</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.dispute_shield?.handled_count ?? 3}</span>
+                  <span>NCRs / Claims:</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.quality_shield?.handled_count ?? 3}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
-                  <span>Disputes Settled:</span>
-                  <span className="font-bold text-rose-600 dark:text-rose-400">${(agentPerf.dispute_shield?.recovered_usd ?? 415).toLocaleString()}</span>
+                  <span>Disputes Defended:</span>
+                  <span className="font-bold text-rose-600 dark:text-rose-400">${(agentPerf.quality_shield?.recovered_usd ?? 415).toLocaleString()}</span>
                 </div>
               </div>
             </div>
             <div className="mt-3 pt-2 text-[10px] text-rose-600 font-semibold flex items-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-500 mr-1 animate-pulse" />
-              <span>{agentPerf.dispute_shield?.status || "Active & Customer Proof Ready"}</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500 mr-1" />
+              <span>{agentPerf.quality_shield?.status || "Active & NCR Ready"}</span>
             </div>
           </div>
 
-          {/* Card 5: ReportBeacon (The Operations Reporting Agent) */}
-          <div className="rounded-xl border border-purple-200/80 bg-white p-4 shadow-xs dark:border-purple-900/60 dark:bg-slate-900 flex flex-col justify-between ring-1 ring-purple-500/10">
+          {/* Card 5: PlantBeacon */}
+          <div className="rounded-xl border border-indigo-200/80 bg-white p-4 shadow-xs dark:border-indigo-900/60 dark:bg-slate-900 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-0.5 rounded-lg bg-purple-50/80 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 flex-shrink-0">
-                    <ReportAgentAvatar className="w-8 h-10" />
-                  </div>
+                  <SwarmBotAvatar agentId="plant_beacon" mood="happy" size="sm" />
                   <div>
-                    <div className="flex items-center space-x-1">
-                      <h4 className="font-bold text-xs text-slate-900 dark:text-white">ReportBeacon</h4>
-                      <span className="font-mono text-[9px] font-bold px-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">RB-04</span>
-                    </div>
-                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold block">Report Console Agent</span>
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">PlantBeacon</h4>
+                    <span className="font-mono text-[10px] text-slate-400">Sunny-Bot · PB-05</span>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-950">
-                  99.9% Acc
+                <span className="text-[10px] font-bold text-indigo-700 px-1.5 py-0.5 rounded bg-indigo-50">
+                  99.8% Acc
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
-                Powers this Report Console with tenant-wide telemetry, KPIs &amp; automated executive briefings.
+                Tracks cost savings, hours reclaimed &amp; exports Google Docs/Sheets.
               </p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs">
                 <div className="flex justify-between text-slate-500">
                   <span>Records Audited:</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.ops_beacon?.handled_count ?? 38}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{agentPerf.plant_beacon?.handled_count ?? 42}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
-                  <span>KPI Categories:</span>
-                  <span className="font-bold text-purple-600 dark:text-purple-400">14 Core Metrics</span>
+                  <span>Hours Saved:</span>
+                  <span className="font-bold text-indigo-600">{agentPerf.plant_beacon?.hours_saved ?? kpis.hours_saved ?? 0} hrs</span>
                 </div>
               </div>
             </div>
-            <div className="mt-3 pt-2 text-[10px] text-purple-600 font-semibold flex items-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-purple-500 mr-1 animate-pulse" />
-              <span>Active &amp; Publishing Reports</span>
+            <div className="mt-3 pt-2 text-[10px] text-indigo-600 font-semibold flex items-center">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 mr-1" />
+              <span>{agentPerf.plant_beacon?.status || "Publishing ROI Briefs"}</span>
             </div>
           </div>
 
         </div>
       </div>
 
-      {/* Facility Resolution Matrix & Exception Class Distribution */}
+      {/* Work-Cell Breakdown & Benchmark */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Facility Breakdown */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center space-x-2">
               <Building2 className="h-4 w-4 text-slate-500" />
               <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">
-                Disposal Facility Resolution Matrix
+                Plant Work-Cell Savings Matrix
               </h4>
             </div>
-            <span className="text-[11px] text-slate-400">Certified Weighbridges</span>
+            <span className="text-[11px] text-slate-400">Shop-Floor &amp; Receiving Zones</span>
           </div>
           <div className="mt-3 space-y-2.5">
             {facilities.map((fac, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 text-xs">
                 <div>
                   <div className="font-bold text-slate-900 dark:text-white">{fac.name}</div>
-                  <div className="text-[11px] text-slate-500">{fac.records_audited} load tickets audited</div>
+                  <div className="text-[11px] text-slate-500">{fac.records_audited} work orders &amp; receipts audited</div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-emerald-600 dark:text-emerald-400">
@@ -729,7 +654,7 @@ export function ReportingAgentView({
 
             <div>
               <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-700 dark:text-slate-300">Cross-Reconciliation (Scale vs Invoice)</span>
+                <span className="text-slate-700 dark:text-slate-300">3-Way Dock Scale vs PO / Invoice Audit</span>
                 <span className="text-blue-600">1.2s (AI) vs 4.8 Days (Manual)</span>
               </div>
               <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">

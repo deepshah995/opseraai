@@ -51,7 +51,7 @@ export function InvestigationDetailView({
       setActionNotice(`Successfully submitted review: ${decision.toUpperCase()}`);
       onRefresh();
     } catch (e: any) {
-      alert(`Review submission failed: ${e.message}`);
+      setActionNotice(`Review submission failed: ${e.message}`);
     } finally {
       setReviewing(false);
     }
@@ -62,7 +62,7 @@ export function InvestigationDetailView({
       await api.triggerInvestigation(exception.id, "Manual trigger from detail view");
       onRefresh();
     } catch (e: any) {
-      alert(`Investigation trigger failed: ${e.message}`);
+      setActionNotice(`Investigation trigger failed: ${e.message}`);
     }
   };
 
@@ -182,17 +182,17 @@ export function InvestigationDetailView({
                   </div>
                 ))}
 
-                {/* Service Tickets */}
+                {/* Work Orders / POs */}
                 {tickets.map((tkt) => (
                   <div key={tkt.id} className="rounded-lg border border-slate-200 bg-slate-50/60 p-4 text-xs dark:border-slate-800 dark:bg-slate-800/40">
                     <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-400 font-semibold">
-                      <span>Field Service Ticket</span>
+                      <span>Work Order / Material PO</span>
                       <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] dark:bg-emerald-950">
                         #{tkt.external_reference}
                       </span>
                     </div>
                     <div className="mt-2 space-y-1 text-slate-600 dark:text-slate-300">
-                      <div>Driver / Site: <span className="font-medium text-slate-900 dark:text-white">{tkt.normalized_data?.driver || tkt.customer_reference}</span></div>
+                      <div>Supplier / Lead: <span className="font-medium text-slate-900 dark:text-white">{tkt.normalized_data?.operator || tkt.normalized_data?.driver || tkt.customer_reference}</span></div>
                       <div>Logged Amount: <span className="font-mono font-bold text-emerald-600">${tkt.amount?.toFixed(2) ?? "-"}</span></div>
                       <div>Quantity: <span className="font-medium">{tkt.quantity ?? "-"} {tkt.unit || ""}</span></div>
                       <div>Contract Rate: <span className="font-medium">${tkt.rate?.toFixed(2) ?? "-"}</span></div>
@@ -200,36 +200,36 @@ export function InvestigationDetailView({
                   </div>
                 ))}
 
-                {/* Scale & Load Receipts */}
+                {/* Receiving Scale Receipts */}
                 {loads.map((ld) => (
                   <div key={ld.id} className="rounded-lg border border-slate-200 bg-slate-50/60 p-4 text-xs dark:border-slate-800 dark:bg-slate-800/40">
                     <div className="flex items-center justify-between text-indigo-700 dark:text-indigo-400 font-semibold">
-                      <span>Certified Disposal Scale Receipt</span>
+                      <span>Receiving Dock Scale Slip</span>
                       <span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] dark:bg-indigo-950">
                         #{ld.external_reference}
                       </span>
                     </div>
                     <div className="mt-2 space-y-1 text-slate-600 dark:text-slate-300">
-                      <div>Disposal Facility: <span className="font-medium text-slate-900 dark:text-white">{ld.normalized_data?.facility || "Disposal Scale"}</span></div>
+                      <div>Receiving Bay: <span className="font-medium text-slate-900 dark:text-white">{ld.normalized_data?.facility || "Receiving Floor Scale"}</span></div>
                       <div>Certified Net Weight: <span className="font-mono font-bold text-slate-900 dark:text-white">{ld.quantity ?? "-"} tons</span></div>
-                      <div>Tipping Fee: <span className="font-medium">${ld.amount?.toFixed(2) ?? "-"}</span></div>
+                      <div>Lot Value: <span className="font-medium">${ld.amount?.toFixed(2) ?? "-"}</span></div>
                     </div>
                   </div>
                 ))}
 
-                {/* Dispatch Logs */}
+                {/* Production Schedule Logs */}
                 {dispatches.map((dsp) => (
                   <div key={dsp.id} className="rounded-lg border border-slate-200 bg-slate-50/60 p-4 text-xs dark:border-slate-800 dark:bg-slate-800/40">
                     <div className="flex items-center justify-between text-purple-700 dark:text-purple-400 font-semibold">
-                      <span>Dispatch Record</span>
+                      <span>Production Schedule Log</span>
                       <span className="rounded bg-purple-100 px-1.5 py-0.5 text-[10px] dark:bg-purple-950">
                         #{dsp.external_reference}
                       </span>
                     </div>
                     <div className="mt-2 space-y-1 text-slate-600 dark:text-slate-300">
-                      <div>Assigned Truck: <span className="font-medium text-slate-900 dark:text-white">{dsp.normalized_data?.truck_id || "-"}</span></div>
-                      <div>Assigned Driver: <span className="font-medium">{dsp.normalized_data?.driver || "-"}</span></div>
-                      <div>Service Date: <span className="font-medium">{dsp.service_date ? dsp.service_date.slice(0, 10) : "-"}</span></div>
+                      <div>Machine Cell: <span className="font-medium text-slate-900 dark:text-white">{dsp.normalized_data?.machine_cell || dsp.normalized_data?.truck_id || "-"}</span></div>
+                      <div>Shift Lead: <span className="font-medium">{dsp.normalized_data?.operator || dsp.normalized_data?.driver || "-"}</span></div>
+                      <div>Run Date: <span className="font-medium">{dsp.service_date ? dsp.service_date.slice(0, 10) : "-"}</span></div>
                     </div>
                   </div>
                 ))}

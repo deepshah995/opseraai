@@ -52,7 +52,7 @@ start:
     echo "  💻 Mac Dashboard:       http://localhost:3000"
     echo "  📱 iPhone / Mobile:     http://${LAN_IP}:3000"
     echo "------------------------------------------------------------------------"
-    echo "  🔑 Default Account:     manager@apexwaste.com / OperationsPass123!"
+    echo "  🔑 Default Account:     manager@apexmfg.com / OperationsPass123!"
     echo "========================================================================"
     echo "  Press Ctrl+C at any time to gracefully terminate all services."
     echo "========================================================================"
@@ -77,7 +77,7 @@ start:
     PYTHONPATH=. $UVICORN backend.main:app --host "${APP_HOST}" --port "${APP_PORT}" --reload &
     BACKEND_PID=$!
 
-    # 2. Start LangGraph Agentic Investigation Worker (port 8080)
+    # 2. Start Google Antigravity Agentic Swarm Worker (port 8080)
     echo "▶️  Starting Agentic Worker on port 8080..."
     PYTHONPATH=. $UVICORN agentic.main:app --host 127.0.0.1 --port 8080 --reload &
     AGENTIC_PID=$!
@@ -103,7 +103,7 @@ backend:
     echo "▶️  Starting Backend API on ${APP_HOST}:${APP_PORT} (Env: ${ENVIRONMENT:-development})..."
     PYTHONPATH=. .venv/bin/uvicorn backend.main:app --host "${APP_HOST}" --port "${APP_PORT}" --reload
 
-# Start only the LangGraph agentic investigation worker (port 8080)
+# Start only the Google Antigravity agentic worker (port 8080)
 agent:
     PYTHONPATH=. .venv/bin/uvicorn agentic.main:app --host 127.0.0.1 --port 8080 --reload
 

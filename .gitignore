@@ -31,6 +31,7 @@ ENV/
 # Databases & local data
 data/storage/
 *.sqlite3
+* 2.db
 jwt_secret.txt
 !data/ops_agent.db
 

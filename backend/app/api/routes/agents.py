@@ -5,9 +5,11 @@ from typing import Any
 from agentic.app.agents.dispatcher import OperationsAgentDispatcher
 from agentic.app.agents.registry import (
     AGENTS_REGISTRY,
+    canonical_agent_id,
     get_agent_definition,
     get_all_agents,
 )
+from agentic.app.agents.swarm_chat import generate_swarm_chat_response, get_llm_status
 from backend.app.api.dependencies import get_current_user
 from backend.app.db.models.audit import AuditEvent
 from backend.app.db.models.exception import Exception as DBException
@@ -15,6 +17,7 @@ from backend.app.db.models.organization import Organization
 from backend.app.db.models.record import OperationalRecord
 from backend.app.db.models.user import User
 from backend.app.db.session import get_db
+from backend.app.services.chat_tools import OperationsDataTools
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -22,12 +25,14 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/agents", tags=["AI Agents Fleet"])
+router = APIRouter(prefix="/agents", tags=["Manufacturing Swarm Agents"])
+
 
 class RunAgentRequest(BaseModel):
     exception_id: str | None = None
     scenario_id: str | None = None
     custom_params: dict[str, Any] = Field(default_factory=dict)
+
 
 class DisputeResolutionRequest(BaseModel):
     customer_name: str
@@ -36,88 +41,82 @@ class DisputeResolutionRequest(BaseModel):
     disputed_amount: float
     exception_id: str | None = None
 
+
 class OperationsReportRequest(BaseModel):
     timeframe: str = "Last 30 Days"
 
-@router.get("", summary="List all 5 specialized AI Operations Agents")
+
+@router.get("", summary="List all 5 specialized Manufacturing Swarm Agents")
 def list_agents(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Returns definitions, capabilities, status, and dynamic metrics for all 5 specialized agents.
-    Strictly isolated to current_user.organization_id.
-    """
+    """Returns definitions, ROI metrics, capabilities, and active issue counts scoped to current tenant."""
     agents = get_all_agents()
-
-    # Query organization stats to augment agent metrics dynamically
     org_id = current_user.organization_id
+
     total_exceptions = db.execute(
         select(DBException).where(DBException.organization_id == org_id)
     ).scalars().all()
-
     total_records = db.execute(
         select(OperationalRecord).where(OperationalRecord.organization_id == org_id)
     ).scalars().all()
 
-    # Calculate real-time counts for each agent's domain
     qty_exceptions = [e for e in total_exceptions if e.exception_type == "quantity_mismatch"]
-    disp_exceptions = [e for e in total_exceptions if e.exception_type == "dispatch_discrepancy"]
-    rate_exceptions = [e for e in total_exceptions if e.exception_type in ("rate_mismatch", "unbilled_job", "duplicate_billing")]
+    sched_exceptions = [e for e in total_exceptions if e.exception_type == "dispatch_discrepancy"]
+    cost_exceptions = [
+        e
+        for e in total_exceptions
+        if e.exception_type in ("rate_mismatch", "unbilled_job", "duplicate_billing")
+    ]
 
     for a in agents:
-        if a["id"] == "ticket_hawk":
+        if a["id"] == "bom_guard":
             a["active_issues_count"] = len([e for e in qty_exceptions if e.status != "resolved"])
-        elif a["id"] == "dispatch_pulse":
-            a["active_issues_count"] = len([e for e in disp_exceptions if e.status != "resolved"])
-        elif a["id"] == "bill_sentry":
-            a["active_issues_count"] = len([e for e in rate_exceptions if e.status != "resolved"])
-        elif a["id"] == "ops_beacon":
+        elif a["id"] == "line_pulse":
+            a["active_issues_count"] = len([e for e in sched_exceptions if e.status != "resolved"])
+        elif a["id"] == "cost_sentry":
+            a["active_issues_count"] = len([e for e in cost_exceptions if e.status != "resolved"])
+        elif a["id"] == "plant_beacon":
             a["active_issues_count"] = len(total_records)
-        elif a["id"] == "dispute_shield":
+        elif a["id"] == "quality_shield":
             a["active_issues_count"] = len([e for e in total_exceptions if e.status == "open"])
 
     return agents
 
-@router.get("/tutorials", summary="Get comprehensive tutorials for all 5 agents")
+
+@router.get("/tutorials", summary="Get interactive tutorials for all 5 manufacturing swarm agents")
 def get_tutorials(current_user: User = Depends(get_current_user)):
-    """Return full interactive tutorial modules and learning steps for each agent."""
+    del current_user
     tutorials = []
     for agent in AGENTS_REGISTRY.values():
-        tutorials.append({
-            "agent_id": agent.id,
-            "agent_name": agent.name,
-            "code_name": agent.code_name,
-            "title": agent.title,
-            "tagline": agent.tagline,
-            "color_theme": agent.color_theme,
-            "icon_name": agent.icon_name,
-            "simple_summary": agent.simple_summary,
-            "tutorial_steps": agent.full_tutorial,
-            "sample_scenarios": agent.sample_scenarios,
-        })
+        tutorials.append(
+            {
+                "agent_id": agent.id,
+                "agent_name": agent.name,
+                "code_name": agent.code_name,
+                "title": agent.title,
+                "tagline": agent.tagline,
+                "color_theme": agent.color_theme,
+                "icon_name": agent.icon_name,
+                "simple_summary": agent.simple_summary,
+                "tutorial_steps": agent.full_tutorial,
+                "sample_scenarios": agent.sample_scenarios,
+            }
+        )
     return tutorials
 
 
-@router.get("/resolution-analytics", summary="Get insightful resolution analytics and agent performance")
+@router.get("/resolution-analytics", summary="Get manufacturing cost savings, hours saved, and agent ROI analytics")
 def get_resolution_analytics(
     timeframe: str = "Last 30 Days",
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Returns comprehensive analytics on operational resolutions:
-    - Auto-resolution rate and cycle time
-    - Dollars recovered vs at-risk
-    - Resolution breakdown by Agent (TicketHawk, DispatchPulse, BillSentry, ReportBeacon, DisputeShield)
-    - Live resolution activity feed
-    """
     org_id = current_user.organization_id
-
     exceptions = db.execute(
         select(DBException).where(DBException.organization_id == org_id)
     ).scalars().all()
-
     records = db.execute(
         select(OperationalRecord).where(OperationalRecord.organization_id == org_id)
     ).scalars().all()
@@ -127,119 +126,136 @@ def get_resolution_analytics(
     open_exc = [e for e in exceptions if e.status in ("open", "investigating")]
     awaiting_exc = [e for e in exceptions if e.status == "awaiting_approval"]
 
-    total_leakage = sum(e.discrepancy_amount or 0.0 for e in exceptions)
-    recovered_amt = sum(e.discrepancy_amount or 0.0 for e in resolved_exc)
-    at_risk_amt = sum(e.discrepancy_amount or 0.0 for e in exceptions if e.status not in ("resolved", "approved", "dismissed"))
-
+    total_leakage = sum(float(e.discrepancy_amount or 0.0) for e in exceptions)
+    recovered_amt = sum(float(e.discrepancy_amount or 0.0) for e in resolved_exc)
+    at_risk_amt = sum(
+        float(e.discrepancy_amount or 0.0)
+        for e in exceptions
+        if e.status not in ("resolved", "approved", "dismissed")
+    )
+    hours_saved = round((total_exc * 45.0 + len(records) * 6.0) / 60.0, 1)
     resolution_rate = round((len(resolved_exc) / max(total_exc, 1)) * 100, 1)
 
-    # Breakdown by agent
     qty_exceptions = [e for e in exceptions if e.exception_type == "quantity_mismatch"]
-    dispatch_exceptions = [e for e in exceptions if e.exception_type == "dispatch_discrepancy"]
-    billing_exceptions = [e for e in exceptions if e.exception_type in ("rate_mismatch", "unbilled_job", "duplicate_billing")]
+    sched_exceptions = [e for e in exceptions if e.exception_type == "dispatch_discrepancy"]
+    cost_exceptions = [
+        e
+        for e in exceptions
+        if e.exception_type in ("rate_mismatch", "unbilled_job", "duplicate_billing")
+    ]
 
     agent_performance = {
-        "ticket_hawk": {
-            "name": "TicketHawk",
-            "code_name": "TH-01",
-            "role": "Scale Slips & Weight Verification",
+        "bom_guard": {
+            "name": "BOMGuard",
+            "code_name": "BG-01",
+            "role": "Receiving Dock & BOM Weight Audit",
             "color": "emerald",
             "icon": "Scale",
             "handled_count": len(qty_exceptions),
             "resolved_count": sum(1 for e in qty_exceptions if e.status in ("resolved", "approved")),
-            "recovered_usd": sum(e.discrepancy_amount or 0.0 for e in qty_exceptions if e.status in ("resolved", "approved")),
-            "at_risk_usd": sum(e.discrepancy_amount or 0.0 for e in qty_exceptions if e.status not in ("resolved", "approved")),
+            "recovered_usd": sum(float(e.discrepancy_amount or 0.0) for e in qty_exceptions if e.status in ("resolved", "approved")),
+            "at_risk_usd": sum(float(e.discrepancy_amount or 0.0) for e in qty_exceptions if e.status not in ("resolved", "approved")),
+            "hours_saved": round(len(qty_exceptions) * 0.7, 1),
             "avg_confidence": 99.1,
-            "status": "Active & Auditing Scales",
+            "status": "Active & Auditing Receiving",
         },
-        "dispatch_pulse": {
-            "name": "DispatchPulse",
-            "code_name": "DP-02",
-            "role": "Fleet Telematics & Route Swaps",
+        "line_pulse": {
+            "name": "LinePulse",
+            "code_name": "LP-03",
+            "role": "Shop-Floor Cell & Schedule Sync",
             "color": "blue",
             "icon": "Truck",
-            "handled_count": len(dispatch_exceptions),
-            "resolved_count": sum(1 for e in dispatch_exceptions if e.status in ("resolved", "approved")),
-            "recovered_usd": 420.00,
+            "handled_count": len(sched_exceptions),
+            "resolved_count": sum(1 for e in sched_exceptions if e.status in ("resolved", "approved")),
+            "recovered_usd": 320.0 * max(len(sched_exceptions), 1),
             "at_risk_usd": 0.0,
+            "hours_saved": round(len(sched_exceptions) * 0.9, 1),
             "avg_confidence": 98.9,
-            "status": "Active & Tracking Fleet GPS",
+            "status": "Active & Syncing CNC Cells",
         },
-        "bill_sentry": {
-            "name": "BillSentry",
-            "code_name": "BS-03",
-            "role": "Invoicing & Revenue Protection",
+        "cost_sentry": {
+            "name": "CostSentry",
+            "code_name": "CS-02",
+            "role": "3-Way PO & Invoice Savings",
             "color": "amber",
             "icon": "Receipt",
-            "handled_count": len(billing_exceptions),
-            "resolved_count": sum(1 for e in billing_exceptions if e.status in ("resolved", "approved")),
-            "recovered_usd": sum(e.discrepancy_amount or 0.0 for e in billing_exceptions if e.status in ("resolved", "approved")),
-            "at_risk_usd": sum(e.discrepancy_amount or 0.0 for e in billing_exceptions if e.status not in ("resolved", "approved")),
+            "handled_count": len(cost_exceptions),
+            "resolved_count": sum(1 for e in cost_exceptions if e.status in ("resolved", "approved")),
+            "recovered_usd": sum(float(e.discrepancy_amount or 0.0) for e in cost_exceptions if e.status in ("resolved", "approved")),
+            "at_risk_usd": sum(float(e.discrepancy_amount or 0.0) for e in cost_exceptions if e.status not in ("resolved", "approved")),
+            "hours_saved": round(len(cost_exceptions) * 0.8, 1),
             "avg_confidence": 99.4,
-            "status": "Active & Checking Rate Books",
+            "status": "Active & Auditing PO Rates",
         },
-        "ops_beacon": {
-            "name": "ReportBeacon",
-            "code_name": "RB-04",
-            "role": "Operations Reporting & Intelligence",
+        "plant_beacon": {
+            "name": "PlantBeacon",
+            "code_name": "PB-05",
+            "role": "Plant ROI & Docs/Sheets Reporting",
             "color": "purple",
             "icon": "BarChart3",
             "handled_count": len(records),
             "resolved_count": len(resolved_exc),
             "recovered_usd": recovered_amt,
             "at_risk_usd": at_risk_amt,
-            "avg_confidence": 98.6,
-            "status": "Active & Generating Briefings",
+            "hours_saved": hours_saved,
+            "avg_confidence": 98.8,
+            "status": "Active & Publishing ROI Briefs",
         },
-        "dispute_shield": {
-            "name": "DisputeShield",
-            "code_name": "DS-05",
-            "role": "Customer Dispute Resolution",
+        "quality_shield": {
+            "name": "QualityShield",
+            "code_name": "QS-04",
+            "role": "QC Defects & Supplier NCRs",
             "color": "rose",
             "icon": "ShieldCheck",
             "handled_count": 3,
             "resolved_count": 2,
-            "recovered_usd": 415.00,
-            "at_risk_usd": 140.00,
+            "recovered_usd": 415.0,
+            "at_risk_usd": 140.0,
+            "hours_saved": 3.2,
             "avg_confidence": 98.7,
-            "status": "Active & Arbitration Ready",
+            "status": "Active & NCR Ready",
         },
     }
-    agent_performance["report_beacon"] = agent_performance["ops_beacon"]
 
-    # Resolution distribution by type
-    by_type = {}
+    by_type: dict[str, int] = {}
     for e in exceptions:
-        t = e.exception_type
-        by_type[t] = by_type.get(t, 0) + 1
+        by_type[e.exception_type] = by_type.get(e.exception_type, 0) + 1
 
-    # Facility breakdown
     facilities = [
-        {"name": "Metro Transfer Station", "records_audited": 18, "exceptions_resolved": 6, "recovered_usd": 1485.00, "status": "Optimized"},
-        {"name": "North Landfill Scale #2", "records_audited": 14, "exceptions_resolved": 5, "recovered_usd": 1120.00, "status": "Audited"},
-        {"name": "Valley Composting Depot", "records_audited": 9, "exceptions_resolved": 3, "recovered_usd": 663.00, "status": "Clean"},
-        {"name": "North Water Recovery Plant", "records_audited": 6, "exceptions_resolved": 2, "recovered_usd": 595.00, "status": "Calibrated"},
+        {"name": "CNC Machining Cell A & B", "records_audited": 18, "exceptions_resolved": 6, "recovered_usd": 1485.00, "status": "Optimized"},
+        {"name": "Raw Material Receiving Dock #2", "records_audited": 14, "exceptions_resolved": 5, "recovered_usd": 1120.00, "status": "Audited"},
+        {"name": "Stamping & Sheet Fabrication Bay", "records_audited": 9, "exceptions_resolved": 3, "recovered_usd": 663.00, "status": "Clean"},
+        {"name": "Final Assembly & QC Lab", "records_audited": 6, "exceptions_resolved": 2, "recovered_usd": 595.00, "status": "Calibrated"},
     ]
 
-    # Live recent resolution stream
     recent_stream = []
     for exc in sorted(exceptions, key=lambda x: x.detected_at, reverse=True)[:8]:
-        agent_key = "ticket_hawk" if exc.exception_type == "quantity_mismatch" else ("dispatch_pulse" if exc.exception_type == "dispatch_discrepancy" else "bill_sentry")
-        perf = agent_performance.get(agent_key, agent_performance["bill_sentry"])
-        recent_stream.append({
-            "exception_id": exc.id,
-            "title": exc.title,
-            "exception_type": exc.exception_type,
-            "severity": exc.severity,
-            "status": exc.status,
-            "amount": exc.discrepancy_amount or 0.0,
-            "agent_name": perf["name"],
-            "agent_code": perf["code_name"],
-            "agent_color": perf["color"],
-            "detected_at": exc.detected_at.isoformat() if exc.detected_at else datetime.now(UTC).isoformat(),
-            "resolved_at": exc.resolved_at.isoformat() if exc.resolved_at else None,
-            "action_taken": "Automated ledger correction proposed" if exc.status == "awaiting_approval" else ("Certified scale calibration match verified" if exc.status in ("resolved", "approved") else "Under active agent inspection"),
-        })
+        agent_key = (
+            "bom_guard"
+            if exc.exception_type == "quantity_mismatch"
+            else ("line_pulse" if exc.exception_type == "dispatch_discrepancy" else "cost_sentry")
+        )
+        perf = agent_performance.get(agent_key, agent_performance["cost_sentry"])
+        recent_stream.append(
+            {
+                "exception_id": exc.id,
+                "title": exc.title,
+                "exception_type": exc.exception_type,
+                "severity": exc.severity,
+                "status": exc.status,
+                "amount": exc.discrepancy_amount or 0.0,
+                "agent_name": perf["name"],
+                "agent_code": perf["code_name"],
+                "agent_color": perf["color"],
+                "detected_at": exc.detected_at.isoformat() if exc.detected_at else datetime.now(UTC).isoformat(),
+                "resolved_at": exc.resolved_at.isoformat() if exc.resolved_at else None,
+                "action_taken": (
+                    "Staged for 1-click manager approval"
+                    if exc.status == "awaiting_approval"
+                    else ("Verified and settled in ledger" if exc.status in ("resolved", "approved") else "Under Antigravity Swarm review")
+                ),
+            }
+        )
 
     return {
         "timeframe": timeframe,
@@ -249,9 +265,10 @@ def get_resolution_analytics(
             "open_count": len(open_exc),
             "awaiting_approval_count": len(awaiting_exc),
             "resolution_rate_pct": resolution_rate,
-            "total_leakage_usd": total_leakage,
-            "recovered_usd": recovered_amt,
-            "at_risk_usd": at_risk_amt,
+            "total_leakage_usd": round(total_leakage, 2),
+            "recovered_usd": round(recovered_amt, 2),
+            "at_risk_usd": round(at_risk_amt, 2),
+            "hours_saved": hours_saved,
             "avg_resolution_cycle_seconds": 1.2,
             "manual_benchmark_days": 4.8,
             "efficiency_gain_pct": 99.6,
@@ -263,17 +280,11 @@ def get_resolution_analytics(
     }
 
 
-@router.post("/resolve-batch", summary="Run Agents in action to auto-resolve pending exceptions")
+@router.post("/resolve-batch", summary="Run Manufacturing Swarm to auto-resolve low-risk issues and stage high-value ones")
 def resolve_batch_exceptions(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Executes the specialized AI Agents in action to resolve open exceptions.
-    - Resolves exceptions below $500 threshold automatically.
-    - Stages high-value exceptions for one-click human approval.
-    - Logs audit trail for every resolution.
-    """
     org_id = current_user.organization_id
     now = datetime.now(UTC)
 
@@ -287,23 +298,26 @@ def resolve_batch_exceptions(
     resolved_count = 0
     awaiting_count = 0
     total_recovered = 0.0
+    total_minutes_saved = 0.0
     resolutions_executed = []
 
     for exc in open_exceptions:
-        amt = exc.discrepancy_amount or 0.0
-
+        amt = float(exc.discrepancy_amount or 0.0)
         if exc.exception_type == "quantity_mismatch":
-            agent_id = "ticket_hawk"
-            agent_name = "TicketHawk (TH-01)"
-            action_desc = "Calibrated scale slip net weight against driver estimate and aligned billing quantity."
+            agent_id = "bom_guard"
+            agent_name = "BOMGuard (BG-01)"
+            action_desc = "Reconciled receiving dock scale slip against PO/work order material count."
+            total_minutes_saved += 40.0
         elif exc.exception_type == "dispatch_discrepancy":
-            agent_id = "dispatch_pulse"
-            agent_name = "DispatchPulse (DP-02)"
-            action_desc = "Aligned dispatch manifest schedule with actual vehicle telemetry and driver service ticket."
+            agent_id = "line_pulse"
+            agent_name = "LinePulse (LP-03)"
+            action_desc = "Synced ERP production schedule with actual shop-floor machine cell completion."
+            total_minutes_saved += 55.0
         else:
-            agent_id = "bill_sentry"
-            agent_name = "BillSentry (BS-03)"
-            action_desc = "Cross-referenced customer contract rate matrix and adjusted invoice line items."
+            agent_id = "cost_sentry"
+            agent_name = "CostSentry (CS-02)"
+            action_desc = "Audited 3-way PO rate, work order, and invoice line items."
+            total_minutes_saved += 45.0
 
         if amt < 500.0 and exc.exception_type != "duplicate_billing":
             exc.status = "resolved"
@@ -315,63 +329,60 @@ def resolve_batch_exceptions(
             exc.status = "awaiting_approval"
             awaiting_count += 1
             total_recovered += amt
-            verdict = "Staged for One-Click Lead Approval"
+            verdict = "Staged for One-Click Manager Sign-Off"
 
-        audit = AuditEvent(
-            organization_id=org_id,
-            actor_type="agent",
-            actor_id=agent_id,
-            action="agent_resolved_exception",
-            resource_type="exception",
-            resource_id=exc.id,
-            action_metadata={
-                "exception_title": exc.title,
-                "amount": amt,
+        db.add(
+            AuditEvent(
+                organization_id=org_id,
+                actor_type="agent",
+                actor_id=agent_id,
+                action="agent_resolved_exception",
+                resource_type="exception",
+                resource_id=exc.id,
+                action_metadata={
+                    "exception_title": exc.title,
+                    "amount": amt,
+                    "verdict": verdict,
+                    "action_desc": action_desc,
+                },
+            )
+        )
+        resolutions_executed.append(
+            {
+                "exception_id": exc.id,
+                "title": exc.title,
+                "agent_name": agent_name,
+                "agent_id": agent_id,
+                "discrepancy_amount": amt,
+                "status": exc.status,
                 "verdict": verdict,
                 "action_desc": action_desc,
-            },
+            }
         )
-        db.add(audit)
-
-        resolutions_executed.append({
-            "exception_id": exc.id,
-            "title": exc.title,
-            "agent_name": agent_name,
-            "agent_id": agent_id,
-            "discrepancy_amount": amt,
-            "status": exc.status,
-            "verdict": verdict,
-            "action_desc": action_desc,
-        })
 
     db.commit()
-
     return {
         "processed_count": len(open_exceptions),
         "auto_resolved": resolved_count,
         "awaiting_approval": awaiting_count,
-        "total_recovered_usd": total_recovered,
+        "total_recovered_usd": round(total_recovered, 2),
+        "total_hours_saved": round(total_minutes_saved / 60.0, 1),
         "resolutions": resolutions_executed,
     }
 
 
-@router.get("/llm-status", summary="Get Live Agent Studio LLM provider status")
-def get_live_agent_llm_status(
-    current_user: User = Depends(get_current_user),
-):
-    """
-    Returns active LLM provider metadata (Gemini / OpenAI / Rule Engine)
-    for Live Agent Studio badges.
-    """
-    from agentic.app.agents.minion_chat import get_llm_status
+@router.get("/llm-status", summary="Get Google Antigravity SDK runtime status")
+def get_live_agent_llm_status(current_user: User = Depends(get_current_user)):
+    del current_user
     return get_llm_status()
 
 
-@router.get("/{agent_id}", summary="Get detailed definition of an agent")
+@router.get("/{agent_id}", summary="Get detailed definition of a manufacturing swarm agent")
 def get_agent_detail(
     agent_id: str,
     current_user: User = Depends(get_current_user),
 ):
+    del current_user
     defn = get_agent_definition(agent_id)
     if not defn:
         raise HTTPException(
@@ -391,6 +402,10 @@ def get_agent_detail(
         "specialization": defn.specialization,
         "reconciles_records": defn.reconciles_records,
         "exception_types_handled": defn.exception_types_handled,
+        "cost_savings_focus": defn.cost_savings_focus,
+        "time_saved_per_task_mins": defn.time_saved_per_task_mins,
+        "inputs": defn.inputs,
+        "outputs": defn.outputs,
         "key_metrics": defn.key_metrics,
         "capabilities": defn.capabilities,
         "simple_summary": defn.simple_summary,
@@ -398,25 +413,22 @@ def get_agent_detail(
         "sample_scenarios": defn.sample_scenarios,
     }
 
-@router.post("/{agent_id}/run", summary="Run a specialized agent on an issue or scenario")
+
+@router.post("/{agent_id}/run", summary="Run a specialized manufacturing agent on an issue or scenario")
 def run_agent(
     agent_id: str,
     req: RunAgentRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Execute a specialized agent with live records or scenario parameters.
-    Guarantees strict organization tenant isolation.
-    """
     org_id = current_user.organization_id
-    defn = get_agent_definition(agent_id)
+    canon_id = canonical_agent_id(agent_id)
+    defn = get_agent_definition(canon_id)
     if not defn:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Agent '{agent_id}' not found.")
 
     params = dict(req.custom_params)
 
-    # If exception_id is provided, pull actual operational records for this exception
     if req.exception_id:
         exc = db.execute(
             select(DBException).where(
@@ -424,7 +436,6 @@ def run_agent(
                 DBException.organization_id == org_id,
             )
         ).scalar_one_or_none()
-
         if not exc:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found.")
 
@@ -436,7 +447,6 @@ def run_agent(
             "severity": exc.severity,
         }
 
-        # Fetch records
         if exc.related_record_ids:
             records = db.execute(
                 select(OperationalRecord).where(
@@ -444,7 +454,6 @@ def run_agent(
                     OperationalRecord.id.in_(exc.related_record_ids),
                 )
             ).scalars().all()
-
             records_dict = [
                 {
                     "id": r.id,
@@ -462,42 +471,35 @@ def run_agent(
                 for r in records
             ]
 
-            # Route records according to agent type
-            if agent_id == "ticket_hawk":
+            if canon_id == "bom_guard":
                 tkts = [r for r in records_dict if r["record_type"] == "service_ticket"]
                 scales = [r for r in records_dict if r["record_type"] == "load_record"]
                 if tkts:
                     params["ticket_record"] = tkts[0]
                 if scales:
                     params["scale_record"] = scales[0]
-
-            elif agent_id == "dispatch_pulse":
+            elif canon_id == "line_pulse":
                 disps = [r for r in records_dict if r["record_type"] == "dispatch_record"]
                 tkts = [r for r in records_dict if r["record_type"] == "service_ticket"]
                 if disps:
                     params["dispatch_record"] = disps[0]
                 if tkts:
                     params["ticket_record"] = tkts[0]
-
-            elif agent_id == "bill_sentry":
-                invs = [r for r in records_dict if r["record_type"] == "invoice"]
-                tkts = [r for r in records_dict if r["record_type"] == "service_ticket"]
-                params["invoice_records"] = invs
-                params["ticket_records"] = tkts
+            elif canon_id == "cost_sentry":
+                params["invoice_records"] = [r for r in records_dict if r["record_type"] == "invoice"]
+                params["ticket_records"] = [r for r in records_dict if r["record_type"] == "service_ticket"]
                 params["exception_type"] = exc.exception_type
-
-            elif agent_id == "dispute_shield":
+            elif canon_id == "quality_shield":
                 params["related_records"] = records_dict
-                params["customer_name"] = exc.title.split("(")[-1].split(")")[0] if "(" in exc.title else "Customer"
+                params["customer_name"] = exc.title.split("(")[-1].split(")")[0] if "(" in exc.title else "Supplier"
                 params["dispute_claim"] = exc.description
                 params["disputed_invoice_ref"] = records_dict[0]["external_reference"] if records_dict else "INV-9021"
                 params["disputed_amount"] = exc.discrepancy_amount or 140.0
 
-    # If scenario_id is provided, match predefined scenario
     if req.scenario_id:
         for s in defn.sample_scenarios:
             if s.get("scenario_id") == req.scenario_id:
-                if agent_id == "ticket_hawk":
+                if canon_id == "bom_guard":
                     params["ticket_record"] = {
                         "external_reference": s["ticket_no"],
                         "customer_reference": s["customer"],
@@ -510,57 +512,62 @@ def run_agent(
                         "quantity": s["certified_tonnage"],
                         "unit": "tons",
                     }
-                elif agent_id == "dispatch_pulse":
+                elif canon_id == "line_pulse":
                     params["dispatch_record"] = {
                         "external_reference": s["dispatch_ref"],
                         "customer_reference": s["customer"],
-                        "service_date": "2024-10-14",
-                        "normalized_data": {"truck_id": s["scheduled_truck"]},
+                        "service_date": "2026-10-14",
+                        "normalized_data": {"machine_cell": s["scheduled_truck"]},
                     }
                     params["ticket_record"] = {
                         "external_reference": s["ticket_no"],
                         "customer_reference": s["customer"],
-                        "service_date": "2024-10-14",
-                        "normalized_data": {"truck_id": s["actual_truck"]},
+                        "service_date": "2026-10-14",
+                        "normalized_data": {"machine_cell": s["actual_truck"]},
                     }
-                elif agent_id == "bill_sentry":
+                elif canon_id == "cost_sentry":
                     if "billed_amount" in s:
-                        params["invoice_records"] = [{
-                            "external_reference": s["invoice_ref"],
-                            "customer_reference": s["customer"],
-                            "amount": s["billed_amount"],
-                        }]
-                        params["ticket_records"] = [{
-                            "external_reference": s["ticket_no"],
-                            "customer_reference": s["customer"],
-                            "amount": s["expected_amount"],
-                        }]
+                        params["invoice_records"] = [
+                            {
+                                "external_reference": s["invoice_ref"],
+                                "customer_reference": s["customer"],
+                                "amount": s["billed_amount"],
+                            }
+                        ]
+                        params["ticket_records"] = [
+                            {
+                                "external_reference": s["ticket_no"],
+                                "customer_reference": s["customer"],
+                                "amount": s["expected_amount"],
+                            }
+                        ]
                         params["exception_type"] = "rate_mismatch"
                     elif "unbilled_amount" in s:
                         params["invoice_records"] = []
-                        params["ticket_records"] = [{
-                            "external_reference": s["ticket_no"],
-                            "customer_reference": s["customer"],
-                            "amount": s["unbilled_amount"],
-                            "status": s["status"],
-                        }]
+                        params["ticket_records"] = [
+                            {
+                                "external_reference": s["ticket_no"],
+                                "customer_reference": s["customer"],
+                                "amount": s["unbilled_amount"],
+                                "status": s["status"],
+                            }
+                        ]
                         params["exception_type"] = "unbilled_job"
                     elif "duplicate_amount" in s:
                         params["invoice_records"] = [
                             {"external_reference": inv_num, "customer_reference": s["customer"], "amount": s["duplicate_amount"]}
                             for inv_num in s["invoices"]
                         ]
-                        params["ticket_records"] = [{"external_reference": "TKT-4411", "customer_reference": s["customer"]}]
+                        params["ticket_records"] = [{"external_reference": "PO-4411", "customer_reference": s["customer"]}]
                         params["exception_type"] = "duplicate_billing"
-                elif agent_id == "dispute_shield":
+                elif canon_id == "quality_shield":
                     params["customer_name"] = s["customer"]
                     params["dispute_claim"] = s["claim"]
                     params["disputed_invoice_ref"] = "INV-9021"
                     params["disputed_amount"] = 140.0
                 break
 
-    # If ReportBeacon / OpsBeacon, populate tenant live records
-    if agent_id in ("ops_beacon", "report_beacon"):
+    if canon_id == "plant_beacon":
         org = db.execute(select(Organization).where(Organization.id == org_id)).scalar_one_or_none()
         all_records = db.execute(
             select(OperationalRecord).where(OperationalRecord.organization_id == org_id)
@@ -568,8 +575,7 @@ def run_agent(
         all_exceptions = db.execute(
             select(DBException).where(DBException.organization_id == org_id)
         ).scalars().all()
-
-        params["organization_name"] = org.name if org else "Apex Industrial Services"
+        params["organization_name"] = org.name if org else "Apex Precision Manufacturing"
         params["records"] = [{"amount": r.amount, "customer_reference": r.customer_reference} for r in all_records]
         params["exceptions"] = [
             {
@@ -582,50 +588,47 @@ def run_agent(
         ]
 
     try:
-        result = OperationsAgentDispatcher.execute_agent(agent_id, params)
-
-        # Audit Event Logging
-        audit = AuditEvent(
-            organization_id=org_id,
-            actor_type="agent",
-            actor_id=agent_id,
-            action=f"agent_run_{agent_id}",
-            resource_type="agent_task",
-            resource_id=req.exception_id or req.scenario_id or "adhoc_run",
-            action_metadata={"agent_name": defn.name, "status": "completed"},
+        result = OperationsAgentDispatcher.execute_agent(canon_id, params)
+        db.add(
+            AuditEvent(
+                organization_id=org_id,
+                actor_type="agent",
+                actor_id=canon_id,
+                action=f"agent_run_{canon_id}",
+                resource_type="agent_task",
+                resource_id=req.exception_id or req.scenario_id or "adhoc_run",
+                action_metadata={"agent_name": defn.name, "status": "completed"},
+            )
         )
-        db.add(audit)
         db.commit()
-
         return result
     except Exception as e:
-        logger.error(f"Error executing agent {agent_id}: {e}", exc_info=True)
+        logger.error(f"Error executing agent {canon_id}: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Agent execution failed: {e!s}",
         )
 
-@router.post("/report_beacon/report", summary="Generate Live Operations Intelligence Report (ReportBeacon)")
-@router.post("/ops_beacon/report", summary="Generate Live Operations Intelligence Report")
+
+@router.post("/plant_beacon/report", summary="Generate Live Plant ROI & Operations Report (PlantBeacon)")
+@router.post("/report_beacon/report", summary="Generate Live Operations Intelligence Report (Alias)")
+@router.post("/ops_beacon/report", summary="Generate Live Operations Intelligence Report (Alias)")
 def generate_ops_report(
     req: OperationsReportRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """ReportBeacon live operational intelligence report generation across tenant records."""
     org_id = current_user.organization_id
     org = db.execute(select(Organization).where(Organization.id == org_id)).scalar_one_or_none()
-
     records = db.execute(
         select(OperationalRecord).where(OperationalRecord.organization_id == org_id)
     ).scalars().all()
-
     exceptions = db.execute(
         select(DBException).where(DBException.organization_id == org_id)
     ).scalars().all()
 
     params = {
-        "organization_name": org.name if org else "Apex Industrial Waste & Recycling",
+        "organization_name": org.name if org else "Apex Precision Manufacturing",
         "records": [{"amount": r.amount, "customer_reference": r.customer_reference} for r in records],
         "exceptions": [
             {
@@ -638,33 +641,30 @@ def generate_ops_report(
         ],
         "timeframe": req.timeframe,
     }
-
-    result = OperationsAgentDispatcher.execute_agent("ops_beacon", params)
-
-    # Log audit event
-    audit = AuditEvent(
-        organization_id=org_id,
-        actor_type="agent",
-        actor_id="ops_beacon",
-        action="generate_operations_report",
-        resource_type="report",
-        resource_id=org_id,
-        action_metadata={"health_score": result.get("health_score_pct")},
+    result = OperationsAgentDispatcher.execute_agent("plant_beacon", params)
+    db.add(
+        AuditEvent(
+            organization_id=org_id,
+            actor_type="agent",
+            actor_id="plant_beacon",
+            action="generate_operations_report",
+            resource_type="report",
+            resource_id=org_id,
+            action_metadata={"health_score": result.get("health_score_pct")},
+        )
     )
-    db.add(audit)
     db.commit()
-
     return result
 
-@router.post("/dispute_shield/resolve", summary="Resolve a Customer Billing Dispute")
+
+@router.post("/quality_shield/resolve", summary="Resolve a QC Defect or Supplier/Customer Claim")
+@router.post("/dispute_shield/resolve", summary="Resolve a Customer Billing Dispute (Alias)")
 def resolve_dispute(
     req: DisputeResolutionRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """DisputeShield customer dispute arbitration and explanation letter drafting."""
     org_id = current_user.organization_id
-
     records = []
     if req.exception_id:
         exc = db.execute(
@@ -698,23 +698,24 @@ def resolve_dispute(
         "disputed_amount": req.disputed_amount,
         "related_records": records,
     }
-
-    result = OperationsAgentDispatcher.execute_agent("dispute_shield", params)
-
-    # Log audit event
-    audit = AuditEvent(
-        organization_id=org_id,
-        actor_type="agent",
-        actor_id="dispute_shield",
-        action="resolve_customer_dispute",
-        resource_type="dispute",
-        resource_id=req.disputed_invoice_ref,
-        action_metadata={"verdict": result.get("verdict"), "proposed_amount": result.get("proposed_resolution", {}).get("proposed_amount")},
+    result = OperationsAgentDispatcher.execute_agent("quality_shield", params)
+    db.add(
+        AuditEvent(
+            organization_id=org_id,
+            actor_type="agent",
+            actor_id="quality_shield",
+            action="resolve_customer_dispute",
+            resource_type="dispute",
+            resource_id=req.disputed_invoice_ref,
+            action_metadata={
+                "verdict": result.get("verdict"),
+                "proposed_amount": result.get("proposed_resolution", {}).get("proposed_amount"),
+            },
+        )
     )
-    db.add(audit)
     db.commit()
-
     return result
+
 
 class ChatHistoryTurn(BaseModel):
     role: str = Field(..., pattern="^(user|assistant)$")
@@ -726,41 +727,28 @@ class AgentChatRequest(BaseModel):
     history: list[ChatHistoryTurn] = Field(default_factory=list, max_length=20)
 
 
-MinionChatRequest = AgentChatRequest  # legacy alias
-
-
-@router.post("/{agent_id}/chat", summary="Chat interactively with an AI Agent")
+@router.post("/{agent_id}/chat", summary="Chat interactively with a Manufacturing Swarm Agent")
 def chat_with_agent(
     agent_id: str,
     req: AgentChatRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Interactive and operations-grounded chat with the autonomous AI Agent.
-    Supports multi-turn conversation history and live read-only database lookups
-    strictly scoped to the authenticated user's organization.
-    """
-    defn = get_agent_definition(agent_id)
+    canon_id = canonical_agent_id(agent_id)
+    defn = get_agent_definition(canon_id)
     if not defn:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Agent '{agent_id}' does not exist.",
         )
 
-    from agentic.app.agents.minion_chat import generate_minion_chat_response
-    from backend.app.services.chat_tools import OperationsDataTools
-
     context = {"organization_id": current_user.organization_id}
     history = [{"role": t.role, "content": t.content} for t in req.history]
     data_tools = OperationsDataTools(db=db, organization_id=current_user.organization_id)
-    res = generate_minion_chat_response(
-        agent_id,
+    return generate_swarm_chat_response(
+        canon_id,
         req.message,
         context=context,
         history=history,
         data_tools=data_tools,
     )
-    return res
-
-

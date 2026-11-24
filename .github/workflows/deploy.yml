@@ -99,7 +99,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           sleep 15
-          ENV_VARS="ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=false,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage,AGENTIC_WORKER_URL=https://opsera-agentic-1030854563974.us-central1.run.app,CORS_ORIGINS=https://opsera-frontend-1030854563974.us-central1.run.app"
+          ENV_VARS="ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=false,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage,AGENTIC_WORKER_URL=https://opsera-agentic-1030854563974.us-central1.run.app,CORS_ORIGINS=https://opsera-frontend-1030854563974.us-central1.run.app,https://opsera-frontend-r7ys35tfna-uc.a.run.app"
           if [ -n "$GEMINI_API_KEY" ]; then
             ENV_VARS="${ENV_VARS},GEMINI_API_KEY=${GEMINI_API_KEY}"
           fi

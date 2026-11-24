@@ -82,14 +82,14 @@ export function ExceptionListView({
   const getAssignedAgent = (type: ExceptionType) => {
     switch (type) {
       case "quantity_mismatch":
-        return { name: "TicketHawk", code: "TH-01", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800" };
+        return { name: "BOMGuard", code: "BG-01", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800" };
       case "dispatch_discrepancy":
-        return { name: "DispatchPulse", code: "DP-02", badge: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-800" };
+        return { name: "LinePulse", code: "LP-03", badge: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-800" };
       case "rate_mismatch":
       case "unbilled_job":
       case "duplicate_billing":
       default:
-        return { name: "BillSentry", code: "BS-03", badge: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-800" };
+        return { name: "CostSentry", code: "CS-02", badge: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-800" };
     }
   };
 

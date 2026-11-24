@@ -34,7 +34,7 @@ export function ApprovalsView({ approvals, onRefresh, onSelectException }: Appro
       await api.reviewApproval(approvalId, decision, "Reviewed from approvals queue");
       onRefresh();
     } catch (e: any) {
-      alert(`Approval review failed: ${e.message}`);
+      console.error(`Approval review failed: ${e.message}`);
     } finally {
       setProcessingId(null);
     }

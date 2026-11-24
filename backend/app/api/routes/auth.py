@@ -40,7 +40,7 @@ def register(req: UserCreate, db: Session = Depends(get_db)):
     # Create org if none provided
     org_id = req.organization_id
     if not org_id:
-        org = Organization(name="Default Industrial Services Corp")
+        org = Organization(name="Precision Manufacturing Operations")
         db.add(org)
         db.flush()
         org_id = org.id

@@ -45,9 +45,9 @@ export function RecordsListView({ records }: RecordsListViewProps) {
         >
           <option value="all">All Record Types</option>
           <option value="invoice">Invoices</option>
-          <option value="service_ticket">Service Tickets</option>
-          <option value="load_record">Scale Receipts</option>
-          <option value="dispatch_record">Dispatch Records</option>
+          <option value="service_ticket">Work Orders &amp; POs</option>
+          <option value="load_record">Receiving Scale Slips</option>
+          <option value="dispatch_record">Production Schedules</option>
         </select>
       </div>
 

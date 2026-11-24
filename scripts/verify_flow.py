@@ -4,7 +4,7 @@ from backend.main import app
 
 def run_verification():
     print("=" * 70)
-    print("  AI OPERATIONS EXCEPTION AGENT - FULL END-TO-END EXECUTION FLOW")
+    print("  OPSERA MANUFACTURING SWARM - END-TO-END EXECUTION VERIFICATION")
     print("=" * 70)
 
     client = TestClient(app)
@@ -18,17 +18,17 @@ def run_verification():
     # 2. Login
     res_login = client.post(
         "/api/auth/login",
-        json={"email": "manager@apexwaste.com", "password": "OperationsPass123!"},
+        json={"email": "manager@apexmfg.com", "password": "OperationsPass123!"},
     )
-    print("\n[Step 2] Authenticating Operations Manager:")
+    print("\n[Step 2] Authenticating Plant Operations Manager:")
     assert res_login.status_code == 200
     token = res_login.json()["access_token"]
     user_info = res_login.json()["user"]
     print(f"  Authenticated as: {user_info['display_name']} (Role: {user_info['role']})")
     headers = {"Authorization": f"Bearer {token}"}
 
-    # 3. Seed demo industrial waste & recycling records
-    print("\n[Step 3] Seeding Industrial Operational Records:")
+    # 3. Seed demo manufacturing operational records
+    print("\n[Step 3] Seeding Manufacturing Operational Records:")
     res_seed = client.post("/api/records/seed-demo", headers=headers)
     seed_data = res_seed.json()
     print(f"  Imported {seed_data['imported_count']} records ({seed_data['skipped_duplicates_count']} duplicates skipped)")
@@ -46,9 +46,9 @@ def run_verification():
 
     assert len(exceptions) >= 4
 
-    # 5. Pick an exception and trigger LangGraph investigation
+    # 5. Pick an exception and trigger Google Antigravity SDK investigation
     target_exc = exceptions[0]
-    print(f"\n[Step 5] Triggering LangGraph Stateful Agent Investigation for: {target_exc['title']}")
+    print(f"\n[Step 5] Triggering Google Antigravity SDK Investigation for: {target_exc['title']}")
     res_inv = client.post(
         "/api/investigations/trigger",
         json={"exception_id": target_exc["id"], "user_notes": "Operations review requested."},
@@ -56,7 +56,7 @@ def run_verification():
     )
     assert res_inv.status_code == 200
     inv = res_inv.json()
-    print("  LangGraph Workflow Status:", inv["status"])
+    print("  Antigravity Swarm Investigation Status:", inv["status"])
     print(f"  Agent Evidence Confidence: {inv['confidence'] * 100:.1f}%")
     print("\n  Root Cause Findings:")
     print("   ", inv["findings"][:180] + "...")

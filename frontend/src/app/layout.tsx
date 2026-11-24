@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
-  title: "Opsera AI | Autonomous Operations Agent Platform",
-  description: "Discrepancy reconciliation, revenue protection, and multi-agent operations intelligence for industrial services and hauling",
+  title: "Opsera — Manufacturing Operations Agent Swarm",
+  description:
+    "Google Antigravity SDK powered AI swarm for manufacturing cost savings, reclaimed hours, drag-and-drop workflow builder, and Google Docs/Sheets connectivity.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-50">
+      <body className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}>
         {children}
       </body>
     </html>

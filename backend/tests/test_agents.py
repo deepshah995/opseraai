@@ -1,111 +1,126 @@
-def test_list_agents_and_tutorials(client, auth_headers):
-    # Test 1: List all 5 specialized agents (including ReportBeacon reporting agent)
+def test_list_manufacturing_agents_and_tutorials(client, auth_headers):
     res = client.get("/api/agents", headers=auth_headers)
     assert res.status_code == 200
     agents = res.json()
     assert len(agents) == 5
-    agent_ids = [a["id"] for a in agents]
-    assert "ticket_hawk" in agent_ids
-    assert "dispatch_pulse" in agent_ids
-    assert "bill_sentry" in agent_ids
-    assert "ops_beacon" in agent_ids
-    assert "dispute_shield" in agent_ids
 
-    # Verify cool names
-    names = [a["name"] for a in agents]
-    assert "TicketHawk" in names
-    assert "DispatchPulse" in names
-    assert "BillSentry" in names
-    assert "ReportBeacon" in names
-    assert "DisputeShield" in names
+    ids = {a["id"] for a in agents}
+    assert ids == {
+        "bom_guard",
+        "cost_sentry",
+        "line_pulse",
+        "quality_shield",
+        "plant_beacon",
+    }
 
-    # Test 2: Get tutorials for all agents
-    res_tut = client.get("/api/agents/tutorials", headers=auth_headers)
-    assert res_tut.status_code == 200
-    tutorials = res_tut.json()
+    for agent in agents:
+        assert agent["name"]
+        assert agent["code_name"]
+        assert agent["cost_savings_focus"]
+        assert agent["time_saved_per_task_mins"] > 0
+        assert isinstance(agent["inputs"], list) and len(agent["inputs"]) > 0
+        assert isinstance(agent["outputs"], list) and len(agent["outputs"]) > 0
+
+    tut_res = client.get("/api/agents/tutorials", headers=auth_headers)
+    assert tut_res.status_code == 200
+    tutorials = tut_res.json()
     assert len(tutorials) == 5
+    for tut in tutorials:
+        assert len(tut["tutorial_steps"]) > 0
 
-    # Test 3: Run TicketHawk simulation
-    run_res = client.post("/api/agents/ticket_hawk/run", json={"scenario_id": "th_scale_overestimate"}, headers=auth_headers)
-    assert run_res.status_code == 200
-    th_data = run_res.json()
-    assert th_data["agent_name"] == "TicketHawk"
-    assert th_data["status"] == "completed"
-    assert th_data["proposed_resolution"]["action_type"] == "credit_memo"
 
-    # Test 4: Run DispatchPulse simulation
-    dp_res = client.post("/api/agents/dispatch_pulse/run", json={"scenario_id": "dp_truck_swap"}, headers=auth_headers)
-    assert dp_res.status_code == 200
-    dp_data = dp_res.json()
-    assert dp_data["agent_name"] == "DispatchPulse"
-    assert dp_data["proposed_resolution"]["action_type"] == "dispatch_adjustment"
+def test_legacy_agent_aliases_work(client, auth_headers):
+    for alias, canonical in (
+        ("ticket_hawk", "bom_guard"),
+        ("dispatch_pulse", "line_pulse"),
+        ("bill_sentry", "cost_sentry"),
+        ("ops_beacon", "plant_beacon"),
+        ("dispute_shield", "quality_shield"),
+    ):
+        res = client.get(f"/api/agents/{alias}", headers=auth_headers)
+        assert res.status_code == 200
+        assert res.json()["id"] == canonical
 
-    # Test 5: Run BillSentry simulation
-    bs_res = client.post("/api/agents/bill_sentry/run", json={"scenario_id": "bs_rate_mismatch"}, headers=auth_headers)
-    assert bs_res.status_code == 200
-    bs_data = bs_res.json()
-    assert bs_data["agent_name"] == "BillSentry"
-    assert bs_data["proposed_resolution"]["action_type"] == "credit_memo"
 
-    # Test 6: Run ReportBeacon report
-    ob_res = client.post("/api/agents/ops_beacon/report", json={"timeframe": "Last 7 Days"}, headers=auth_headers)
-    assert ob_res.status_code == 200
-    ob_data = ob_res.json()
-    assert ob_data["agent_name"] == "ReportBeacon"
-    assert "health_score_pct" in ob_data
-    assert "kpis" in ob_data
+def test_run_manufacturing_agents_with_scenarios(client, auth_headers):
+    agents = client.get("/api/agents", headers=auth_headers).json()
+    for agent in agents:
+        agent_id = agent["id"]
+        scenarios = agent.get("sample_scenarios", [])
+        scenario_id = scenarios[0]["scenario_id"] if scenarios else None
 
-    # Test 7: Run DisputeShield dispute resolution
-    ds_res = client.post("/api/agents/dispute_shield/resolve", json={
-        "customer_name": "Apex Manufacturing Corp",
-        "dispute_claim": "Customer says 6.8 tons was overcharged and scale receipt shows 4.0 tons.",
-        "disputed_invoice_ref": "INV-9020",
-        "disputed_amount": 140.0,
-    }, headers=auth_headers)
-    assert ds_res.status_code == 200
-    ds_data = ds_res.json()
-    assert ds_data["agent_name"] == "DisputeShield"
-    assert "customer_resolution_letter" in ds_data
-    assert ds_data["claim_is_valid"] is True
+        run_res = client.post(
+            f"/api/agents/{agent_id}/run",
+            json={"scenario_id": scenario_id},
+            headers=auth_headers,
+        )
+        assert run_res.status_code == 200, f"Failed running {agent_id}: {run_res.text}"
+        data = run_res.json()
+        assert data["agent_id"] == agent_id
 
-    # Test 8: Chat with AI Agent (TicketHawk)
+
+def test_plant_beacon_report_and_quality_shield_dispute(client, auth_headers):
+    rep_res = client.post(
+        "/api/agents/plant_beacon/report",
+        json={"timeframe": "Last 30 Days"},
+        headers=auth_headers,
+    )
+    assert rep_res.status_code == 200
+    rep = rep_res.json()
+    assert rep["agent_id"] == "plant_beacon"
+    assert "kpis" in rep
+    assert "hours_saved" in rep["kpis"]
+    assert "executive_summary" in rep
+
+    dispute_res = client.post(
+        "/api/agents/quality_shield/resolve",
+        json={
+            "customer_name": "Apex Construction & Metals",
+            "dispute_claim": "Raw steel bar delivery on PO-4401 was overbilled vs contracted rate.",
+            "disputed_invoice_ref": "INV-9021",
+            "disputed_amount": 900.0,
+        },
+        headers=auth_headers,
+    )
+    assert dispute_res.status_code == 200
+    disp = dispute_res.json()
+    assert disp["agent_id"] == "quality_shield"
+    assert disp["customer_resolution_letter"]
+
+
+def test_analytics_batch_resolve_and_antigravity_chat(client, auth_headers):
+    client.post("/api/records/seed-demo", headers=auth_headers)
+
+    analytics_res = client.get("/api/agents/resolution-analytics", headers=auth_headers)
+    assert analytics_res.status_code == 200
+    analytics = analytics_res.json()
+    assert analytics["kpis"]["hours_saved"] >= 0
+    assert set(analytics["agent_performance"].keys()) == {
+        "bom_guard",
+        "line_pulse",
+        "cost_sentry",
+        "plant_beacon",
+        "quality_shield",
+    }
+
+    batch_res = client.post("/api/agents/resolve-batch", headers=auth_headers)
+    assert batch_res.status_code == 200
+    batch = batch_res.json()
+    assert "processed_count" in batch
+    assert "total_hours_saved" in batch
+
+    llm_res = client.get("/api/agents/llm-status", headers=auth_headers)
+    assert llm_res.status_code == 200
+    llm_data = llm_res.json()
+    assert llm_data["sdk"] == "Google Antigravity SDK"
+
     chat_res = client.post(
-        "/api/agents/ticket_hawk/chat",
-        json={"message": "Tell me a funny operations joke!"},
-        headers=auth_headers
+        "/api/agents/cost_sentry/chat",
+        json={"message": "Summarize open cost savings and pending approvals"},
+        headers=auth_headers,
     )
     assert chat_res.status_code == 200
-    chat_data = chat_res.json()
-    assert chat_data["agent_name"] == "TicketHawk"
-    assert "response" in chat_data
-    assert "funny_action" in chat_data
-    assert len(chat_data["linked_systems_active"]) > 0
-
-    # Test 9: Resolution Analytics endpoint
-    res_analytics = client.get("/api/agents/resolution-analytics", headers=auth_headers)
-    assert res_analytics.status_code == 200
-    analytics_data = res_analytics.json()
-    assert "kpis" in analytics_data
-    assert "agent_performance" in analytics_data
-    assert "ticket_hawk" in analytics_data["agent_performance"]
-    assert "dispatch_pulse" in analytics_data["agent_performance"]
-    assert "bill_sentry" in analytics_data["agent_performance"]
-    assert "ops_beacon" in analytics_data["agent_performance"]
-    assert "dispute_shield" in analytics_data["agent_performance"]
-    assert "facilities" in analytics_data
-
-    # Test 10: Run Agents in action to auto-resolve open exceptions
-    res_batch = client.post("/api/agents/resolve-batch", headers=auth_headers)
-    assert res_batch.status_code == 200
-    batch_data = res_batch.json()
-    assert "processed_count" in batch_data
-    assert "resolutions" in batch_data
-
-    # Test 11: LLM provider status check
-    llm_status_res = client.get("/api/agents/llm-status", headers=auth_headers)
-    assert llm_status_res.status_code == 200
-    status_data = llm_status_res.json()
-    assert "provider" in status_data
-    assert "badge" in status_data
-
-
+    chat = chat_res.json()
+    assert chat["agent_id"] == "cost_sentry"
+    assert "Google Antigravity SDK" in chat["ai_provider"]
+    assert len(chat["response"]) > 10

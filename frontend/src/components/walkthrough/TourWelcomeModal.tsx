@@ -2,18 +2,12 @@
 
 import React from "react";
 import {
-  Sparkles,
-  Bot,
-  Scale,
-  CheckCircle,
+  BookOpen,
   FileSpreadsheet,
-  ArrowRight,
+  GitBranch,
+  Play,
+  Sparkles,
   X,
-  ShieldCheck,
-  RefreshCw,
-  Database,
-  BarChart3,
-  Layers,
 } from "lucide-react";
 
 interface TourWelcomeModalProps {
@@ -22,114 +16,94 @@ interface TourWelcomeModalProps {
   onStartTour: () => void;
 }
 
-export const TourWelcomeModal: React.FC<TourWelcomeModalProps> = ({
+export function TourWelcomeModal({
   isOpen,
   onClose,
   onStartTour,
-}) => {
+}: TourWelcomeModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-xl bg-slate-900 border border-blue-500/30 rounded-3xl shadow-2xl p-6 sm:p-8 text-white overflow-hidden">
-        {/* Glow ambient background accents */}
-        <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-blue-600/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-purple-600/20 blur-3xl pointer-events-none" />
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          title="Skip tour"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Header */}
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-mono font-bold tracking-wider uppercase">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
-            <span>Interactive Opsera AI Tour</span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-bold text-blue-700">
+            <Sparkles className="h-4 w-4" />
+            Opsera Manufacturing Swarm · Quick Tour
           </div>
-
-          <h2 className="text-2xl font-bold text-white tracking-tight">
-            Autonomous Reconciliation & AI Agent Operations
-          </h2>
-
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Take a 1-minute guided tour to explore how Opsera AI audits scale slips, coordinates 5 specialized AI agents, generates executive briefings, and delivers 1-click human-approved resolutions.
-          </p>
-        </div>
-
-        {/* Tour Highlights */}
-        <div className="my-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
-              <Database className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white">1. Real Scale & ERP Data</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                Pre-loaded with landfill scale slips, customer billing invoices, and signed driver handheld tickets.
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
-              <Bot className="w-4 h-4 text-purple-400" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white">2. Live AI Agents Fleet</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                Meet TicketHawk, BillSentry, OpsBeacon, and DisputeShield with animated character avatars & live chat.
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
-              <BarChart3 className="w-4 h-4 text-indigo-400" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white">3. Report Console & KPIs</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                OpsBeacon synthesizes margin leakage across facilities into automated executive KPI briefings.
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white">4. 1-Click Human Governance</div>
-              <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                AI proposes mathematically proven fixes. Managers review evidence side-by-side and approve with 1 click.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-white/10">
           <button
+            type="button"
             onClick={onClose}
-            className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer py-2 px-3"
+            aria-label="Close welcome modal"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            I'll Explore on My Own
+            <X className="h-4 w-4" />
           </button>
+        </div>
 
+        <div className="p-6 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">
+            Welcome to Your Manufacturing Agent Swarm
+          </h2>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Built with the Google Antigravity SDK to find cost leaks, reclaim engineering &amp;
+            finance hours, and connect directly with your plant&apos;s tools.
+          </p>
+
+          <div className="space-y-2.5 text-xs">
+            <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+              <FileSpreadsheet className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-bold text-slate-900">Google Sheets, Docs &amp; ERP Sync</p>
+                <p className="text-slate-600 mt-0.5">
+                  Import receiving scale slips, POs, and work orders, or export cost savings and
+                  supplier NCR briefs automatically.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+              <GitBranch className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-bold text-slate-900">Drag &amp; Drop Swarm Builder</p>
+                <p className="text-slate-600 mt-0.5">
+                  Customize workflows visually across BOMGuard, CostSentry, LinePulse,
+                  QualityShield, and PlantBeacon with a $500 manager gate.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+              <BookOpen className="h-4 w-4 text-indigo-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-bold text-slate-900">Dedicated How It Works Guide</p>
+                <p className="text-slate-600 mt-0.5">
+                  Read a plain-English breakdown of each agent&apos;s ROI or run a safe preview
+                  simulation anytime from the left sidebar.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2">
           <button
-            onClick={onStartTour}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition-all hover:scale-[1.02] cursor-pointer"
+            type="button"
+            onClick={onClose}
+            className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50"
           >
-            <span>Start Guided Tour</span>
-            <ArrowRight className="w-4 h-4" />
+            Dismiss
+          </button>
+          <button
+            type="button"
+            onClick={onStartTour}
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5"
+          >
+            <Play className="h-3.5 w-3.5" />
+            Take Guided Tour
           </button>
         </div>
       </div>
     </div>
   );
-};
+}

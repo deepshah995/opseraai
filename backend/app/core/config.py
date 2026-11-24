@@ -15,8 +15,8 @@ load_dotenv(dotenv_path=ROOT_DIR / ".env")
 logger = logging.getLogger(__name__)
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "AI Operations Exception Agent"
-    VERSION: str = "1.0.0"
+    PROJECT_NAME: str = "Opsera Manufacturing Swarm"
+    VERSION: str = "2.0.0"
     API_V1_STR: str = "/api/v1"
     
     # Server Configuration
@@ -63,10 +63,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str | None = Field(default=None)
     VERTEX_AI_PROJECT: str = Field(default="")
     VERTEX_AI_LOCATION: str = Field(default="us-central1")
-    GEMINI_MODEL: str = Field(default="gemini-2.5-flash")
+    GEMINI_MODEL: str = Field(default="gemini-4-hydrogen")
     OPENAI_MODEL: str = Field(default="gpt-4o-mini")
     USE_MOCK_LLM_IN_DEV: bool = Field(default=False)
-    AGENTIC_WORKER_URL: str = Field(default="https://opsera-agentic-1030854563974.us-central1.run.app")
+    AGENTIC_WORKER_URL: str = Field(default="")
     
     # CORS
     CORS_ORIGINS: list[str] | str = Field(
@@ -76,6 +76,7 @@ class Settings(BaseSettings):
             "http://localhost:8000",
             "http://127.0.0.1:8000",
             "https://opsera-frontend-1030854563974.us-central1.run.app",
+            "https://opsera-frontend-r7ys35tfna-uc.a.run.app",
         ]
     )
 

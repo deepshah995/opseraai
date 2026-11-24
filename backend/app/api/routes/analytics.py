@@ -38,8 +38,14 @@ def get_analytics_summary(
     at_risk_amount = sum(
         e.discrepancy_amount or 0.0
         for e in exceptions
-        if e.status not in ("resolved", "dismissed")
+        if e.status not in ("resolved", "approved", "dismissed")
     )
+    captured_savings = sum(
+        e.discrepancy_amount or 0.0
+        for e in exceptions
+        if e.status in ("resolved", "approved")
+    )
+    hours_saved_mtd = round((total_exceptions * 45.0 + records_count * 6.0) / 60.0, 1)
 
     # Investigations
     investigations = db.execute(
@@ -67,6 +73,9 @@ def get_analytics_summary(
         "awaiting_approval": awaiting_approval,
         "resolved_exceptions": resolved_exceptions,
         "at_risk_discrepancy_amount": round(at_risk_amount, 2),
+        "cost_savings_identified_usd": round(at_risk_amount + captured_savings, 2),
+        "cost_savings_captured_usd": round(captured_savings, 2),
+        "hours_saved_mtd": hours_saved_mtd,
         "average_investigation_confidence": avg_confidence,
         "pending_human_approvals": pending_approvals_count,
         "reconciliation_health_pct": round(

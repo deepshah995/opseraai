@@ -105,7 +105,7 @@ export function SettingsView() {
             <div className="flex items-start space-x-2">
               <CheckCircle className="h-4 w-4 text-emerald-600 mt-0.5" />
               <div>
-                <strong>Model Integration:</strong> Configured for Gemini 1.5 Pro via Google Cloud Vertex AI with LangGraph state checkpointing.
+                <strong>Agentic SDK Integration:</strong> Powered by Google Antigravity SDK with fail-closed tenant-scoped tool policies, Gemini reasoning, and deterministic grounded fallbacks.
               </div>
             </div>
           </div>

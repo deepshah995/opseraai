@@ -1,4 +1,8 @@
-from typing import Any, TypedDict
+"""State and Pydantic structured output schemas for the Antigravity Manufacturing Swarm."""
+
+from typing import Any, Literal, TypedDict
+
+import pydantic
 
 
 class GroundedEvidenceItem(TypedDict):
@@ -9,6 +13,7 @@ class GroundedEvidenceItem(TypedDict):
     excerpt: dict[str, Any]
     relevance_explanation: str
 
+
 class ProposedResolution(TypedDict):
     action_type: str  # 'credit_memo', 'rebill_invoice', 'dispatch_adjustment', 'dismiss_no_fault'
     recommended_action: str
@@ -16,6 +21,7 @@ class ProposedResolution(TypedDict):
     customer_reference: str | None
     affected_reference: str | None
     explanation: str
+
 
 class InvestigationState(TypedDict):
     organization_id: str
@@ -31,4 +37,24 @@ class InvestigationState(TypedDict):
     requires_human_approval: bool
     status: str
     step_history: list[str]
+    cost_savings_usd: float
+    time_saved_minutes: float
+    sdk_metadata: dict[str, Any]
     error: str | None
+
+
+class ProposedResolutionModel(pydantic.BaseModel):
+    action_type: Literal["credit_memo", "rebill_invoice", "dispatch_adjustment", "dismiss_no_fault"]
+    recommended_action: str
+    proposed_amount: float | None = None
+    customer_reference: str | None = None
+    affected_reference: str | None = None
+    explanation: str
+
+
+class InvestigationOutputSchema(pydantic.BaseModel):
+    """Structured output enforced via Google Antigravity LocalAgentConfig(response_schema=...)."""
+
+    root_cause_analysis: str
+    confidence_score: float = pydantic.Field(ge=0.0, le=1.0)
+    proposed_resolution: ProposedResolutionModel

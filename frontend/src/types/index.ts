@@ -164,6 +164,9 @@ export interface AnalyticsSummary {
   awaiting_approval: number;
   resolved_exceptions: number;
   at_risk_discrepancy_amount: number;
+  cost_savings_identified_usd?: number;
+  cost_savings_captured_usd?: number;
+  hours_saved_mtd?: number;
   average_investigation_confidence: number;
   pending_human_approvals: number;
   reconciliation_health_pct: number;
@@ -196,12 +199,17 @@ export interface AgentDefinition {
   specialization: string;
   reconciles_records: string[];
   exception_types_handled: string[];
+  cost_savings_focus?: string;
+  time_saved_per_task_mins?: number;
+  inputs?: string[];
+  outputs?: string[];
   key_metrics: {
     accuracy_rate: string;
     avg_resolution_time?: string;
     avg_generation_time?: string;
     avg_draft_time?: string;
     recovered_leakage_mtd?: string;
+    hours_saved_mtd?: string;
     schedule_divergence_caught?: string;
     revenue_leakage_prevented?: string;
     kpi_categories_analyzed?: string;
@@ -212,6 +220,12 @@ export interface AgentDefinition {
   simple_summary: string;
   active_issues_count?: number;
   full_tutorial?: Array<{
+    step: number;
+    title: string;
+    explanation: string;
+    papers_compared: string[];
+  }>;
+  tutorial_steps?: Array<{
     step: number;
     title: string;
     explanation: string;
@@ -269,7 +283,9 @@ export interface AgentRunResult {
   status: string;
   confidence_score?: number;
   reasoning_steps?: string[];
+  reasoning_chain?: string[];
   root_cause_analysis?: string;
+  dispute_rationale?: string;
   divergences_identified?: string[];
   evidence_citations?: Array<{
     reference: string;
@@ -327,6 +343,7 @@ export interface AgentPerformanceDetail {
   resolved_count?: number;
   recovered_usd?: number;
   at_risk_usd?: number;
+  hours_saved?: number;
   avg_confidence?: number;
   status: string;
   health_score?: number;
@@ -368,6 +385,7 @@ export interface ResolutionAnalytics {
     total_leakage_usd: number;
     recovered_usd: number;
     at_risk_usd: number;
+    hours_saved?: number;
     avg_resolution_cycle_seconds: number;
     manual_benchmark_days: number;
     efficiency_gain_pct: number;
@@ -383,6 +401,7 @@ export interface BatchResolutionResponse {
   auto_resolved: number;
   awaiting_approval: number;
   total_recovered_usd: number;
+  total_hours_saved?: number;
   resolutions: Array<{
     exception_id: string;
     title: string;
@@ -393,6 +412,114 @@ export interface BatchResolutionResponse {
     verdict: string;
     action_desc: string;
   }>;
+}
+
+export type WorkflowNodeKind = "connector_input" | "agent" | "approval_gate" | "connector_output";
+
+export type WorkflowEdgeCondition =
+  | "always"
+  | "if_variance_gt_500"
+  | "if_discrepancy_found"
+  | "auto_settle_below_500";
+
+export interface WorkflowNode {
+  id: string;
+  kind: WorkflowNodeKind;
+  ref_id: string;
+  agent_id?: string | null;
+  label: string;
+  subtitle?: string | null;
+  x: number;
+  y: number;
+  config: Record<string, any>;
+}
+
+export interface WorkflowEdge {
+  id: string;
+  source: string;
+  target: string;
+  condition: WorkflowEdgeCondition;
+  label?: string | null;
+}
+
+export interface SwarmWorkflow {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string;
+  category: "cost_savings" | "time_savings" | "quality" | "production" | "full_swarm" | string;
+  is_template: boolean;
+  is_active: boolean;
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+  estimated_cost_savings_usd: number;
+  estimated_hours_saved_monthly: number;
+  last_run_at?: string | null;
+  last_run_summary?: {
+    cost_savings_usd?: number;
+    hours_saved?: number;
+    status?: string;
+    steps_count?: number;
+  } | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SwarmRunStep {
+  node_id: string;
+  label: string;
+  kind: WorkflowNodeKind;
+  status: string;
+  summary: string;
+  cost_savings_usd: number;
+  time_saved_minutes: number;
+}
+
+export interface SwarmRun {
+  id: string;
+  workflow_id: string;
+  workflow_name: string;
+  status: string;
+  sdk: string;
+  total_cost_savings_usd: number;
+  total_time_saved_minutes: number;
+  total_hours_saved: number;
+  orchestrator_summary: string;
+  steps: SwarmRunStep[];
+  exported_artifacts: Array<{
+    type: string;
+    title: string;
+    preview?: string;
+  }>;
+  sdk_metadata: Record<string, any>;
+  created_at: string;
+}
+
+export type ConnectorType =
+  | "google_sheets"
+  | "google_docs"
+  | "erp_database"
+  | "slack_webhook"
+  | "email_digest";
+
+export interface AppConnector {
+  id: string;
+  organization_id: string;
+  connector_type: ConnectorType | string;
+  name: string;
+  description: string;
+  sync_direction: "import" | "export" | "bidirectional" | string;
+  status: "connected" | "ready" | "error" | "paused" | string;
+  external_url?: string | null;
+  resource_id?: string | null;
+  config: Record<string, any>;
+  has_credentials: boolean;
+  secret_preview?: string | null;
+  last_synced_at?: string | null;
+  records_synced: number;
+  last_sync_summary?: Record<string, any> | null;
+  created_at: string;
+  updated_at: string;
 }
 
 
