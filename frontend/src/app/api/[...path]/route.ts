@@ -47,12 +47,17 @@ async function handleProxy(
     const resHeaders = new Headers();
     res.headers.forEach((val, key) => {
       const lower = key.toLowerCase();
-      if (lower !== "content-encoding" && lower !== "content-length") {
+      if (
+        lower !== "content-encoding" &&
+        lower !== "content-length" &&
+        lower !== "transfer-encoding"
+      ) {
         resHeaders.set(key, val);
       }
     });
 
-    const resBody = await res.arrayBuffer();
+    const isNullBodyStatus = res.status === 204 || res.status === 205 || res.status === 304;
+    const resBody = isNullBodyStatus ? null : await res.arrayBuffer();
     return new NextResponse(resBody, {
       status: res.status,
       statusText: res.statusText,

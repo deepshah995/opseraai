@@ -61,7 +61,14 @@ class ApiClient {
       const errorBody = await res.json().catch(() => ({ detail: res.statusText }));
       throw new Error(errorBody.detail || `HTTP ${res.status}: ${res.statusText}`);
     }
-    return res.json();
+    if (res.status === 204 || res.status === 205) {
+      return undefined as T;
+    }
+    const rawText = await res.text();
+    if (!rawText) {
+      return undefined as T;
+    }
+    return JSON.parse(rawText) as T;
   }
 
   // --- Analytics ---
