@@ -192,14 +192,14 @@ export function AgentFleetStudio({
   return (
     <div className="space-y-4">
       {/* Compact SDK Status Strip */}
-      <div className="bg-white rounded-xl border border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+      <div className="bg-white rounded-2xl border border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
         <div className="flex items-center gap-2.5 text-xs">
-          <span className="inline-flex items-center gap-1.5 font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
-            <Sparkles className="h-3.5 w-3.5" />
+          <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
             {sdkBadge}
           </span>
           <span className="text-slate-500">
-            Model: <strong className="text-slate-700">{sdkModel}</strong>
+            Model: <strong className="text-slate-900 font-mono text-[11px]">{sdkModel}</strong>
           </span>
           <span className="hidden sm:inline text-slate-300">|</span>
           <span className="hidden sm:inline text-slate-500">
@@ -211,7 +211,7 @@ export function AgentFleetStudio({
           <button
             type="button"
             onClick={onNavigateToReports}
-            className="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1"
+            className="text-xs font-semibold text-emerald-700 hover:underline flex items-center gap-1"
           >
             <BarChart3 className="h-3.5 w-3.5" />
             Open Plant ROI Reports &rarr;
@@ -350,7 +350,7 @@ export function AgentFleetStudio({
                   <button
                     type="button"
                     onClick={() => onLaunchConsole(selectedAgent)}
-                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 text-xs font-semibold rounded-full bg-emerald-600 text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-colors"
                   >
                     <Play className="h-3.5 w-3.5" />
                     Run Check
@@ -499,7 +499,7 @@ export function AgentFleetStudio({
               <button
                 type="submit"
                 disabled={sending || !draftInput.trim()}
-                className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1.5"
+                className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold disabled:opacity-50 flex items-center gap-1.5 transition-colors shadow-xs"
               >
                 <Send className="h-3.5 w-3.5" />
                 Send

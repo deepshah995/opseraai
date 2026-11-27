@@ -239,12 +239,16 @@ export function ConnectorsView() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div className="hero-aura rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">App Connectors Hub</h2>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Connect Google Sheets, Google Docs, your Manufacturing ERP, and Slack so the Agent Swarm
-            reads live floor data and publishes reports automatically.
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800 mb-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Two-Way Workspace Sync
+          </span>
+          <h2 className="font-display text-lg font-bold text-slate-950">App Connectors Hub</h2>
+          <p className="text-sm text-slate-600 mt-0.5">
+            Connect Google Sheets, Google Docs, your Manufacturing ERP, and Slack so your Faktry AI
+            Swarm reads live floor data and publishes reports automatically.
           </p>
         </div>
 
@@ -252,7 +256,7 @@ export function ConnectorsView() {
           <button
             type="button"
             onClick={() => loadConnectors(selectedId || undefined)}
-            className="px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 flex items-center gap-1.5"
+            className="px-3.5 py-2 text-xs font-semibold rounded-full border border-slate-200 text-slate-700 bg-white hover:border-slate-300 hover:bg-slate-50 flex items-center gap-1.5"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Refresh
@@ -260,7 +264,7 @@ export function ConnectorsView() {
           <button
             type="button"
             onClick={() => setShowAddForm((prev) => !prev)}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm"
+            className="px-4 py-2 text-xs font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors"
           >
             <Plus className="h-3.5 w-3.5" />
             Add App Connector

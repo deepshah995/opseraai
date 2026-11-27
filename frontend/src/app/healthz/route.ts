@@ -3,5 +3,5 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ status: "healthy", service: "opsera-frontend" });
+  return NextResponse.json({ status: "healthy", service: "faktry-frontend" });
 }

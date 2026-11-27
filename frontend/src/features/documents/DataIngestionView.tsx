@@ -734,7 +734,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
                 Database Schema & Template Matcher
               </h3>
               <p className="text-xs text-slate-500 mb-4">
-                Select a table to align its columns with the Opsera AI template format before importing.
+                Select a table to align its columns with the Faktry AI template format before importing.
               </p>
 
               {!dbConnected ? (
@@ -789,7 +789,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
                       <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/30">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                            Match Database Columns to Opsera AI Template
+                            Match Database Columns to Faktry AI Template
                           </h4>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                             isDbTemplateValid 
@@ -869,7 +869,7 @@ export function DataIngestionView({ documents, onRefresh }: DataIngestionViewPro
                       <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
                         <span className="text-xs text-slate-500">
                           {isDbTemplateValid 
-                            ? "✅ Schema format verified against Opsera AI template."
+                            ? "✅ Schema format verified against Faktry AI template."
                             : "⚠️ Please assign columns for Ticket/Invoice # and Customer Name."}
                         </span>
 

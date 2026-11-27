@@ -15,7 +15,7 @@ load_dotenv(dotenv_path=ROOT_DIR / ".env")
 logger = logging.getLogger(__name__)
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Opsera Manufacturing Swarm"
+    PROJECT_NAME: str = "Faktry AI Manufacturing Swarm"
     VERSION: str = "2.0.0"
     API_V1_STR: str = "/api/v1"
     
@@ -75,8 +75,9 @@ class Settings(BaseSettings):
             "http://127.0.0.1:3000",
             "http://localhost:8000",
             "http://127.0.0.1:8000",
-            "https://opsera-frontend-1030854563974.us-central1.run.app",
-            "https://opsera-frontend-r7ys35tfna-uc.a.run.app",
+            "https://faktry-frontend-1030854563974.us-central1.run.app",
+            "https://faktry.ai",
+            "https://www.faktry.ai",
         ]
     )
 

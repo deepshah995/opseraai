@@ -12,6 +12,7 @@ import { RecordsListView } from "@/features/records/RecordsListView";
 import { AuditTrailView } from "@/features/audit/AuditTrailView";
 import { SettingsView } from "@/features/settings/SettingsView";
 import { AgentsHubView } from "@/features/agents/AgentsHubView";
+import { SwarmBuilderView } from "@/features/agents/SwarmBuilderView";
 import { ReportingAgentView } from "@/features/reporting/ReportingAgentView";
 import { ConnectorsView } from "@/features/connectors/ConnectorsView";
 import { HowItWorksView } from "@/features/guide/HowItWorksView";
@@ -34,6 +35,7 @@ export default function Home() {
   const [currentTab, setCurrentTab] = useState<NavTab>("dashboard");
   const [selectedExceptionId, setSelectedExceptionId] = useState<string | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>(undefined);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
 
   // Tour States
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
@@ -75,6 +77,10 @@ export default function Home() {
         ];
         
         const candidate = (hash || path) as NavTab;
+        const wfParam = new URLSearchParams(window.location.search).get("workflow");
+        if (wfParam) {
+          setSelectedWorkflowId(wfParam);
+        }
         if (candidate && validTabs.includes(candidate)) {
           setCurrentTab(candidate);
           setIsWelcomeModalOpen(false);
@@ -177,7 +183,7 @@ export default function Home() {
   const openExceptionsCount = exceptions.filter((e) => e.status === "open" || e.status === "awaiting_approval").length;
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="flex min-h-screen flex-col bg-[#f8fafc]">
       <Navbar 
         onRefresh={loadData}
         onStartTour={() => setIsWelcomeModalOpen(true)}
@@ -200,7 +206,11 @@ export default function Home() {
           pendingApprovalsCount={pendingApprovalsCount}
         />
 
-        <main className="flex-1 p-8 overflow-y-auto">
+        <main
+          className={`flex-1 overflow-y-auto ${
+            currentTab === "builder" ? "p-4 lg:p-6" : "p-8"
+          }`}
+        >
           {currentTab === "dashboard" && (
             <DashboardView
               summary={summary}
@@ -225,14 +235,8 @@ export default function Home() {
           )}
 
           {currentTab === "builder" && (
-            <AgentsHubView
-              summary={summary}
-              exceptions={exceptions}
-              onRefreshData={loadData}
-              onSelectException={handleSelectException}
-              initialSelectedAgentId={selectedAgentId}
-              initialTab="builder"
-              onNavigateToReports={() => handleTabChange("reports")}
+            <SwarmBuilderView
+              initialWorkflowId={selectedWorkflowId}
               onNavigateTab={(t) => handleTabChange(t as NavTab)}
             />
           )}

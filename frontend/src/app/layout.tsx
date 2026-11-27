@@ -1,13 +1,29 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Opsera — Manufacturing Operations Agent Swarm",
+  title: "Faktry AI — Manufacturing Operations Agent Swarm",
   description:
-    "Google Antigravity SDK powered AI swarm for manufacturing cost savings, reclaimed hours, drag-and-drop workflow builder, and Google Docs/Sheets connectivity.",
+    "Faktry AI powered manufacturing operations swarm for cost savings, reclaimed hours, drag-and-drop workflow design, and Google Docs/Sheets sync.",
 };
 
 export default function RootLayout({
@@ -16,8 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className="font-sans bg-white text-slate-950 antialiased selection:bg-emerald-100 selection:text-slate-950">
         {children}
       </body>
     </html>

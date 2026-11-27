@@ -110,19 +110,22 @@ export function HowItWorksView({
   return (
     <div className="space-y-6 max-w-6xl mx-auto animate-in fade-in duration-300">
       {/* Calm Plain-English Hero */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
+      <div className="hero-aura rounded-2xl border border-slate-200/80 p-6 md:p-8 shadow-2xs">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-2xl space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold">
-              <Sparkles className="h-3.5 w-3.5" />
-              Powered by Google Antigravity SDK
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+              Faktry AI · Powered by Google Antigravity SDK
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              How Your Manufacturing Agent Swarm Works
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
+              How Your Manufacturing{" "}
+              <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                Agent Swarm Works
+              </span>
             </h1>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Opsera connects your plant spreadsheets, ERP work orders, and supplier invoices to a
-              team of five focused AI agents. Together, they catch hidden cost leaks (short
+              Faktry AI connects your plant spreadsheets, ERP work orders, and supplier invoices to a
+              team of five friendly AI agents. Together, they catch hidden cost leaks (short
               deliveries, overbilling, duplicate invoices, unlogged shop-floor runs) and eliminate
               manual spreadsheet chasing — while always keeping your managers in charge of approvals.
             </p>
@@ -134,7 +137,7 @@ export function HowItWorksView({
                 <button
                   type="button"
                   onClick={() => onNavigateTab("builder")}
-                  className="px-4 py-2.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center gap-2 shadow-sm"
+                  className="px-5 py-2.5 text-xs font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2 shadow-xs transition-colors"
                 >
                   <GitBranch className="h-4 w-4" />
                   Open Drag &amp; Drop Builder
@@ -142,7 +145,7 @@ export function HowItWorksView({
                 <button
                   type="button"
                   onClick={() => onNavigateTab("connectors")}
-                  className="px-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 flex items-center justify-center gap-2"
+                  className="px-5 py-2.5 text-xs font-semibold rounded-full border border-slate-200 bg-white hover:border-emerald-300 hover:bg-slate-50 text-slate-800 flex items-center justify-center gap-2 transition-colors"
                 >
                   <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
                   Connect Google Sheets / Docs
@@ -198,13 +201,13 @@ export function HowItWorksView({
       </div>
 
       {/* Interactive 10-Second Simulation */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-sm space-y-4">
+      <div className="brand-gradient-card text-white rounded-2xl p-6 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-base font-bold">
+            <h2 className="font-display text-base font-bold">
               Try a Safe Preview Run on Your Current Plant Data
             </h2>
-            <p className="text-xs text-slate-300 mt-1">
+            <p className="text-xs text-slate-200/90 mt-1">
               Runs the default 3-Way Cost Saver Swarm workflow in preview mode (makes zero
               changes to database statuses) so you can see cost &amp; time savings immediately.
             </p>
@@ -213,7 +216,7 @@ export function HowItWorksView({
             type="button"
             onClick={handleRunDrySimulation}
             disabled={simulating}
-            className="px-4 py-2.5 text-xs font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center gap-2 disabled:opacity-60 shrink-0"
+            className="px-5 py-2.5 text-xs font-semibold rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center gap-2 disabled:opacity-60 shrink-0 shadow-xs transition-colors"
           >
             {simulating ? (
               <RefreshCw className="h-4 w-4 animate-spin" />

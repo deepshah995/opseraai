@@ -120,7 +120,7 @@ export default function ProspectAuditPreviewPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex items-center gap-3 text-sm text-slate-700">
           <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />
-          <span>Loading custom Opsera Ops Audit Preview...</span>
+          <span>Loading custom Faktry AI Ops Audit Preview...</span>
         </div>
       </div>
     );
@@ -134,13 +134,13 @@ export default function ProspectAuditPreviewPage() {
           <h1 className="text-lg font-bold text-slate-900">Audit Preview Unavailable</h1>
           <p className="text-xs text-slate-600 leading-relaxed">
             {error || "This custom manufacturing preview link was not found."} You can still explore
-            the full live Opsera Manufacturing Operations Swarm workspace below.
+            the full live Faktry AI Manufacturing Operations Swarm workspace below.
           </p>
           <Link
             href="/"
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white"
           >
-            Open Live Opsera Workspace
+            Open Live Faktry AI Workspace
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -160,7 +160,7 @@ export default function ProspectAuditPreviewPage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-bold text-sm text-slate-900 truncate">
-                Opsera Manufacturing AI
+                Faktry AI Manufacturing
               </span>
               <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 Zero ERP Replacement Sidecar
@@ -219,7 +219,7 @@ export default function ProspectAuditPreviewPage() {
                 <Play className="h-4 w-4" />
                 {simStep >= 0 && !simDone
                   ? "Running Swarm Preview..."
-                  : "Simulate Opsera Sidecar Run"}
+                  : "Simulate Faktry AI Sidecar Run"}
               </button>
               <Link
                 href="/guide"
@@ -313,7 +313,7 @@ export default function ProspectAuditPreviewPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-slate-900">
-                Recommended Opsera Agents for {preview.company_name}
+                Recommended Faktry AI Agents for {preview.company_name}
               </h2>
               <p className="text-xs text-slate-500">
                 Mapped directly from {preview.company_name}&apos;s plant footprint and system signals
@@ -449,7 +449,7 @@ export default function ProspectAuditPreviewPage() {
                 href="/"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold"
               >
-                Explore Live Interactive Opsera Demo
+                Explore Live Interactive Faktry AI Demo
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>

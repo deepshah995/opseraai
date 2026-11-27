@@ -30,6 +30,7 @@ interface AgentsHubViewProps {
   onSelectException?: (id: string) => void;
   initialSelectedAgentId?: string;
   initialTab?: "fleet" | "studio" | "builder" | "workbench";
+  initialWorkflowId?: string | null;
   onNavigateToReports?: () => void;
   onNavigateTab?: (tab: string) => void;
 }
@@ -40,6 +41,7 @@ export function AgentsHubView({
   onRefreshData,
   initialSelectedAgentId,
   initialTab = "studio",
+  initialWorkflowId = null,
   onNavigateToReports,
   onNavigateTab,
 }: AgentsHubViewProps) {
@@ -112,26 +114,31 @@ export function AgentsHubView({
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
-      {/* Clean Header Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      {/* Clean Header Bar (hidden in Drag & Drop Builder to keep workspace uncluttered) */}
+      {activeSubTab !== "builder" && (
+        <div className="hero-aura rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800 mb-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Faktry AI Agent Board
+          </span>
+          <h2 className="font-display text-lg font-bold text-slate-950">
             Manufacturing Swarm Studio
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-600 mt-0.5">
             Operate your 5 specialized manufacturing agents, chat with live plant records, or
             design custom drag-and-drop orchestrations.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="hidden sm:flex items-center gap-4 px-3.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+          <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-full bg-white border border-slate-200 text-xs shadow-2xs tabular-nums">
             <span className="flex items-center gap-1 font-semibold text-emerald-700">
               <DollarSign className="h-3.5 w-3.5" />
               ${openSavings.toLocaleString()} Identified
             </span>
             <span className="text-slate-300">|</span>
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold text-slate-800">
               ${capturedSavings.toLocaleString()} Captured
             </span>
             <span className="text-slate-300">|</span>
@@ -145,7 +152,7 @@ export function AgentsHubView({
             type="button"
             onClick={handleBatchResolve}
             disabled={batchRunning}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
+            className="px-4 py-2 text-xs font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 flex items-center gap-1.5 shadow-xs transition-colors"
           >
             {batchRunning ? (
               <RefreshCw className="h-3.5 w-3.5 animate-spin" />
@@ -156,6 +163,7 @@ export function AgentsHubView({
           </button>
         </div>
       </div>
+      )}
 
       {/* Inline Batch Feedback */}
       {batchSummary && (
@@ -189,43 +197,43 @@ export function AgentsHubView({
       )}
 
       {/* Clean 3-Tab Navigation */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
         <button
           type="button"
           onClick={() => setActiveSubTab("studio")}
-          className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors ${
+          className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-colors ${
             activeSubTab === "studio"
-              ? "bg-slate-900 text-white"
-              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              ? "bg-slate-950 text-white shadow-xs"
+              : "bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:bg-slate-50"
           }`}
         >
-          <Bot className="h-3.5 w-3.5" />
+          <Bot className={`h-3.5 w-3.5 ${activeSubTab === "studio" ? "text-emerald-400" : ""}`} />
           Swarm Overview &amp; Chat
         </button>
 
         <button
           type="button"
           onClick={() => setActiveSubTab("builder")}
-          className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors ${
+          className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-colors ${
             activeSubTab === "builder"
-              ? "bg-slate-900 text-white"
-              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              ? "bg-slate-950 text-white shadow-xs"
+              : "bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:bg-slate-50"
           }`}
         >
-          <GitBranch className="h-3.5 w-3.5" />
+          <GitBranch className={`h-3.5 w-3.5 ${activeSubTab === "builder" ? "text-emerald-400" : ""}`} />
           Drag &amp; Drop Builder
         </button>
 
         <button
           type="button"
           onClick={() => setActiveSubTab("workbench")}
-          className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors ${
+          className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-colors ${
             activeSubTab === "workbench"
-              ? "bg-slate-900 text-white"
-              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              ? "bg-slate-950 text-white shadow-xs"
+              : "bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:bg-slate-50"
           }`}
         >
-          <Terminal className="h-3.5 w-3.5" />
+          <Terminal className={`h-3.5 w-3.5 ${activeSubTab === "workbench" ? "text-emerald-400" : ""}`} />
           Agent Test Console
         </button>
       </div>
@@ -250,7 +258,10 @@ export function AgentsHubView({
           )}
 
           {activeSubTab === "builder" && (
-            <SwarmBuilderView onNavigateTab={onNavigateTab} />
+            <SwarmBuilderView
+              onNavigateTab={onNavigateTab}
+              initialWorkflowId={initialWorkflowId}
+            />
           )}
 
           {activeSubTab === "workbench" && selectedAgent && (

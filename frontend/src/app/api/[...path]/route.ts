@@ -10,7 +10,7 @@ const getBackendUrl = () => {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
   }
   if (process.env.NODE_ENV === "production") {
-    return "https://opsera-backend-1030854563974.us-central1.run.app";
+    return "https://faktry-backend-1030854563974.us-central1.run.app";
   }
   return "http://127.0.0.1:8000";
 };

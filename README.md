@@ -1,4 +1,4 @@
-# Opsera Manufacturing Operations Agent Swarm
+# Faktry AI — Manufacturing Operations Agent Swarm
 
 An enterprise AI Operations Swarm built specifically for **manufacturing businesses** to optimize plant operations, capture cost savings, save engineering & finance hours, and connect directly with **Google Sheets, Google Docs, ERP systems, and Slack**.
 

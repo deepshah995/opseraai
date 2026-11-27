@@ -441,6 +441,15 @@ def run_workflow(
             "name": c.name,
             "status": c.status,
             "resource_id": c.resource_id,
+            "config": {
+                k: v
+                for k, v in (c.config or {}).items()
+                if not any(
+                    secret_kw in k.lower()
+                    for secret_kw in ("secret", "token", "password", "credential", "api_key", "private")
+                )
+            },
+            "last_sync_summary": c.last_sync_summary,
         }
         for c in connectors_db
     ]
@@ -481,6 +490,7 @@ def run_workflow(
             dry_run=req.dry_run,
         )
 
+    now = datetime.now(UTC)
     run_rec = SwarmRun(
         organization_id=org_id,
         workflow_id=wf.id,
@@ -493,13 +503,58 @@ def run_workflow(
         sdk_metadata=result["sdk_metadata"],
     )
     db.add(run_rec)
-    wf.last_run_at = datetime.now(UTC)
+    wf.last_run_at = now
     wf.last_run_summary = {
         "cost_savings_usd": result["total_cost_savings_usd"],
         "hours_saved": result["total_hours_saved"],
         "status": result["status"],
         "steps_count": len(result["steps"]),
     }
+
+    if not req.dry_run:
+        connectors_by_id = {c.id: c for c in connectors_db}
+        for art in result.get("exported_artifacts", []):
+            art_conn = None
+            art_conn_id = art.get("connector_id")
+            if isinstance(art_conn_id, str) and art_conn_id in connectors_by_id:
+                art_conn = connectors_by_id[art_conn_id]
+            else:
+                art_type = art.get("connector_type")
+                art_conn = next(
+                    (c for c in connectors_db if c.connector_type == art_type),
+                    None,
+                )
+            if art_conn is None:
+                continue
+
+            art_format = art.get("format") or "markdown"
+            art_conn.last_synced_at = now
+            art_conn.status = "connected"
+            art_conn.records_synced = (art_conn.records_synced or 0) + 1
+            art_conn.last_sync_summary = {
+                "mode": "export",
+                "title": art.get("title") or f"{wf.name} Export",
+                "content_type": "text/csv" if art_format == "csv" else "text/markdown",
+                "content": art.get("content") or art.get("preview") or "",
+                "synced_at": now.isoformat(),
+                "workflow_name": wf.name,
+            }
+            db.add(
+                AuditEvent(
+                    organization_id=org_id,
+                    actor_type="agent",
+                    actor_id="antigravity_swarm_orchestrator",
+                    action="connector_exported",
+                    resource_type="app_connector",
+                    resource_id=art_conn.id,
+                    action_metadata={
+                        "workflow_id": wf.id,
+                        "workflow_name": wf.name,
+                        "title": art.get("title"),
+                        "format": art_format,
+                    },
+                )
+            )
 
     audit = AuditEvent(
         organization_id=org_id,

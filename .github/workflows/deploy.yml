@@ -49,7 +49,7 @@ jobs:
   # All 3 services build and deploy concurrently
   # ==========================================
 
-  # --- 1. OPSERA BACKEND SERVICE ---
+  # --- 1. FAKTRY AI BACKEND SERVICE ---
   service-backend:
     name: "Backend: Build & Deploy"
     needs: [backend-tests]
@@ -78,12 +78,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            ${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/opsera-backend:latest
+            ${{ env.DOCKER_USER }}/faktry-backend:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/faktry-backend:latest
 
       - name: Pre-warm Google Mirror Cache
         run: |
-          curl -s -o /dev/null -w "Triggered mirror cache for opsera-backend: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/opsera-backend/manifests/${{ github.sha }}" || true
+          curl -s -o /dev/null -w "Triggered mirror cache for faktry-backend: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/faktry-backend/manifests/${{ github.sha }}" || true
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -93,13 +93,13 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy opsera-backend to Cloud Run
+      - name: Deploy faktry-backend to Cloud Run
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           sleep 15
-          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-agentic-r7ys35tfna-uc.a.run.app")
+          AGENTIC_URL=$(gcloud run services describe faktry-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://faktry-agentic-1030854563974.us-central1.run.app")
           ENV_VARS="ENVIRONMENT=production,DATABASE_URL=sqlite:////app/data/ops_agent.db,USE_MOCK_LLM_IN_DEV=false,STORAGE_BACKEND=local,LOCAL_STORAGE_DIR=/app/data/storage,AGENTIC_WORKER_URL=${AGENTIC_URL}"
           if [ -n "$GEMINI_API_KEY" ]; then
             ENV_VARS="${ENV_VARS},GEMINI_API_KEY=${GEMINI_API_KEY}"
@@ -117,10 +117,10 @@ jobs:
           fi
 
           for attempt in $(seq 1 12); do
-            echo "Attempt $attempt of 12: Deploying opsera-backend to Cloud Run..."
-            DEPLOY_CMD=(gcloud run deploy opsera-backend
+            echo "Attempt $attempt of 12: Deploying faktry-backend to Cloud Run..."
+            DEPLOY_CMD=(gcloud run deploy faktry-backend
               --project "${{ env.PROJECT_ID }}"
-              --image "docker.io/${{ env.DOCKER_USER }}/opsera-backend:${{ github.sha }}"
+              --image "docker.io/${{ env.DOCKER_USER }}/faktry-backend:${{ github.sha }}"
               --platform managed
               --region "${{ env.REGION }}"
               --allow-unauthenticated
@@ -135,7 +135,7 @@ jobs:
               DEPLOY_CMD+=("${SECRETS_ARGS[@]}")
             fi
             if "${DEPLOY_CMD[@]}"; then
-              echo "opsera-backend deployment succeeded!"
+              echo "faktry-backend deployment succeeded!"
               break
             fi
             if [ $attempt -eq 12 ]; then
@@ -147,13 +147,13 @@ jobs:
           done
 
           echo "Applying IAM invoker policy binding for public access..."
-          gcloud run services add-iam-policy-binding opsera-backend \
+          gcloud run services add-iam-policy-binding faktry-backend \
             --project ${{ env.PROJECT_ID }} \
             --region ${{ env.REGION }} \
             --member="allUsers" \
             --role="roles/run.invoker" || true
 
-  # --- 2. OPSERA AGENTIC WORKER SERVICE ---
+  # --- 2. FAKTRY AI AGENTIC WORKER SERVICE ---
   service-agentic:
     name: "Agentic Worker: Build & Deploy"
     needs: [backend-tests]
@@ -182,12 +182,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            ${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/opsera-agentic:latest
+            ${{ env.DOCKER_USER }}/faktry-agentic:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/faktry-agentic:latest
 
       - name: Pre-warm Google Mirror Cache
         run: |
-          curl -s -o /dev/null -w "Triggered mirror cache for opsera-agentic: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/opsera-agentic/manifests/${{ github.sha }}" || true
+          curl -s -o /dev/null -w "Triggered mirror cache for faktry-agentic: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/faktry-agentic/manifests/${{ github.sha }}" || true
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -197,7 +197,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy opsera-agentic to Cloud Run
+      - name: Deploy faktry-agentic to Cloud Run
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -220,10 +220,10 @@ jobs:
           fi
 
           for attempt in $(seq 1 12); do
-            echo "Attempt $attempt of 12: Deploying opsera-agentic to Cloud Run..."
-            DEPLOY_CMD=(gcloud run deploy opsera-agentic
+            echo "Attempt $attempt of 12: Deploying faktry-agentic to Cloud Run..."
+            DEPLOY_CMD=(gcloud run deploy faktry-agentic
               --project "${{ env.PROJECT_ID }}"
-              --image "docker.io/${{ env.DOCKER_USER }}/opsera-agentic:${{ github.sha }}"
+              --image "docker.io/${{ env.DOCKER_USER }}/faktry-agentic:${{ github.sha }}"
               --platform managed
               --region "${{ env.REGION }}"
               --allow-unauthenticated
@@ -238,7 +238,7 @@ jobs:
               DEPLOY_CMD+=("${SECRETS_ARGS[@]}")
             fi
             if "${DEPLOY_CMD[@]}"; then
-              echo "opsera-agentic deployment succeeded!"
+              echo "faktry-agentic deployment succeeded!"
               break
             fi
             if [ $attempt -eq 12 ]; then
@@ -250,13 +250,13 @@ jobs:
           done
 
           echo "Applying IAM invoker policy binding for public access..."
-          gcloud run services add-iam-policy-binding opsera-agentic \
+          gcloud run services add-iam-policy-binding faktry-agentic \
             --project ${{ env.PROJECT_ID }} \
             --region ${{ env.REGION }} \
             --member="allUsers" \
             --role="roles/run.invoker" || true
 
-  # --- 3. OPSERA FRONTEND SERVICE ---
+  # --- 3. FAKTRY AI FRONTEND SERVICE ---
   # Runs immediately in parallel (T=0)
   service-frontend:
     name: "Frontend: Build & Deploy"
@@ -285,12 +285,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            ${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }}
-            ${{ env.DOCKER_USER }}/opsera-frontend:latest
+            ${{ env.DOCKER_USER }}/faktry-frontend:${{ github.sha }}
+            ${{ env.DOCKER_USER }}/faktry-frontend:latest
 
       - name: Pre-warm Google Mirror Cache
         run: |
-          curl -s -o /dev/null -w "Triggered mirror cache for opsera-frontend: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/opsera-frontend/manifests/${{ github.sha }}" || true
+          curl -s -o /dev/null -w "Triggered mirror cache for faktry-frontend: %{http_code}\n" "https://mirror.gcr.io/v2/${{ env.DOCKER_USER }}/faktry-frontend/manifests/${{ github.sha }}" || true
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -300,30 +300,35 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Discover Backend URL & Deploy opsera-frontend
+      - name: Discover Backend URL & Deploy faktry-frontend
         run: |
-          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
+          BACKEND_URL=$(gcloud run services describe faktry-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
           if [ -z "$BACKEND_URL" ]; then
-            BACKEND_URL="https://opsera-backend-1030854563974.us-central1.run.app"
+            BACKEND_URL="https://faktry-backend-1030854563974.us-central1.run.app"
+          fi
+          AGENTIC_URL=$(gcloud run services describe faktry-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || true)
+          if [ -z "$AGENTIC_URL" ]; then
+            AGENTIC_URL="https://faktry-agentic-1030854563974.us-central1.run.app"
           fi
           echo "Using Backend URL: $BACKEND_URL"
+          echo "Using Agentic URL: $AGENTIC_URL"
 
           sleep 15
           for attempt in $(seq 1 12); do
-            echo "Attempt $attempt of 12: Deploying opsera-frontend to Cloud Run..."
-            if gcloud run deploy opsera-frontend \
+            echo "Attempt $attempt of 12: Deploying faktry-frontend to Cloud Run..."
+            if gcloud run deploy faktry-frontend \
               --project ${{ env.PROJECT_ID }} \
-              --image docker.io/${{ env.DOCKER_USER }}/opsera-frontend:${{ github.sha }} \
+              --image docker.io/${{ env.DOCKER_USER }}/faktry-frontend:${{ github.sha }} \
               --platform managed \
               --region ${{ env.REGION }} \
               --allow-unauthenticated \
               --port 8080 \
-              --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL},NEXT_PUBLIC_API_URL=/api,AGENTIC_API_URL=https://opsera-agentic-1030854563974.us-central1.run.app" \
+              --set-env-vars "NODE_ENV=production,BACKEND_API_URL=${BACKEND_URL},NEXT_PUBLIC_API_URL=/api,AGENTIC_API_URL=${AGENTIC_URL}" \
               --memory 512Mi \
               --cpu 1 \
               --min-instances 0 \
               --max-instances 2; then
-              echo "opsera-frontend deployment succeeded!"
+              echo "faktry-frontend deployment succeeded!"
               break
             fi
             if [ $attempt -eq 12 ]; then
@@ -335,7 +340,7 @@ jobs:
           done
 
           echo "Applying IAM invoker policy binding for public access..."
-          gcloud run services add-iam-policy-binding opsera-frontend \
+          gcloud run services add-iam-policy-binding faktry-frontend \
             --project ${{ env.PROJECT_ID }} \
             --region ${{ env.REGION }} \
             --member="allUsers" \
@@ -360,9 +365,9 @@ jobs:
 
       - name: Publish Summary Table
         run: |
-          FRONTEND_URL=$(gcloud run services describe opsera-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-frontend-1030854563974.us-central1.run.app")
-          BACKEND_URL=$(gcloud run services describe opsera-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-backend-1030854563974.us-central1.run.app")
-          AGENTIC_URL=$(gcloud run services describe opsera-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://opsera-agentic-1030854563974.us-central1.run.app")
+          FRONTEND_URL=$(gcloud run services describe faktry-frontend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://faktry-frontend-1030854563974.us-central1.run.app")
+          BACKEND_URL=$(gcloud run services describe faktry-backend --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://faktry-backend-1030854563974.us-central1.run.app")
+          AGENTIC_URL=$(gcloud run services describe faktry-agentic --project ${{ env.PROJECT_ID }} --platform managed --region ${{ env.REGION }} --format 'value(status.url)' 2>/dev/null || echo "https://faktry-agentic-1030854563974.us-central1.run.app")
 
           FRONT_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" || echo "N/A")
           BACK_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/api/healthz" || echo "N/A")

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <rect width="160" height="160" rx="34" fill="#FFFFFF" />
+  <g transform="translate(12, 22)">
+    <path
+      d="M 45 1 L 135 1 L 116 28 Q 111 34 103 34 L 32 34 Q 16 34 1 39 C 6 30 16 14 27 6 C 34 2 40 1 45 1 Z"
+      fill="#0F172A"
+    />
+    <path
+      d="M 33 51 L 101 51 L 83 75 Q 79 80 73 80 L 36 80 L 1 114 L 1 78 C 1 68 12 56 24 52 C 28 51 31 51 33 51 Z"
+      fill="#0F172A"
+    />
+  </g>
+</svg>

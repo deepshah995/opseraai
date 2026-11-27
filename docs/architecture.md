@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Opsera Manufacturing Operations Swarm** helps discrete and process manufacturers eliminate hidden margin leaks and manual spreadsheet reconciliation. It monitors Purchase Orders, receiving dock scale tickets, CNC/shop-floor work orders, production schedules, and supplier/customer invoices inside a strict multi-tenant architecture.
+**Faktry AI Manufacturing Operations Swarm** helps discrete and process manufacturers eliminate hidden margin leaks and manual spreadsheet reconciliation. It monitors Purchase Orders, receiving dock scale tickets, CNC/shop-floor work orders, production schedules, and supplier/customer invoices inside a strict multi-tenant architecture.
 
 ## System Topology
 

@@ -111,39 +111,36 @@ export function ReportingAgentView({
     <div className="space-y-6 pb-16 animate-in fade-in duration-300">
       
       {/* PlantBeacon Reporting Agent Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-purple-200/80 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 p-6 sm:p-8 text-white shadow-lg dark:border-purple-800">
-        <div className="absolute right-0 top-0 -mr-16 -mt-16 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute left-1/3 bottom-0 h-48 w-48 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
-
+      <div className="relative overflow-hidden rounded-[26px] border border-emerald-500/20 brand-gradient-card p-6 sm:p-8 text-white shadow-md">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
             <div className="relative flex-shrink-0 flex flex-col items-center">
-              <div className="p-2 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
+              <div className="p-2 rounded-2xl bg-white/10 border border-emerald-400/30 flex items-center justify-center">
                 <SwarmBotAvatar
                   agentId="plant_beacon"
                   mood={generatingReport || runningSweep ? "scanning" : "proud"}
                   size="lg"
                 />
               </div>
-              <span className="mt-1.5 font-mono text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-950/90 text-indigo-200 border border-indigo-400/30">
+              <span className="mt-1.5 font-mono text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-200 border border-emerald-400/30">
                 PlantBeacon (Sunny-Bot) • PB-05
               </span>
             </div>
 
             <div className="space-y-1 max-w-2xl">
               <div className="flex items-center space-x-2">
-                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-indigo-800/80 text-indigo-200 border border-indigo-700/60">
-                  PLANT SAVINGS &amp; ROI
+                <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-200 border border-emerald-400/30">
+                  FAKTRY AI · PLANT SAVINGS &amp; ROI
                 </span>
-                <span className="text-xs font-semibold text-indigo-200 flex items-center space-x-1">
+                <span className="text-xs font-semibold text-emerald-200 flex items-center space-x-1">
                   <Clock className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>{kpis.hours_saved ?? 0} Hours Reclaimed MTD</span>
+                  <span className="tabular-nums">{kpis.hours_saved ?? 0} Hours Reclaimed MTD</span>
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 Manufacturing Savings &amp; ROI Console
               </h1>
-              <p className="text-xs sm:text-sm text-indigo-200/90 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed">
                 Real-time cost savings, time reclaimed, work-cell benchmarks, and discrepancy audits compiled by PlantBeacon across your 5 Google Antigravity SDK swarm agents.
               </p>
             </div>
@@ -152,8 +149,8 @@ export function ReportingAgentView({
           {/* Timeframe & Report Agent Action Controls */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             {/* Timeframe Dropdown */}
-            <div className="relative flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-3 py-2">
-              <Calendar className="h-3.5 w-3.5 text-purple-300 mr-2" />
+            <div className="relative flex items-center bg-white/10 backdrop-blur-md rounded-full border border-white/20 px-3.5 py-2">
+              <Calendar className="h-3.5 w-3.5 text-emerald-300 mr-2" />
               <select
                 value={timeframe}
                 onChange={(e) => setTimeframe(e.target.value)}
@@ -171,9 +168,9 @@ export function ReportingAgentView({
               id="btn-generate-report"
               onClick={handleGenerateBriefing}
               disabled={generatingReport}
-              className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-purple-950/30 transition transform active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition transform active:scale-95 disabled:opacity-50 cursor-pointer"
             >
-              <Sparkles className={`h-4 w-4 ${generatingReport ? "animate-spin text-amber-300" : "text-amber-300"}`} />
+              <Sparkles className={`h-4 w-4 ${generatingReport ? "animate-spin text-slate-900" : "text-slate-900"}`} />
               <span>{generatingReport ? "PlantBeacon Synthesizing..." : "Generate Plant ROI Report"}</span>
             </button>
 
@@ -183,7 +180,7 @@ export function ReportingAgentView({
               onClick={handleRunAgentSweep}
               disabled={runningSweep}
               title="Instructs Swarm to audit open discrepancies and auto-settle verified variances (<$500)"
-              className="inline-flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-md transition disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-md transition disabled:opacity-50 cursor-pointer"
             >
               <Zap className={`h-3.5 w-3.5 text-emerald-400 ${runningSweep ? "animate-bounce" : ""}`} />
               <span>{runningSweep ? "Auditing Fleet..." : "Fleet Auto-Reconcile (<$500)"}</span>

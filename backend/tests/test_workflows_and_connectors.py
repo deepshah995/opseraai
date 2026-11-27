@@ -132,6 +132,157 @@ def test_workflow_templates_crud_and_antigravity_dag_run(client, auth_headers):
     assert del_res.status_code == 204
 
 
+def test_workflow_inline_csv_data_flow_conditional_edges_and_connector_persistence(
+    client, auth_headers
+):
+    connectors = client.get("/api/connectors", headers=auth_headers).json()
+    sheet_conn = next(c for c in connectors if c["connector_type"] == "google_sheets")
+    doc_conn = next(c for c in connectors if c["connector_type"] == "google_docs")
+    slack_conn = next(c for c in connectors if c["connector_type"] == "slack_webhook")
+
+    sample_csv = (
+        "record_type,external_reference,supplier_name,service_date,quantity,unit,rate,amount\n"
+        "service_ticket,PO-9014,Precision Alloys LLC,2026-11-24,500,lbs,14.50,7250.00\n"
+        "load_record,RCV-4410,Precision Alloys LLC,2026-11-25,440,lbs,14.50,6380.00\n"
+        "invoice,INV-88321,Precision Alloys LLC,2026-11-26,500,lbs,17.20,8600.00"
+    )
+
+    flow_payload = {
+        "name": "Inline CSV Dual-Branch Flow",
+        "description": "Streams inline CSV rows, checks variance >= $500, exports to Google Docs, skips low-dollar branch.",
+        "category": "cost_savings",
+        "nodes": [
+            {
+                "id": "n-sheet",
+                "kind": "connector_input",
+                "ref_id": "google_sheets",
+                "label": "Sheet CSV Input",
+                "x": 40,
+                "y": 140,
+                "config": {
+                    "connector_id": sheet_conn["id"],
+                    "connector_type": "google_sheets",
+                    "record_type": "all",
+                    "sample_csv": sample_csv,
+                },
+            },
+            {
+                "id": "n-cs",
+                "kind": "agent",
+                "ref_id": "cost_sentry",
+                "agent_id": "cost_sentry",
+                "label": "CostSentry",
+                "x": 300,
+                "y": 140,
+                "config": {"check_duplicates": True},
+            },
+            {
+                "id": "n-gate",
+                "kind": "approval_gate",
+                "ref_id": "approval_gate",
+                "label": "Manager Sign-Off Gate",
+                "x": 560,
+                "y": 80,
+                "config": {"threshold_usd": 500},
+            },
+            {
+                "id": "n-doc",
+                "kind": "connector_output",
+                "ref_id": "google_docs",
+                "label": "Google Docs Export",
+                "x": 820,
+                "y": 80,
+                "config": {
+                    "connector_id": doc_conn["id"],
+                    "connector_type": "google_docs",
+                },
+            },
+            {
+                "id": "n-slack",
+                "kind": "connector_output",
+                "ref_id": "slack_webhook",
+                "label": "Low-Impact Slack Auto-Clear",
+                "x": 560,
+                "y": 240,
+                "config": {
+                    "connector_id": slack_conn["id"],
+                    "connector_type": "slack_webhook",
+                },
+            },
+        ],
+        "edges": [
+            {"id": "e-in", "source": "n-sheet", "target": "n-cs", "condition": "always"},
+            {"id": "e-high", "source": "n-cs", "target": "n-gate", "condition": "if_variance_gt_500"},
+            {"id": "e-doc", "source": "n-gate", "target": "n-doc", "condition": "always"},
+            {"id": "e-low", "source": "n-cs", "target": "n-slack", "condition": "auto_settle_below_500"},
+        ],
+    }
+
+    wf = client.post("/api/workflows", json=flow_payload, headers=auth_headers).json()
+    run_res = client.post(
+        f"/api/workflows/{wf['id']}/run",
+        json={"dry_run": False},
+        headers=auth_headers,
+    )
+    assert run_res.status_code == 200, run_res.text
+    run = run_res.json()
+    assert run["total_cost_savings_usd"] >= 1350.0
+
+    traces = {t["edge_id"]: t for t in run["sdk_metadata"].get("edge_traces", [])}
+    assert traces["e-in"]["triggered"] is True
+    assert traces["e-in"]["items_passed"] == 3
+    assert traces["e-high"]["triggered"] is True
+    assert traces["e-doc"]["triggered"] is True
+    assert traces["e-low"]["triggered"] is False
+
+    steps = {s["node_id"]: s for s in run["steps"]}
+    assert steps["n-slack"]["status"] == "skipped"
+    assert steps["n-doc"]["status"] == "completed"
+
+    assert len(run["exported_artifacts"]) == 1
+    art = run["exported_artifacts"][0]
+    assert art["connector_id"] == doc_conn["id"]
+    assert art["title"]
+    assert art["content"]
+
+    # Verify non-dry run persisted export back to Google Docs connector
+    refreshed = client.get("/api/connectors", headers=auth_headers).json()
+    updated_doc = next(c for c in refreshed if c["id"] == doc_conn["id"])
+    assert updated_doc["records_synced"] >= 1
+    assert updated_doc["last_sync_summary"]["mode"] == "export"
+    assert updated_doc["last_sync_summary"]["content"] == art["content"]
+
+    dl_res = client.get(f"/api/connectors/{doc_conn['id']}/export", headers=auth_headers)
+    assert dl_res.status_code == 200
+    assert art["content"] in dl_res.text
+
+    # Verify small variance (< $500) skips if_variance_gt_500 gate cleanly
+    small_csv = (
+        "record_type,external_reference,supplier_name,service_date,quantity,unit,rate,amount\n"
+        "service_ticket,PO-10,Small Coil Co,2026-11-24,10,tons,100.0,1000.0\n"
+        "invoice,INV-10,Small Coil Co,2026-11-26,10,tons,120.0,1200.0"
+    )
+    small_payload = dict(flow_payload)
+    small_payload["name"] = "Low Variance Gate Skip Check"
+    small_payload["nodes"] = [
+        {**n, "config": {**n["config"], "sample_csv": small_csv}} if n["id"] == "n-sheet" else n
+        for n in flow_payload["nodes"]
+    ]
+    wf2 = client.post("/api/workflows", json=small_payload, headers=auth_headers).json()
+    run2 = client.post(
+        f"/api/workflows/{wf2['id']}/run",
+        json={"dry_run": True},
+        headers=auth_headers,
+    ).json()
+    traces2 = {t["edge_id"]: t for t in run2["sdk_metadata"].get("edge_traces", [])}
+    steps2 = {s["node_id"]: s for s in run2["steps"]}
+    assert traces2["e-high"]["triggered"] is False
+    assert traces2["e-low"]["triggered"] is True
+    assert steps2["n-gate"]["status"] == "skipped"
+    assert steps2["n-doc"]["status"] == "skipped"
+    assert steps2["n-slack"]["status"] == "completed"
+
+
 def test_connectors_google_sheets_docs_ssrf_and_tenant_isolation(client, auth_headers):
     list_res = client.get("/api/connectors", headers=auth_headers)
     assert list_res.status_code == 200

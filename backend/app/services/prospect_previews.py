@@ -29,7 +29,7 @@ DEFAULT_PILOT_PLAN: list[dict[str, str]] = [
         "phase": "Days 1–3 · Read-Only Sidecar Connect",
         "detail": (
             "Drop 2 weeks of read-only PO, invoice, receiving/scrap, or work-order CSVs "
-            "(or Google Sheets) into Opsera — zero ERP code changes or write permissions."
+            "(or Google Sheets) into Faktry AI — zero ERP code changes or write permissions."
         ),
     },
     {
@@ -783,7 +783,7 @@ SEEDED_PROSPECT_PREVIEWS: dict[str, ProspectPreviewResponse] = {
 
 
 def build_deterministic_preview_from_payload(req: ProspectPreviewCreate) -> ProspectPreviewResponse:
-    """Constructs a tailored read-only Opsera Audit Preview for any discovered manufacturer."""
+    """Constructs a tailored read-only Faktry AI Audit Preview for any discovered manufacturer."""
     slug = normalize_preview_slug(req.slug or req.domain or req.company_name)
     if slug in SEEDED_PROSPECT_PREVIEWS and not req.observed_signals:
         return SEEDED_PROSPECT_PREVIEWS[slug]
@@ -888,7 +888,7 @@ def build_deterministic_preview_from_payload(req: ProspectPreviewCreate) -> Pros
         erp_stack=erp_stack,
         compliance_tags=compliance_tags,
         executive_hook=(
-            f"Run Opsera as a zero-disruption read-only sidecar over {req.company_name}'s "
+            f"Run Faktry AI as a zero-disruption read-only sidecar over {req.company_name}'s "
             f"{erp_stack[0]} workflows—catching cost leaks & QA bottlenecks in 14 days."
         ),
         observed_signals=signals,

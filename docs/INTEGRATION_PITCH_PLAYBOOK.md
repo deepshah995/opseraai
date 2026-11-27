@@ -1,6 +1,6 @@
-# Opsera AI — Enterprise Integration & Pitch Playbook
+# Faktry AI — Enterprise Integration & Pitch Playbook
 
-> **Executive Summary:** A comprehensive sales, architecture, and objection-handling guide designed to assure B2B industrial service, hauling, logistics, and supply chain executives that Opsera AI integrates seamlessly into their existing systems with **zero operational disruption**, **no ERP replacement**, and **zero initial IT overhead**. While Waste & Recycling serves as the initial reference showcase, the underlying engine is **100% industry-agnostic**.
+> **Executive Summary:** A comprehensive sales, architecture, and objection-handling guide designed to assure B2B industrial service, hauling, logistics, and supply chain executives that Faktry AI integrates seamlessly into their existing systems with **zero operational disruption**, **no ERP replacement**, and **zero initial IT overhead**. While Waste & Recycling serves as the initial reference showcase, the underlying engine is **100% industry-agnostic**.
 
 ---
 
@@ -27,9 +27,9 @@ Every B2B industrial hauling, field service, and logistics company bleeds **1% t
 - Duplicate invoices issued on separate billing cycles for the same job.
 
 ### The Pitch Verbatim
-> *"We do not ask you to rip and replace your ERP, dispatch system, or scale software. Opsera AI functions as a **read-only audit sidecar**.*
+> *"We do not ask you to rip and replace your ERP, dispatch system, or scale software. Faktry AI functions as a **read-only audit sidecar**.*
 > 
-> *Your drivers keep using their existing tablets. Your dispatchers stay in their current dispatch screen. Your billing team keeps using QuickBooks, NetSuite, or Soft-Pak. Opsera AI quietly cross-examines the data flowing between those systems to catch discrepancies before customer invoices go out the door."*
+> *Your drivers keep using their existing tablets. Your dispatchers stay in their current dispatch screen. Your billing team keeps using QuickBooks, NetSuite, or Soft-Pak. Faktry AI quietly cross-examines the data flowing between those systems to catch discrepancies before customer invoices go out the door."*
 
 ---
 
@@ -67,7 +67,7 @@ Every industrial B2B operation experiences the same five failure modes:
 | **5. Dispatch Discrepancy** | Schedule or vehicle assigned in dispatch does not match actual field execution. | Truck reassigned morning of job; route cost misallocated to the wrong customer contract. |
 
 ### Multi-Industry Application Matrix
-With **zero backend code changes**, Opsera AI can be pitched and deployed across multiple multi-billion-dollar industrial sectors:
+With **zero backend code changes**, Faktry AI can be pitched and deployed across multiple multi-billion-dollar industrial sectors:
 
 | Industry Vertical | Primary Documents Reconciled | Revenue Leakage Prevented |
 | :--- | :--- | :--- |
@@ -89,7 +89,7 @@ When pitching a prospect outside waste management, you can customize the system 
 
 ## 3. Core Integration Philosophy: The Non-Invasive Sidecar
 
-Most enterprise software pitches fail because they demand workflow changes. Opsera AI adheres to three strict architectural guardrails:
+Most enterprise software pitches fail because they demand workflow changes. Faktry AI adheres to three strict architectural guardrails:
 
 ```mermaid
 graph TD
@@ -99,7 +99,7 @@ graph TD
         C["Accounting & ERP<br/>(Soft-Pak, WasteWorks, QuickBooks, NetSuite)"]
     end
 
-    subgraph OpseraSidecar["Opsera AI (Read-Only Sidecar Layer)"]
+    subgraph FaktrySidecar["Faktry AI (Read-Only Sidecar Layer)"]
         D["Ingestion & Column Synonyms<br/>(Auto-detects formats)"]
         E["Deterministic Rule Engine<br/>(Finds price, weight, dupes)"]
         F["LangGraph AI Investigator<br/>(Gathers proof side-by-side)"]
@@ -142,12 +142,12 @@ graph LR
 - **Customer Reassurance:** *"You can test this today with last month's records. You don't need a single meeting with your IT department."*
 
 ### Tier 2: "Automated Read-Only Sync" (Week 2 — 1 Hour IT Setup)
-- **Mechanism:** Read-only database user connection (PostgreSQL, MySQL, SQL Server) or a scheduled SFTP report drop. Opsera AI periodically pulls newly created tickets and invoices.
+- **Mechanism:** Read-only database user connection (PostgreSQL, MySQL, SQL Server) or a scheduled SFTP report drop. Faktry AI periodically pulls newly created tickets and invoices.
 - **Customer IT Effort:** **< 1 hour** (creating a read-only credential).
 - **Customer Reassurance:** *"Read-only access means our software has zero ability to write to, lock, or corrupt your production database tables."*
 
 ### Tier 3: "Closed-Loop Automation" (Month 2 — Enterprise)
-- **Mechanism:** Two-way integration via webhooks or REST API. When an operations manager clicks **"Approve Fix"** on an overbilling or unbilled job, Opsera AI pushes the correction (or draft credit memo) back into their ERP.
+- **Mechanism:** Two-way integration via webhooks or REST API. When an operations manager clicks **"Approve Fix"** on an overbilling or unbilled job, Faktry AI pushes the correction (or draft credit memo) back into their ERP.
 - **Customer IT Effort:** **2–4 hours** (API key configuration).
 - **Customer Reassurance:** *"The API only executes actions that an authorized human manager explicitly clicks to approve."*
 
@@ -155,9 +155,9 @@ graph LR
 
 ## 5. Industry Software & ERP Compatibility Matrix
 
-Opsera AI includes pre-configured schema mappings for the most widely deployed operational and accounting platforms in the industrial services and logistics sectors:
+Faktry AI includes pre-configured schema mappings for the most widely deployed operational and accounting platforms in the industrial services and logistics sectors:
 
-| System Category | Vendor / Product | How Opsera AI Connects | Data Extracted |
+| System Category | Vendor / Product | How Faktry AI Connects | Data Extracted |
 | :--- | :--- | :--- | :--- |
 | **Specialized Waste ERP** | **Soft-Pak** | Read-only SQL replica or nightly export | Work orders, scale dumps, AR invoice lines |
 | **Landfill & Scale Software** | **WasteWorks** | Direct ODBC / SQL connector or CSV drop | Gross/tare weights, scale tickets, tipping fees |
@@ -172,9 +172,9 @@ Opsera AI includes pre-configured schema mappings for the most widely deployed o
 ## 6. Data Ingestion & Schema Alignment Specifications
 
 ### How We Handle "Dirty" Customer Data
-Industrial companies often struggle with inconsistent data across facilities. Opsera AI utilizes an **Intelligent Synonym Engine** that automatically maps raw customer column names to canonical template fields:
+Industrial companies often struggle with inconsistent data across facilities. Faktry AI utilizes an **Intelligent Synonym Engine** that automatically maps raw customer column names to canonical template fields:
 
-| Canonical Opsera Field | Accepted Synonyms in Customer Reports | Status |
+| Canonical Faktry AI Field | Accepted Synonyms in Customer Reports | Status |
 | :--- | :--- | :--- |
 | `external_reference` | `ticket_number`, `ticket_no`, `tkt_id`, `invoice_no`, `inv_num`, `scale_ticket`, `manifest_no`, `dispatch_id`, `bol_number` | **Required** |
 | `customer_reference` | `customer_name`, `customer`, `account_name`, `client`, `account_no`, `client_id`, `shipper`, `consignee` | **Required** |
@@ -206,7 +206,7 @@ If a customer uses a proprietary or unconventional column header, the built-in *
 
 ### Objection 1: "Our IT team has a 6-month backlog and won't approve a new software project."
 > **The Script:**
-> *"That is exactly why we built Opsera AI to start without IT. You don't need an API integration or server installation to see value. Your billing team can download our pre-formatted template or drop last week's CSV export right into the browser. We prove ROI and find leaked revenue on Day 1 before we ever ask your IT department for a single minute of their time."*
+> *"That is exactly why we built Faktry AI to start without IT. You don't need an API integration or server installation to see value. Your billing team can download our pre-formatted template or drop last week's CSV export right into the browser. We prove ROI and find leaked revenue on Day 1 before we ever ask your IT department for a single minute of their time."*
 
 ### Objection 2: "Our data is too messy. Different branches use different spreadsheets and naming conventions."
 > **The Script:**
@@ -214,7 +214,7 @@ If a customer uses a proprietary or unconventional column header, the built-in *
 
 ### Objection 3: "We can't risk an AI hallucinating and sending incorrect bills or credits to our customers."
 > **The Script:**
-> *"Opsera AI never touches customer billing directly. All math is deterministic—calculated by exact formulas, not generative text. The AI is used strictly as a digital paralegal that compares the two documents side-by-side and summarizes the evidence. Most importantly, nothing ever changes in your billing system until an authorized operations manager reviews the proof and clicks 'Approve'."*
+> *"Faktry AI never touches customer billing directly. All math is deterministic—calculated by exact formulas, not generative text. The AI is used strictly as a digital paralegal that compares the two documents side-by-side and summarizes the evidence. Most importantly, nothing ever changes in your billing system until an authorized operations manager reviews the proof and clicks 'Approve'."*
 
 ### Objection 4: "We already have an ERP (Soft-Pak / WasteWorks / NetSuite / SAP). Why do we need this?"
 > **The Script:**
@@ -230,9 +230,9 @@ When closing prospects, propose a structured 14-day risk-free pilot:
 timeline
     title 14-Day "Leakage Audit" Proof of Concept
     Day 1 : Kickoff Call (30 min) : Export last 30-60 days of tickets & invoices (CSV or PDF).
-    Day 2 - 3 : Historical Audit Run : Opsera AI ingests data and runs cross-document exception detection.
+    Day 2 - 3 : Historical Audit Run : Faktry AI ingests data and runs cross-document exception detection.
     Day 7 : Mid-Pilot Findings Review : Present executive dashboard showing total dollars at risk and top 5 leakage patterns.
-    Day 8 - 13 : Live Parallel Run : Billing team runs weekly batch through Opsera AI before final billing.
+    Day 8 - 13 : Live Parallel Run : Billing team runs weekly batch through Faktry AI before final billing.
     Day 14 : Final Executive Decision : Calculate verified recovered dollars vs. annual subscription cost.
 ```
 

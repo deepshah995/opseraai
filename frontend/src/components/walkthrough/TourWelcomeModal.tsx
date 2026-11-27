@@ -29,7 +29,7 @@ export function TourWelcomeModal({
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-blue-700">
             <Sparkles className="h-4 w-4" />
-            Opsera Manufacturing Swarm · Quick Tour
+            Faktry AI Manufacturing Swarm · Quick Tour
           </div>
           <button
             type="button"

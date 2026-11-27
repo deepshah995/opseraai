@@ -4,7 +4,7 @@ from backend.main import app
 
 def run_verification():
     print("=" * 70)
-    print("  OPSERA MANUFACTURING SWARM - END-TO-END EXECUTION VERIFICATION")
+    print("  FAKTRY AI MANUFACTURING SWARM - END-TO-END EXECUTION VERIFICATION")
     print("=" * 70)
 
     client = TestClient(app)

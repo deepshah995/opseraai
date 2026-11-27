@@ -2,6 +2,52 @@
 
 import React from "react";
 
+export function FaktryLogo({ className = "h-5 w-6" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 136 116" className={className} fill="none" aria-hidden="true">
+      <path
+        d="M 45 1 L 135 1 L 116 28 Q 111 34 103 34 L 32 34 Q 16 34 1 39 C 6 30 16 14 27 6 C 34 2 40 1 45 1 Z"
+        fill="#0F172A"
+      />
+      <path
+        d="M 33 51 L 101 51 L 83 75 Q 79 80 73 80 L 36 80 L 1 114 L 1 78 C 1 68 12 56 24 52 C 28 51 31 51 33 51 Z"
+        fill="#0F172A"
+      />
+    </svg>
+  );
+}
+
+export function GradientOrb({
+  variant = "sage",
+  size = "sm",
+}: {
+  variant?: "sage" | "copper" | "iris";
+  size?: "xs" | "sm" | "md" | "lg";
+}) {
+  const cls =
+    variant === "copper"
+      ? "orb-copper"
+      : variant === "iris"
+        ? "orb-iris"
+        : "orb-sage";
+
+  const sizeCls =
+    size === "xs"
+      ? "h-4 w-4"
+      : size === "sm"
+        ? "h-6 w-6"
+        : size === "lg"
+          ? "h-16 w-16"
+          : "h-9 w-9";
+
+  return (
+    <span
+      className={`inline-block shrink-0 rounded-full shadow-inner ${cls} ${sizeCls}`}
+      aria-hidden="true"
+    />
+  );
+}
+
 export type BotMood = "happy" | "scanning" | "thinking" | "proud" | "alert";
 export type BotSize = "xs" | "sm" | "md" | "lg" | "xl";
 

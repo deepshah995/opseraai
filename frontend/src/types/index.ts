@@ -473,6 +473,28 @@ export interface SwarmRunStep {
   summary: string;
   cost_savings_usd: number;
   time_saved_minutes: number;
+  output?: Record<string, any>;
+}
+
+export interface WorkflowEdgeTrace {
+  edge_id: string;
+  source: string;
+  target: string;
+  condition: WorkflowEdgeCondition | string;
+  triggered: boolean;
+  items_passed: number;
+  summary: string;
+}
+
+export interface SwarmExportedArtifact {
+  type: string;
+  connector_id?: string | null;
+  connector_type?: string;
+  connector_name?: string;
+  format?: string;
+  title: string;
+  preview?: string;
+  content?: string;
 }
 
 export interface SwarmRun {
@@ -486,12 +508,10 @@ export interface SwarmRun {
   total_hours_saved: number;
   orchestrator_summary: string;
   steps: SwarmRunStep[];
-  exported_artifacts: Array<{
-    type: string;
-    title: string;
-    preview?: string;
-  }>;
-  sdk_metadata: Record<string, any>;
+  exported_artifacts: SwarmExportedArtifact[];
+  sdk_metadata: Record<string, any> & {
+    edge_traces?: WorkflowEdgeTrace[];
+  };
   created_at: string;
 }
 
