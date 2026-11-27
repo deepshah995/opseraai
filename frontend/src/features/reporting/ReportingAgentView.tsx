@@ -426,7 +426,7 @@ export function ReportingAgentView({
                   <SwarmBotAvatar agentId="bom_guard" mood="happy" size="sm" />
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 dark:text-white">BOMGuard</h4>
-                    <span className="font-mono text-[10px] text-slate-400">Hawk-Bot · BG-01</span>
+                    <span className="font-mono text-[10px] text-slate-400">Materials · BG-01</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950">
@@ -461,7 +461,7 @@ export function ReportingAgentView({
                   <SwarmBotAvatar agentId="line_pulse" mood="happy" size="sm" />
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 dark:text-white">LinePulse</h4>
-                    <span className="font-mono text-[10px] text-slate-400">Bolt-Bot · LP-03</span>
+                    <span className="font-mono text-[10px] text-slate-400">Schedule · LP-03</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950">
@@ -496,7 +496,7 @@ export function ReportingAgentView({
                   <SwarmBotAvatar agentId="cost_sentry" mood="happy" size="sm" />
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 dark:text-white">CostSentry</h4>
-                    <span className="font-mono text-[10px] text-slate-400">Penny-Bot · CS-02</span>
+                    <span className="font-mono text-[10px] text-slate-400">Billing · CS-02</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950">
@@ -531,7 +531,7 @@ export function ReportingAgentView({
                   <SwarmBotAvatar agentId="quality_shield" mood="happy" size="sm" />
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 dark:text-white">QualityShield</h4>
-                    <span className="font-mono text-[10px] text-slate-400">Aegis-Bot · QS-04</span>
+                    <span className="font-mono text-[10px] text-slate-400">Quality · QS-04</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-950">
@@ -566,7 +566,7 @@ export function ReportingAgentView({
                   <SwarmBotAvatar agentId="plant_beacon" mood="happy" size="sm" />
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 dark:text-white">PlantBeacon</h4>
-                    <span className="font-mono text-[10px] text-slate-400">Sunny-Bot · PB-05</span>
+                    <span className="font-mono text-[10px] text-slate-400">Summary · PB-05</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-indigo-700 px-1.5 py-0.5 rounded bg-indigo-50">

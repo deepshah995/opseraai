@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SwarmBotAvatar } from "@/components/agents/SwarmBotAvatar";
+import { SkeletalWorkflowSandbox } from "@/features/agents/SkeletalWorkflowSandbox";
 import {
   AlertTriangle,
   ArrowRight,
@@ -307,6 +308,13 @@ export default function ProspectAuditPreviewPage() {
             </p>
           </div>
         </section>
+
+        {/* Interactive Skeletal Drag-and-Drop Workflow Orchestration Sandbox */}
+        <SkeletalWorkflowSandbox
+          companyName={preview.company_name}
+          erpStack={preview.erp_stack}
+          agentDeployments={preview.agent_deployments}
+        />
 
         {/* Assigned Swarm Agents & Interactive Stepper */}
         <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">

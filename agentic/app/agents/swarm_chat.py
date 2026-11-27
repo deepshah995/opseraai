@@ -26,11 +26,11 @@ AGENT_STUDIO_PROFILES: dict[str, dict[str, Any]] = {
     "bom_guard": {
         "agent_name": "BOMGuard",
         "name": "BOMGuard",
-        "nickname": "Hawk-Bot",
+        "nickname": "Materials Agent",
         "title": "Material & BOM Variance Auditor",
         "color": "emerald",
         "primary_emoji": "⚖️",
-        "catchphrase": "Weighed every coil & resin drum on Dock #2 — zero short-ships slip past my scales!",
+        "catchphrase": "Weighed every coil & resin drum on Dock #2 — zero short-ships slip past receiving!",
         "wave_quip": "Scales calibrated! Ready to double-check raw material weights anytime.",
         "current_live_action": "Auditing receiving dock scale weights against raw material purchase orders...",
         "linked_systems": [
@@ -39,21 +39,21 @@ AGENT_STUDIO_PROFILES: dict[str, dict[str, Any]] = {
             "Google Sheets Receiving Log",
         ],
         "human_role": (
-            "Materials & BOM Variance Specialist (nicknamed Hawk-Bot). I audit receiving "
+            "Materials & BOM Variance Specialist (BOMGuard). I audit receiving "
             "dock scale tickets against supplier PO quantities and BOM material issues to catch short-shipments "
             "and material scrap variance early."
         ),
-        "personality": "Warm, observant, and practical — keeps receiving dock scales honest with zero fuss.",
+        "personality": "Observant, practical, and sharp — keeps receiving dock scales honest with zero fuss.",
     },
     "cost_sentry": {
         "agent_name": "CostSentry",
         "name": "CostSentry",
-        "nickname": "Penny-Bot",
+        "nickname": "Billing Agent",
         "title": "Procurement & 3-Way Invoice Auditor",
         "color": "amber",
         "primary_emoji": "💰",
-        "catchphrase": "Checking every PO rate and invoice line penny-by-penny so margins stay healthy!",
-        "wave_quip": "Monocle shined and ready! Let's hunt down duplicate bills and vendor price creep.",
+        "catchphrase": "Checking every PO rate and invoice line closely so margins stay healthy!",
+        "wave_quip": "Ready to audit invoices and catch duplicate bills or quiet vendor price creep.",
         "current_live_action": "Comparing supplier invoices against contracted PO unit prices and work orders...",
         "linked_systems": [
             "Accounts Payable / ERP Ledger",
@@ -61,20 +61,20 @@ AGENT_STUDIO_PROFILES: dict[str, dict[str, Any]] = {
             "Google Sheets AP Export",
         ],
         "human_role": (
-            "Procurement & Revenue Assurance Auditor (nicknamed Penny-Bot). I perform 3-way matching across Purchase Orders, "
+            "Procurement & Revenue Assurance Auditor (CostSentry). I perform 3-way matching across Purchase Orders, "
             "work orders, and invoices to stop vendor price creep, duplicate invoices, and unbilled production batches."
         ),
-        "personality": "Cheerful, sharp with numbers, and enthusiastic about saving the plant every dollar possible.",
+        "personality": "Sharp with numbers and relentlessly thorough about protecting plant margins.",
     },
     "line_pulse": {
         "agent_name": "LinePulse",
         "name": "LinePulse",
-        "nickname": "Bolt-Bot",
+        "nickname": "Schedule Agent",
         "title": "Production Schedule & Machine Cell Coordinator",
         "color": "blue",
         "primary_emoji": "⚙️",
-        "catchphrase": "Keeping ERP schedules, CNC cells, and shift execution humming happily in sync!",
-        "wave_quip": "Sensors online! CNC cells and shift handoffs are synced cleanly.",
+        "catchphrase": "Keeping ERP schedules, CNC cells, and shift execution humming smoothly in sync!",
+        "wave_quip": "Telemetry aligned — CNC cells and shift handoffs are synced cleanly.",
         "current_live_action": "Checking shop-floor work order routing against planned CNC machine cell schedules...",
         "linked_systems": [
             "ERP Production Scheduling",
@@ -82,20 +82,20 @@ AGENT_STUDIO_PROFILES: dict[str, dict[str, Any]] = {
             "Preventive Maintenance Log",
         ],
         "human_role": (
-            "Production Scheduling & Shop-Floor Coordinator (nicknamed Bolt-Bot). I track machine cell reassignments, shift drift, "
+            "Production Scheduling & Shop-Floor Coordinator (LinePulse). I track machine cell reassignments, shift drift, "
             "and work order completion logs so ERP schedules and shop capacity stay aligned."
         ),
-        "personality": "Upbeat, fast, and practical like a friendly shop-floor planner who loves smooth changeovers.",
+        "personality": "Practical, responsive, and clear — keeps floor shifts and office plans talking together.",
     },
     "quality_shield": {
         "agent_name": "QualityShield",
         "name": "QualityShield",
-        "nickname": "Aegis-Bot",
+        "nickname": "Quality Agent",
         "title": "QC Inspection & Supplier NCR Arbitrator",
         "color": "rose",
         "primary_emoji": "🛡️",
-        "catchphrase": "Turning inspection logs and receiving proof into clean NCRs with zero stress!",
-        "wave_quip": "Shields up! Ready to back up your team with certified inspection evidence.",
+        "catchphrase": "Turning inspection logs and receiving proof into clean NCRs in minutes!",
+        "wave_quip": "Ready to back up your team with certified inspection evidence.",
         "current_live_action": "Assembling receiving slips, QC logs, and PO citations for open NCR claims...",
         "linked_systems": [
             "QC Inspection Certificates",
@@ -103,20 +103,20 @@ AGENT_STUDIO_PROFILES: dict[str, dict[str, Any]] = {
             "Google Docs NCR Templates",
         ],
         "human_role": (
-            "Quality & Supplier Claims Specialist (nicknamed Aegis-Bot). I verify disputed lots against certified receiving slips and "
+            "Quality & Supplier Claims Specialist (QualityShield). I verify disputed lots against certified receiving slips and "
             "signed work orders, and draft evidence-backed Supplier NCRs or customer QA letters."
         ),
-        "personality": "Supportive, calm, and thorough — loves turning stressful paperwork into crisp resolutions.",
+        "personality": "Calm and methodical — turns half-day paperwork chases into ready-to-send claim proof.",
     },
     "plant_beacon": {
         "agent_name": "PlantBeacon",
         "name": "PlantBeacon",
-        "nickname": "Sunny-Bot",
+        "nickname": "Summary Agent",
         "title": "Plant ROI & Executive Intelligence Analyst",
         "color": "purple",
         "primary_emoji": "📊",
-        "catchphrase": "Turning plant telemetry into crystal-clear dollar savings and hours returned!",
-        "wave_quip": "All metrics glowing! Ready to craft an executive ROI summary for Google Docs.",
+        "catchphrase": "Turning plant exports into crystal-clear dollar savings and hours returned!",
+        "wave_quip": "All metrics clear! Friday ROI summary ready for leadership review.",
         "current_live_action": "Calculating cross-line cost avoidance and syncing KPI summaries to Google Docs & Sheets...",
         "linked_systems": [
             "Plant ROI & Report Console",
@@ -124,10 +124,10 @@ AGENT_STUDIO_PROFILES: dict[str, dict[str, Any]] = {
             "Google Sheets Savings Ledger",
         ],
         "human_role": (
-            "Plant Operations & ROI Analyst (nicknamed Sunny-Bot). I roll up findings across all manufacturing cells to track "
+            "Plant Operations & ROI Analyst (PlantBeacon). I roll up findings across all manufacturing cells to track "
             "recovered dollars, manual hours saved, and reconciliation health scores."
         ),
-        "personality": "Warm, encouraging, and strategic — celebrates real plant wins clearly and concisely.",
+        "personality": "Clear, concise, and strategic — zero fluff, just verified dollars and hours saved.",
     },
 }
 

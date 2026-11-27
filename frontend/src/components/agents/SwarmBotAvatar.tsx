@@ -76,34 +76,34 @@ export const AGENT_COMPANION_META: Record<
   }
 > = {
   bom_guard: {
-    nickname: "Hawk-Bot",
-    roleTag: "Scale & BOM Buddy",
-    greeting: "Weighed every coil & resin drum on Dock #2 — zero short-ships get past my scales!",
-    quipOnWave: "Beep-boop! Scales calibrated to +/-0.1 lb and ready to audit!",
+    nickname: "Materials Agent",
+    roleTag: "Scale & BOM Watch",
+    greeting: "Weighed every coil & resin drum on Dock #2 — zero short-ships slip past receiving!",
+    quipOnWave: "Scales calibrated to +/-0.1 lb and ready to audit!",
   },
   cost_sentry: {
-    nickname: "Penny-Bot",
+    nickname: "Billing Agent",
     roleTag: "3-Way PO Detective",
-    greeting: "Checking supplier invoices against contracted PO rates penny by penny!",
-    quipOnWave: "Ka-ching! Magnifying glass polished — zero duplicate bills on my watch!",
+    greeting: "Checking supplier invoices against contracted PO rates line by line!",
+    quipOnWave: "Audit lens ready — zero duplicate bills on my watch!",
   },
   line_pulse: {
-    nickname: "Bolt-Bot",
+    nickname: "Schedule Agent",
     roleTag: "Shop-Floor Coordinator",
     greeting: "Keeping CNC cells, tooling changeovers, and ERP schedules humming in sync!",
-    quipOnWave: "Vroom! Shift telemetry synced and machine cells running smoothly!",
+    quipOnWave: "Shift telemetry synced and machine cells running smoothly!",
   },
   quality_shield: {
-    nickname: "Aegis-Bot",
-    roleTag: "QC & NCR Champion",
+    nickname: "Quality Agent",
+    roleTag: "QC & NCR Specialist",
     greeting: "Turning scattered inspection slips into clean supplier NCRs in seconds!",
-    quipOnWave: "Shields up! Inspection certificates backed up and ready for review!",
+    quipOnWave: "Inspection certificates backed up and ready for review!",
   },
   plant_beacon: {
-    nickname: "Sunny-Bot",
-    roleTag: "Plant ROI Storyteller",
+    nickname: "Summary Agent",
+    roleTag: "Weekly ROI Brief",
     greeting: "Adding up every dollar saved and hour returned back to your plant team!",
-    quipOnWave: "All signals green! Ready tobeam fresh ROI briefs straight to Google Docs!",
+    quipOnWave: "All signals green! Fresh Friday ROI brief ready for your team!",
   },
 };
 
